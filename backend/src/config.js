@@ -7,7 +7,7 @@ dotenv.config();
 
 export const config = {
     db: {
-        URI: process.env.DB_URI || "mongodb://localhost:27017/ZonaDigicalDB20230070",
+        URI: process.env.DB_URI || "mongodb+srv://DevLeonardo:wMyIP08maSsm3JWT@ecogardendb.tobim.mongodb.net/?retryWrites=true&w=majority&appName=EcoGardenDB",
     },
     server: {
         port: process.env.PORT || 4000,
