@@ -3,6 +3,8 @@
 //importo todo lo de la libreria de express
 import express from "express";
 import categoriesRoutes from "./src/routes/categories.js";
+import ratingsRoutes from "./src/routes/ratings.js";
+
 
 
 //crear constante que es igual a la libreria que importe
@@ -13,6 +15,7 @@ app.use(express.json());
 
 //Definir las rutas de las funciones que tendra la pagina web
 app.use("/api/categories", categoriesRoutes);
+app.use("/api/ratings", ratingsRoutes);
 
 
 //exporto la constante para poder usar express en otros archivos
