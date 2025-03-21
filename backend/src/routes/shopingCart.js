@@ -1,5 +1,5 @@
 import express from "express";
-import shopingCartController from "./controllers/shopingCartController.js";
+import shopingCartController from "../controllers/shopingCartController.js";
 
 //Router nos ayuda a colocar los métodos que tendrá mi ruta
 const router = express.Router();
