@@ -11,10 +11,10 @@ administratorsController.getAdministrators = async (req, res) => {
 
 //INSERT
 administratorsController.createAdministrators = async (req, res) => {
-    const { name, address, telephone, schedule } = req.body;
+    const { name, lastname, phone, email, password} = req.body;
     const newAdministrator = new Administrators({
         name,
-        lastName,
+        lastname,
         phone,
         email,
         password
@@ -33,14 +33,14 @@ administratorsController.deleteAdministrators = async (req, res) => {
 administratorsController.updateAdministrators = async (req, res) => {
     //Solicito todos los valores
     const { name,
-        lastName,
+        lastname,
         phone,
         email,
         password } = req.body;
     //Actualizo
     await Administrators.findByIdAndUpdate(req.params.id, {
         name,
-        lastName,
+        lastname,
         phone,
         email,
         password

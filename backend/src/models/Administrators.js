@@ -1,7 +1,7 @@
 /*
     Campos:
         name
-        lastName
+        lastname
         phone
         email
         password
@@ -15,11 +15,11 @@ const administratorsSchema = new Schema(
             type: String,
             require: true,
         },
-        lastName: {
+        lastname: {
             type: String,
         },
         phone: {
-            type: Number,
+            type: String,
             require: true,
         },
         email: {
