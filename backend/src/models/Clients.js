@@ -20,8 +20,7 @@ const clientsSchema = new Schema({
     },
     telephone: {
         type: String,
-        require: true,
-        min: 0
+        require: true
     },
     email: {
         type: String,

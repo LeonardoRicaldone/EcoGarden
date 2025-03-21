@@ -3,7 +3,7 @@ import clientsModel from "../models/Clients.js"
 
 // SELECT
 clientsController.getClients = async (req, res) => {
-    const clients = await clientsModel.find().
+    const clients = await clientsModel.find()
     res.json(clients)
 }
 

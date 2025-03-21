@@ -9,7 +9,7 @@ import clientsRoutes from "./src/routes/clients.js"
 import favoritesRoutes from "./src/routes/favorites.js"
 import productsRoutes from "./src/routes/products.js"
 import salesRoutes from "./src/routes/sales.js"
-import shopingCartRoutes from "./src/routes/shopingCart.js"
+import shoppingCartRoutes from "./src/routes/shoppingCart.js"
 
 
 
@@ -29,7 +29,7 @@ app.use("/api/clients", clientsRoutes);
 app.use("/api/favorites", favoritesRoutes);
 app.use("/api/products", productsRoutes);
 app.use("/api/sales", salesRoutes);
-app.use("/api/shopingCart", shopingCartRoutes);
+app.use("/api/shoppingCart", shoppingCartRoutes);
 
 
 

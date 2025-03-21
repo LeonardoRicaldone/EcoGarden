@@ -9,7 +9,7 @@
 
 import { Schema, model } from "mongoose";
 
-const shopingCartSchema = new Schema(
+const shoppingCartSchema = new Schema(
     {
         idClient: {
             type: Schema.Types.ObjectId,
@@ -54,4 +54,4 @@ const shopingCartSchema = new Schema(
     }
 );
 
-export default model("ShopingCart", shopingCartSchema)
+export default model("ShoppingCart", shoppingCartSchema)
