@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 
 dotenv.config();
 
-import { config } from "./src/config.js";
+import { config } from "./src/utils/config.js";
 
 // 1- configuro la URI o direccion de la base de datos
 //const URI = "";

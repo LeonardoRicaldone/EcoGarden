@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-import { config } from "./src/config.js";
+import { config } from "./src/utils/config.js";
 
 
 //importamos lo que exportamos en el app que creamos en app.js
