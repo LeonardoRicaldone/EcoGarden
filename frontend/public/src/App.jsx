@@ -1,4 +1,3 @@
-import './App.css'
 import Footer from './components/Footer/Footer';
 import {BrowserRouter as Router, Routes, Route} 
 from 'react-router'
@@ -21,7 +20,7 @@ function App() {
     <>
 
     <Router>
-|    <Nav />
+    <Nav />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/About" element={<About />} />
