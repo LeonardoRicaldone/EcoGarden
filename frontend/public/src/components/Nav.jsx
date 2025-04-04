@@ -12,7 +12,7 @@ const Nav = () => {
                         </a>
                     </li>
                     <li>
-                        <a href="/Abot" className="hover:text-gray-200">
+                        <a href="/About" className="hover:text-gray-200">
                             About
                         </a>
                     </li>
