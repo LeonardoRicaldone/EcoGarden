@@ -11,7 +11,7 @@ import Products from './screens/Products'
 import Profile from './screens/Profile'
 import ShoppingCart from './screens/ShoppingCart'
 import TermsConditions from './screens/TermsConditions'
-import Nav from './components/Nav'
+import Nav from './components/Nav/Nav'
 
 
 function App() {
