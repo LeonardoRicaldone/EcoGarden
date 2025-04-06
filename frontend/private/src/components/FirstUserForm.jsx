@@ -7,7 +7,7 @@ const FirstUserForm = () => {
         
         <>
 
-        <div class="contenedor-principal">
+        <div className="contenedor-principal">
 
         <div id="DivPrincipal">
 
