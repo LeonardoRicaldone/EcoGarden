@@ -1,13 +1,13 @@
 import { Routes, Route } from 'react-router-dom';
 import './App.css'
-import FirtsUserForm from "./components/FirtsUserForm"
+import FirstUserForm from "./components/FirstUserForm"
 
 function App() {
 
   return (
     <>
 
-    <FirtsUserForm/>
+    <FirstUserForm/>
       
     </>
   )
