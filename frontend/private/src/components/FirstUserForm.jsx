@@ -35,7 +35,7 @@ const FirstUserForm = () => {
 
         <div class="form-check">
         <input class="form-check-input" type="checkbox" value="" id="checkDefault"/>
-        <label class="form-check-label" for="checkDefault">Acepto <a href="">Terminos y condiciones</a></label>
+        <label class="form-check-label" for="checkDefault">Acepto <a href="https://youtu.be/tQN9hdPNVS4?si=T9NAuKCSqhZ0_kCT">Terminos y condiciones</a></label>
         </div> <br />
 
         <button class="btn-registrar">Registrar</button>
@@ -49,8 +49,7 @@ const FirstUserForm = () => {
 
         </div>
 
-        
-
+--https://youtu.be/igDpFxg60qU?si=LileRhVDsO_JAu9B
 
         </>
     )
