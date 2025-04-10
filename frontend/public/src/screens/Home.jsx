@@ -19,26 +19,26 @@ const Home = () => {
 
     // Datos de productos para ofertas
     const offerProducts = [
-        { id: 1, name: 'Cactus de ordenador', price: '$5 - $15', rating: 2, img: '/images/cactus.jpg' },
-        { id: 2, name: 'Echeveria elegans', price: '$45 - $55', rating: 2, img: '/images/echeveria.jpg' },
-        { id: 3, name: 'Romero', price: '$5 - $15', rating: 3, img: '/images/romero.jpg' },
-        { id: 4, name: 'Planta de león', price: '$45 - $55', rating: 2, img: '/images/planta-leon.jpg' }
+        { id: 1, name: 'Cactus de ordenador', price: '$5 - $15', rating: 2, img: 'https://latiendadelcactus.com/wp-content/uploads/2021/09/cereus-peruvianus-2-600x600.jpg' },
+        { id: 2, name: 'Echeveria elegans', price: '$45 - $55', rating: 2, img: 'https://coastalsucculentsandcacti.com/cdn/shop/products/20220815_175134_540x.jpg?v=1660601267' },
+        { id: 3, name: 'Romero', price: '$5 - $15', rating: 3, img: 'https://kellogggarden.com/wp-content/uploads/2021/03/Tips-on-How-to-Grow-Rosemary.jpg' },
+        { id: 4, name: 'Diente de león', price: '$45 - $55', rating: 2, img: 'https://upload.wikimedia.org/wikipedia/commons/d/dc/Schulterbachtal_L%C3%B6wenzahn_Samenstand-20200517-RM-111527.jpg' }
     ];
 
     // Datos de productos populares
     const popularProducts = [
-        { id: 1, name: 'Albahaca', price: '$15', rating: 5, img: '/images/albahaca.jpg' },
-        { id: 2, name: 'Aloe vera', price: '$25', rating: 5, img: '/images/aloe.jpg' },
-        { id: 3, name: 'Boca de dragón', price: '$35', rating: 4, img: '/images/boca-dragon.jpg' },
-        { id: 4, name: 'Cactus candelabro', price: '$55', rating: 4, img: '/images/cactus-candelabro.jpg' }
+        { id: 1, name: 'Albahaca', price: '$15', rating: 5, img: 'https://www.decoalive.com/wp-content/uploads/2021/05/albahaca.jpg' },
+        { id: 2, name: 'Aloe vera', price: '$25', rating: 5, img: 'https://unlimitedgreens.com/cdn/shop/products/Aloe-Vera-Website-Front.webp?crop=center&height=600&v=1676457070&width=600' },
+        { id: 3, name: 'Boca de dragón', price: '$35', rating: 4, img: 'https://media.revistaad.es/photos/62cd549b7cfdd4662ecbbb95/master/w_1600%2Cc_limit/Flor%2520boca%2520de%2520dragon.jpg' },
+        { id: 4, name: 'Cactus candelabro', price: '$55', rating: 4, img: 'https://image.made-in-china.com/365f3j00OwSaNzJdcKkG/Candelabro-de-cactus-artificial-de-aspecto-realista-de-Serene-Spaces-Living-Planta-artificial-de-cactus-con-brazos-de-cactus-realistas-perfecta-para-la-decoraci-n-del-hogar-interior.webp' }
     ];
 
     // Datos de publicaciones de Instagram
     const instaPosts = [
-        { id: 1, img: '/images/insta-1.jpg' },
-        { id: 2, img: '/images/insta-2.jpg' },
-        { id: 3, img: '/images/insta-3.jpg' },
-        { id: 4, img: '/images/insta-4.jpg' }
+        { id: 1, img: 'https://img.interempresas.net/fotos/272363.jpeg' },
+        { id: 2, img: 'https://www.bbva.com/wp-content/uploads/2021/08/sostenibilidad-invernadero-casero-BBVA.jpg' },
+        { id: 3, img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTH9ouQROVQCen35VhvH9LLN9xeN2Wzj8pXxQ&s' },
+        { id: 4, img: 'https://es.onduline.com/sites/onduline_es/files/inline-images/invernadero-con-placas-policarbonato-onduclair-pc-13.jpg' }
     ];
 
     return (
@@ -179,7 +179,7 @@ const Home = () => {
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center">
                         <div className="w-12 h-12 rounded-full overflow-hidden mr-3">
-                            <img src="/images/logo.png" alt="EcoGarden" className="w-full h-full object-cover" />
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/2048px-Instagram_icon.png" alt="EcoGarden" className="w-full h-full object-cover" />
                         </div>
                         <div>
                             <h3 className="font-bold text-gray-800">EcoGarden</h3>
@@ -194,11 +194,8 @@ const Home = () => {
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
                     {instaPosts.map((post) => (
-                        <div key={post.id} className="relative group">
+                        <div key={post.id} >
                             <img src={post.img} alt="Instagram post" className="w-full aspect-square object-cover" />
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 flex items-center justify-center transition-all duration-200">
-                                <FaInstagram className="text-white text-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                            </div>
                         </div>
                     ))}
                 </div>
