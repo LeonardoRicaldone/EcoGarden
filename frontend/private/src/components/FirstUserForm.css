@@ -11,7 +11,7 @@ html, body {
 }
 
 #DivPrincipal {
-    width: 35%; 
+    width: 30%; 
     height: 100%; /* Usamos 100% para que ocupe toda la altura disponible */
     padding: 40px;
     display: flex;
@@ -22,10 +22,11 @@ html, body {
     box-sizing: border-box;
     text-align: center;
     overflow-y: auto; /* Permite desplazamiento si el contenido es grande */
+    text-align: left;
 }
 
 .imagen-lateral {
-    width: 65%; /* Ocupa el 65% de la pantalla */
+    width: 70%; /* Ocupa el 65% de la pantalla */
     height: 100%;
 }
 
@@ -69,3 +70,11 @@ html, body {
     border-color: #93A267;      /* Cambia el color del borde */
     box-shadow: 0 0 0 0.25rem rgba(147, 162, 103, 0.25); /* Borde externo suave */
   }
+
+h5{
+    font-weight: bold;
+}
+
+h3{
+    font-weight: bold;
+}

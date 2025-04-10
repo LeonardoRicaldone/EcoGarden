@@ -12,12 +12,12 @@ const FirstUserForm = () => {
         <div id="DivPrincipal">
 
         <div className="logo-contenedor">
-        <img src="src/img/logo.png" alt="" /> 
+        <img src="src/img/logo.png" alt="" />
         <h3>EcoGarden</h3> <br />
-        </div>
+        </div> <br />
 
-        <h6>¡Bienvenido Administrador de EcoGarden!</h6>
-        <h6>Registra el primer usuario de tu sistema</h6> 
+        <h5>¡Bienvenido Administrador de EcoGarden!</h5>
+        <h5>Registra el primer usuario de tu sistema</h5> 
 
         <br />
 
@@ -33,12 +33,13 @@ const FirstUserForm = () => {
 
         <Imput label={"Contraseña"} placeholder={"Escribe tu contraseña"} type={"password"}/> <br />
 
-        <div class="form-check">
+
+        <div class="form-check" >
         <input class="form-check-input" type="checkbox" value="" id="checkDefault"/>
         <label class="form-check-label" for="checkDefault">Acepto <a href="https://youtu.be/tQN9hdPNVS4?si=T9NAuKCSqhZ0_kCT">Terminos y condiciones</a></label>
         </div> <br />
 
-        <button class="btn-registrar">Registrar</button>
+        <button class="btn-registrar">Registrarse</button>
 
         </div>
 
@@ -49,10 +50,11 @@ const FirstUserForm = () => {
 
         </div>
 
---https://youtu.be/igDpFxg60qU?si=LileRhVDsO_JAu9B
+
 
         </>
     )
 }
+//https://youtu.be/igDpFxg60qU?si=LileRhVDsO_JAu9B
 
 export default FirstUserForm;
