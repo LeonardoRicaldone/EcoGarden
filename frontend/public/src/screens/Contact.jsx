@@ -25,7 +25,9 @@ const Contact = () => {
   };
 
   return (
+    <div className="page-container">
     <div className="contact-container">
+      
       <div className="contact-header">
         <h1>Contáctanos</h1>
         <p>Esperamos tu mensaje, estamos listos para atenderte</p>
@@ -93,6 +95,7 @@ const Contact = () => {
           </button>
         </form>
       </div>
+    </div>
     </div>
   );
 };

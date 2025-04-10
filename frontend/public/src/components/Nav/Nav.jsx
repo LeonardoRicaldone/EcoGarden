@@ -1,14 +1,38 @@
+import { useState, useEffect } from 'react';
 import { FaHeart, FaSearch, FaUser, FaShoppingCart } from 'react-icons/fa';
 import './Nav.css';
-import logo from '../../assets/logo.png'
-
+import logo from '../../assets/logo.png';
 
 const Nav = () => {
+    const [prevScrollPos, setPrevScrollPos] = useState(0);
+    const [visible, setVisible] = useState(true);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            // Obtiene la posición actual del scroll
+            const currentScrollPos = window.scrollY;
+            
+            // Define si la navbar debe ser visible basado en la dirección del scroll
+            const isVisible = prevScrollPos > currentScrollPos || currentScrollPos < 10;
+            
+            setPrevScrollPos(currentScrollPos);
+            setVisible(isVisible);
+        };
+
+        // Agregar event listener para el scroll
+        window.addEventListener('scroll', handleScroll);
+        
+        // Limpieza del event listener cuando el componente se desmonte
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, [prevScrollPos]);
+
     return (
-        <nav className="navbar">
+        <nav className={`navbar ${visible ? "navbar-visible" : "navbar-hidden"}`}>
             {/* Logo */}
             <div className="logo-container">
-                <img src= {logo}alt="Logo" className="logo" />
+                <img src={logo} alt="Logo" className="logo" />
             </div>
 
             {/* Navigation Links */}
@@ -36,10 +60,10 @@ const Nav = () => {
             {/* User and Cart Icons */}
             <div className="nav-icons">
                 <button className="icon-button">
-                    <FaUser />
+                    <FaUser className='person-icon'/>
                 </button>
                 <button className="icon-button">
-                    <FaShoppingCart />
+                    <FaShoppingCart className='cart-icon'/>
                 </button>
             </div>
         </nav>

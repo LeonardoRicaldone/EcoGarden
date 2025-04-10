@@ -16,7 +16,7 @@
   /* Estilos generales */
   .contact-container {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 10px auto;
     padding: 3rem 2rem;
     font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     color: var(--text-color);

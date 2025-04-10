@@ -5,6 +5,7 @@ import './AboutUs.css';
 
 const About = () => {
     return (
+        <div className="page-container">
         <div className="about-us-container">
             {/* Hero Section */}
             <motion.div 
@@ -105,6 +106,7 @@ const About = () => {
                     </motion.div>
                 </div>
             </motion.div>
+        </div>
         </div>
     );
 };
