@@ -1,62 +1,46 @@
-//import { FaUser, FaShoppingCart, FaSearch } from 'react-icons/fa';
+import { FaHeart, FaSearch, FaUser, FaShoppingCart } from 'react-icons/fa';
 import './Nav.css';
+import logo from '../../assets/logo.png'
+
 
 const Nav = () => {
-
     return (
         <nav className="navbar">
             {/* Logo */}
             <div className="logo-container">
-                <img src="" alt="Logo" className="logo" />
+                <img src= {logo}alt="Logo" className="logo" />
             </div>
 
             {/* Navigation Links */}
             <div className="nav-links">
-                <a href="/" className="nav-link">Home</a>
-
-                <a href="/About" className="nav-link">About</a>
-
-                <a href="/Contact" className="nav-link">
-                    Contact
-                </a>
-
-                <a href="/Register" className="nav-link">
-                    Register
-                </a>
-
-                <a href="/Login" className="nav-link">
-                    Login
-                </a>
-
-                <a href="/Favorites" className="nav-link">
-                    Favorites
-                </a>
-
-                <a href="/Products" className="nav-link">
-                    Products
-                </a>
-
-                <a href="/Profile" className="nav-link">
-                    Profile
-                </a>
-
-                <a href="/ShoppingCart" className="nav-link">
-                    ShoppingCart
-                </a>
-
-                <a href="/TermsConditions" className="nav-link">
-                    TermsConditions
-                </a>
+                <a href="/" className="nav-link">Inicio</a>
+                <a href="/offers" className="nav-link">Ofertas</a>
+                <a href="/products" className="nav-link">Productos</a>
+                <a href="/favorites" className="nav-link">Favoritos</a>
+                <a href="/contact" className="nav-link">Contáctanos</a>
+                <a href="/about" className="nav-link">Sobre nosotros</a>
             </div>
 
             {/* Search Bar */}
             <div className="search-container">
-                
+                <input 
+                    type="text" 
+                    placeholder="Buscar" 
+                    className="search-input" 
+                />
+                <button className="search-button">
+                    <FaSearch />
+                </button>
             </div>
 
             {/* User and Cart Icons */}
             <div className="nav-icons">
-                
+                <button className="icon-button">
+                    <FaUser />
+                </button>
+                <button className="icon-button">
+                    <FaShoppingCart />
+                </button>
             </div>
         </nav>
     );
