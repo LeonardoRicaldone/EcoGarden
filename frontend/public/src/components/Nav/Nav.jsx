@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { FaHeart, FaSearch, FaUser, FaShoppingCart } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 import './Nav.css';
+import '../../screens/Login.jsx'
 import logo from '../../assets/logo.png';
 
 const Nav = () => {
@@ -59,9 +61,9 @@ const Nav = () => {
 
             {/* User and Cart Icons */}
             <div className="nav-icons">
-                <button className="icon-button">
-                    <FaUser className='person-icon'/>
-                </button>
+            <Link to="/login" className="icon-button">
+                 <FaUser className="person-icon" />
+            </Link>
                 <button className="icon-button">
                     <FaShoppingCart className='cart-icon'/>
                 </button>
