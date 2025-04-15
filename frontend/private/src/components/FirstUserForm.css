@@ -11,7 +11,7 @@ html, body {
 }
 
 #DivPrincipal {
-    width: 30%; 
+    width: 35%; 
     height: 100%; /* Usamos 100% para que ocupe toda la altura disponible */
     padding: 40px;
     display: flex;
@@ -26,7 +26,7 @@ html, body {
 }
 
 .imagen-lateral {
-    width: 70%; /* Ocupa el 65% de la pantalla */
+    width: 65%; /* Ocupa el 65% de la pantalla */
     height: 100%;
 }
 
@@ -77,4 +77,79 @@ h5{
 
 h3{
     font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .contenedor-principal {
+        flex-direction: column;
+    }
+
+    #DivPrincipal {
+        width: 100%;
+        height: auto;
+        padding: 20px;
+    }
+
+    .imagen-lateral {
+        display: none;
+    }
+
+    .logo-contenedor {
+        justify-content: center;
+    }
+
+    .btn-registrar {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    #DivPrincipal {
+        padding: 15px;
+    }
+
+    .btn-registrar {
+        font-size: 14px;
+    }
+
+    h5, h3 {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    
+    .contenedor-principal {
+        flex-direction: column;
+        background-image: url('src/img/forest.png');
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
+
+    .imagen-lateral {
+        display: none;
+    }
+
+    #DivPrincipal {
+        width: 90%;
+        max-width: 400px;
+        margin: 60px auto 40px auto; /* Arriba: 60px, abajo: 40px */
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        z-index: 2;
+    }
+
+    .logo-contenedor {
+        justify-content: center;
+    }
+
+    .btn-registrar {
+        width: 100%;
+        padding: 12px;
+    }
 }
