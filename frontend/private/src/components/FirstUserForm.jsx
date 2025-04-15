@@ -1,4 +1,5 @@
 import Imput from "./Imput"
+import Button from "./Button"
 import './FirstUserForm.css';
 
 const FirstUserForm = () => {
@@ -39,7 +40,7 @@ const FirstUserForm = () => {
         <label class="form-check-label" for="checkDefault">Acepto <a href="https://youtu.be/tQN9hdPNVS4?si=T9NAuKCSqhZ0_kCT">Terminos y condiciones</a></label>
         </div> <br />
 
-        <button class="btn-registrar">Registrarse</button>
+        <Button text="Registrarse"/>
 
         </div>
 

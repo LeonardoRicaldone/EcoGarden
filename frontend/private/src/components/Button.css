@@ -1,0 +1,15 @@
+.btn-registrar {
+    background-color: #9DA66E; /* Verde oliva claro */
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-registrar:hover {
+    background-color: #8C945F; /* Un tono más oscuro al pasar el mouse */
+}
