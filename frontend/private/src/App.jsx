@@ -18,7 +18,7 @@ function App() {
     {/*<Router>*/}
     <div style={{ display: 'flex', minHeight: '100vh' }}>
     <Nav />
-    <div style={{ flex: 1, padding: '20px' }}>
+    <div style={{ flex: 1}}>
     <Routes>
       <Route path="/" element={<Dashboard/>}/>
       <Route path="/products" element={<Products/>}/>
