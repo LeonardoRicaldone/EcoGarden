@@ -78,7 +78,7 @@ body {
   font-size: 1rem;
   margin-left: 50px; 
   position: absolute;
-  right: 5px; /* Ajusta esto según lo que necesites */
+  right: 5px; 
   top: 50%;
   transform: translateY(-50%);
 }
