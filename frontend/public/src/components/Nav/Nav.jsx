@@ -13,17 +13,17 @@ const Nav = () => {
         const handleScroll = () => {
             // Obtiene la posición actual del scroll
             const currentScrollPos = window.scrollY;
-            
+
             // Define si la navbar debe ser visible basado en la dirección del scroll
             const isVisible = prevScrollPos > currentScrollPos || currentScrollPos < 10;
-            
+
             setPrevScrollPos(currentScrollPos);
             setVisible(isVisible);
         };
 
         // Agregar event listener para el scroll
         window.addEventListener('scroll', handleScroll);
-        
+
         // Limpieza del event listener cuando el componente se desmonte
         return () => {
             window.removeEventListener('scroll', handleScroll);
@@ -49,10 +49,10 @@ const Nav = () => {
 
             {/* Search Bar */}
             <div className="search-container">
-                <input 
-                    type="text" 
-                    placeholder="Buscar" 
-                    className="search-input" 
+                <input
+                    type="text"
+                    placeholder="Buscar"
+                    className="search-input"
                 />
                 <button className="search-button">
                     <FaSearch />
@@ -61,11 +61,14 @@ const Nav = () => {
 
             {/* User and Cart Icons */}
             <div className="nav-icons">
-            <Link to="/login" className="icon-button">
-                 <FaUser className="person-icon" />
-            </Link>
+                <Link to="/login" className="icon-button">
+                    <FaUser className="person-icon" />
+                </Link>
                 <button className="icon-button">
-                    <FaShoppingCart className='cart-icon'/>
+                    <FaHeart className='fav-icon' />
+                </button>
+                <button className="icon-button">
+                    <FaShoppingCart className='cart-icon' />
                 </button>
             </div>
         </nav>

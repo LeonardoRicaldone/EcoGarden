@@ -1,5 +1,6 @@
 import './Register.css';
 import { FaGoogle } from 'react-icons/fa';
+import logo from '../assets/logo.png';
 
 const Register = () => {
   return (
@@ -12,7 +13,8 @@ const Register = () => {
             className="register-image"
           />
           <div className="logo-overlay">
-            EcoGarden
+            <img src={logo} alt="EcoGarden Logo" className="logo-image" />
+            <span>EcoGarden</span>
           </div>
         </div>
 
@@ -28,8 +30,8 @@ const Register = () => {
           <input type="password" placeholder="Contraseña" className="register-input" />
 
           <div className="checkbox-container">
-          <input type="checkbox" id="terms" className="terms-checkbox" />
-          <label htmlFor="terms" className="termsConditions">Acepto <a href="/terms-conditions">términos y condiciones</a></label>
+            <input type="checkbox" id="terms" className="terms-checkbox" />
+            <label htmlFor="terms" className="termsConditions">Acepto <a href="/terms-conditions">términos y condiciones</a></label>
           </div>
 
           <button className="register-button">Registrarse</button>

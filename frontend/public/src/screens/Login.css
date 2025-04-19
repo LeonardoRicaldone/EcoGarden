@@ -117,9 +117,6 @@
     width: 100%;
   }
   
-  .input-group {
-    margin-bottom: 20px;
-  }
   
   .input-group label {
     display: block;
@@ -131,7 +128,7 @@
   .login-input {
     width: 100%;
     padding: 16px 20px;
-    border: 2px solid #7ba477;
+    border: 2px solid #bfcabe;
     border-radius: 30px !important;
     font-size: 1rem;
     transition: all 0.3s;
@@ -139,11 +136,6 @@
     background-color: #ffffff;
   }
   
-  .login-input:focus {
-    border-color: #2e7d32;
-    box-shadow: 0 0 0 3px rgba(123, 164, 119, 0.2);
-    background-color: white;
-  }
   
   .login-options {
     display: flex;
