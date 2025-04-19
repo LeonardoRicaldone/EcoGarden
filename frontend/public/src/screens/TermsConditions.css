@@ -1,0 +1,102 @@
+.terms-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    min-height: 100vh;
+    align-items: center;
+    padding: 40px;
+}
+
+.back-button {
+    align-self: flex-start;
+    margin-bottom: 1.5rem;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.terms-box {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    max-width: 850px;
+    width: 100%;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+.terms-box h1 {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.update {
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 1.5rem;
+}
+
+.terms-section {
+    margin-top: 1.5rem;
+}
+
+.terms-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    color: #34495e;
+}
+
+.terms-section ul {
+    padding-left: 1.2rem;
+    color: #555;
+}
+
+.terms-section li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+.terms-buttons {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.correoterms {
+    color: #485935;
+}
+
+.accept {
+    background-color: #93A267;
+    border: none;
+    color: white;
+    padding: 0.7rem 1.4rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.accept:hover {
+    background-color: #485935;
+}
+
+.decline {
+    background-color: transparent;
+    border: 1px solid #ccc;
+    color: #333;
+    padding: 0.7rem 1.4rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.decline:hover {
+    background-color: #f0f0f0;
+}

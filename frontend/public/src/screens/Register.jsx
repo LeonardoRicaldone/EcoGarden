@@ -1,8 +1,12 @@
 import './Register.css';
 import { FaGoogle } from 'react-icons/fa';
 import logo from '../assets/logo.png';
+import { Link, useLocation } from 'react-router-dom';
 
 const Register = () => {
+  const location = useLocation(); 
+  const termsAccepted = location.state?.termsAccepted || false;
+
   return (
     <div className="page-container">
       <div className="register-container">
@@ -30,8 +34,15 @@ const Register = () => {
           <input type="password" placeholder="Contraseña" className="register-input" />
 
           <div className="checkbox-container">
-            <input type="checkbox" id="terms" className="terms-checkbox" />
-            <label htmlFor="terms" className="termsConditions">Acepto <a href="/terms-conditions">términos y condiciones</a></label>
+            <input
+              type="checkbox"
+              id="terms"
+              className="terms-checkbox"
+              defaultChecked={termsAccepted} 
+            />
+            <label htmlFor="terms" className="termsConditions">
+              Acepto <Link to="/TermsConditions">términos y condiciones</Link>
+            </label>
           </div>
 
           <button className="register-button">Registrarse</button>

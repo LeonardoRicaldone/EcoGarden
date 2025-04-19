@@ -1,6 +1,4 @@
-/* Contact.css - Estilos mejorados para el componente de contacto */
 
-/* Fuentes y colores base */
 :root {
     --primary-color: #3498db;
     --primary-dark: #2980b9;
@@ -13,12 +11,10 @@
     --transition: all 0.3s ease;
   }
   
-  /* Estilos generales */
   .contact-container {
     max-width: 1200px;
     margin: 10px auto;
     padding: 3rem 2rem;
-    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     color: var(--text-color);
     background-color: #f5f7fa;
     min-height: 100vh;
