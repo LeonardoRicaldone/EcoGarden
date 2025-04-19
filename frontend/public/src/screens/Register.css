@@ -1,0 +1,165 @@
+.register-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.register-left {
+    flex: 1;
+    position: relative;
+    height: 100vh;
+}
+
+.register-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.logo-overlay {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-weight: bold;
+    color: white;
+    font-size: 24px;
+}
+
+.register-right {
+    flex: 1;
+    background-color: white;
+    padding: 2rem 4rem;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.register-title {
+    font-size: 24px;
+    text-align: left;
+    margin-bottom: 2rem;
+    text-align: center;
+    color: #485935;
+}
+
+.input-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.register-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    font-size: 14px;
+    outline: none;
+}
+
+.half-width {
+    width: 50%;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    margin-bottom: 1.5rem;
+}
+
+.terms-checkbox {
+    margin-right: 8px;
+    accent-color: #7ba477;
+    width: 16px; 
+    height: 16px; 
+    cursor: pointer;
+}
+
+.checkbox-container a {
+    color: #CADBB7;
+}
+
+
+.termsConditions {
+    font-weight: 500;
+    color: #485935;
+}
+
+.register-button {
+    background-color: #93A267;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 50%;
+    border-radius: 20px;
+    display: block;
+    margin: 0 auto; 
+}
+.already-account {
+    text-align: center;
+    font-size: 14px;
+    margin: 1rem 0;
+    color: #485935;
+    font-weight: 600;
+}
+
+.already-account a {
+    color: #CADBB7;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+  
+.already-account a:hover {
+    color: #2e7d32;
+    text-decoration: underline;
+  }
+  
+.google-divider {
+    display: flex;
+    align-items: center;
+    margin: 1rem 0;
+    font-size: 14px;
+    color: #aaa;
+}
+
+.google-divider::before,
+.google-divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #ccc;
+}
+
+.google-divider::before {
+    margin-right: 10px;
+}
+
+.google-divider::after {
+    margin-left: 10px;
+}
+
+.google-register-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40%;
+    margin: 0 auto; 
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: white;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.google-icon {
+    font-size: 16px;
+}

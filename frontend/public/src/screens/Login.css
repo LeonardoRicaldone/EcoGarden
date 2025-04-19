@@ -1,4 +1,3 @@
-/* Estilos generales */
 .login-page {
     min-height: 100vh;
     display: flex;
@@ -19,7 +18,6 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   }
   
-  /* Sección izquierda - Formulario */
   .login-left {
     flex: 1;
     padding: 60px;
@@ -64,7 +62,6 @@
     margin-bottom: 0;
   }
   
-  /* Botón de Google */
   .google-button {
     display: flex;
     align-items: center;
@@ -93,7 +90,6 @@
     margin-right: 12px;
   }
   
-  /* Divisor */
   .divider {
     display: flex;
     align-items: center;
@@ -117,7 +113,6 @@
     margin-left: 15px;
   }
   
-  /* Formulario */
   .login-form {
     width: 100%;
   }
@@ -129,7 +124,6 @@
   .input-group label {
     display: block;
     margin-bottom: 8px;
-    color: #555;
     font-size: 0.9rem;
     font-weight: 500;
   }
@@ -138,11 +132,11 @@
     width: 100%;
     padding: 16px 20px;
     border: 2px solid #7ba477;
-    border-radius: 12px;
+    border-radius: 30px !important;
     font-size: 1rem;
     transition: all 0.3s;
     outline: none;
-    background-color: #f9f9f9;
+    background-color: #ffffff;
   }
   
   .login-input:focus {
@@ -185,7 +179,6 @@
     text-decoration: underline;
   }
   
-  /* Botón de enviar */
   .submit-button {
     width: 100%;
     padding: 16px;
@@ -206,7 +199,6 @@
     box-shadow: 0 5px 15px rgba(46, 125, 50, 0.3);
   }
   
-  /* Sección de registro */
   .register-section {
     text-align: center;
     margin-top: 30px;
@@ -226,7 +218,6 @@
     text-decoration: underline;
   }
   
-  /* Sección derecha - Imagen */
   .login-right {
     flex: 1.5;
     position: relative;
@@ -271,7 +262,6 @@
     opacity: 0.9;
   }
   
-  /* Responsive */
   @media (max-width: 768px) {
     .login-container {
       flex-direction: column;

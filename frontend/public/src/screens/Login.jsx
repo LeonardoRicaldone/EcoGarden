@@ -8,7 +8,6 @@ const Login = () => {
 <div className="page-container">
     <div className="login-page">
       <div className="login-container">
-        {/* Sección izquierda - Formulario */}
         <div className="login-left">
           <div className="login-header">
             <div className="logoLogin">
@@ -34,7 +33,7 @@ const Login = () => {
               <input 
                 type="email" 
                 id="email"
-                placeholder="tucorreo@ejemplo.com" 
+                placeholder="correo@gmail.com" 
                 className="login-input"
               />
             </div>
@@ -69,7 +68,6 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Sección derecha - Imagen */}
         <div className="login-right">
           <div className="image-overlay"></div>
           <img 
