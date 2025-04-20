@@ -4,6 +4,7 @@
   padding: 24px;
   min-height: 100vh;
   font-family: sans-serif;
+  color: #0E6251;
 }
 
 /* Encabezado */
@@ -23,7 +24,7 @@
 }
 
 .user-name {
-  color: #003c1d;
+  color: #0E6251;
   font-size: 24px;
   font-weight: bold;
 }
@@ -39,29 +40,32 @@
 .date,
 .user-info {
   background-color: #ffffff;
-  padding: 12px 16px;
+  padding: 8px 12px; /* antes era 12px 16px */
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   display: flex;
   align-items: center;
-  min-height: 64px;
-  height: 64px;
+  min-height: 56px;  /* antes era 64px */
+  height: 56px;      /* antes era 64px */
   box-sizing: border-box;
 }
 
 .time {
   font-size: 18px;
   font-weight: 600;
+  color: #0E6251;
 }
 
 .date {
-  font-size: 14px;
-  color: #4b5563;
+  font-size: 18px;
+  font-weight: 600;
+  color: #0E6251;
 }
 
 .user-info {
   gap: 8px;
   margin: 0;
+  color: #0E6251;
 }
 
 .avatar {
@@ -78,7 +82,7 @@
 
 .user-email {
   font-size: 14px;
-  color: #6b7280;
+  color: #0E6251;
   line-height: 1.2;
   margin-top: 0;
 }

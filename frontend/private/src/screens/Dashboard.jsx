@@ -15,15 +15,15 @@ const Dashboard = () => {
         </div>
         <div className="header-right">
           <div className="time">11:31 AM</div>
-          <div className="date">Saturday, November 11, 2025</div>
+          <div className="date">Saturday, November 11, 2025 📆</div>
           <div className="user-info">
             <img src="https://avatars.githubusercontent.com/u/139492302?v=4" alt="avatar" className="avatar" />
             <div>
               <p className="user-fullname">Marvin Coto</p>
               <p className="user-email">marvinjaviercoto@ecogarden.com</p>
             </div>
+            <button className="settings-button">⚙️</button>
           </div>
-          <button className="settings-button">⚙️</button>
         </div>
       </div>
 
