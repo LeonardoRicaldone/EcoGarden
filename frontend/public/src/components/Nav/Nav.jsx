@@ -67,9 +67,9 @@ const Nav = () => {
                 <button className="icon-button">
                     <FaHeart className='fav-icon' />
                 </button>
-                <button className="icon-button">
+                <Link to="/ShoppingCart"  className="icon-button">
                     <FaShoppingCart className='cart-icon' />
-                </button>
+                </Link>
             </div>
         </nav>
     );

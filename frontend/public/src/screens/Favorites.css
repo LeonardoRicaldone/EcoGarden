@@ -1,0 +1,31 @@
+.favorites-container {
+    padding: 20px 0;
+    background-color: #f9fafb;
+    min-height: 100vh;
+}
+
+.simple-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    background-color: white;
+}
+
+.simple-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.simple-card button {
+    transition: all 0.2s ease;
+}
+
+.simple-card button:hover {
+    transform: scale(1.05);
+}
+
+/* Media queries for responsive design */
+@media (max-width: 640px) {
+    .favorites-container {
+        padding: 10px;
+    }
+}

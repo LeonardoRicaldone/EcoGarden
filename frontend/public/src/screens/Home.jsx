@@ -19,7 +19,7 @@ const Home = () => {
 
     // Datos de productos para ofertas
     const offerProducts = [
-        { id: 1, name: 'Cactus de ordenador', price: '$5 - $15', rating: 2, img: 'https://latiendadelcactus.com/wp-content/uploads/2021/09/cereus-peruvianus-2-600x600.jpg' },
+        { id: 1, name: 'Cactus de ordenador', price: '$5 - $15', rating: 2, img: 'https://www.catalunyaplants.com/wp-content/uploads/2012/12/Cereus-peruvianus-cactus.jpg' },
         { id: 2, name: 'Echeveria elegans', price: '$45 - $55', rating: 2, img: 'https://coastalsucculentsandcacti.com/cdn/shop/products/20220815_175134_540x.jpg?v=1660601267' },
         { id: 3, name: 'Romero', price: '$5 - $15', rating: 3, img: 'https://kellogggarden.com/wp-content/uploads/2021/03/Tips-on-How-to-Grow-Rosemary.jpg' },
         { id: 4, name: 'Diente de león', price: '$45 - $55', rating: 2, img: 'https://upload.wikimedia.org/wikipedia/commons/d/dc/Schulterbachtal_L%C3%B6wenzahn_Samenstand-20200517-RM-111527.jpg' }

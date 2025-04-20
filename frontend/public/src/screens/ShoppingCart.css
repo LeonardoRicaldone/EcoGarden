@@ -1,0 +1,131 @@
+:root {
+    /* Colores de texto */
+    --title-color: #485935;
+    --product-title-color: #93A267;
+    --price-color: #485935;
+    --text-color: #485935;
+    
+    /* Colores de iconos */
+    --icon-color: #93A267;
+    --delete-icon-color: #6b7280;
+    --feature-icon-color: #93A267;
+    
+    /* Colores de botones principales */
+    --primary-button-bg: #7da267;
+    --primary-button-text: #ffffff;
+    --primary-button-hover: #7da267;
+    
+    /* Colores de botones de contorno */
+    --outline-button-border: #485935;
+    --outline-button-text: #485935;
+    --outline-button-hover: #eef7ee;
+    
+    /* Color de fondo de la sección de características */
+    --features-section-bg: #eef7ee;
+}
+
+.tramitarcompra{
+    border-radius: 25px;
+}
+
+.cajaBeneficios{
+    background-color: #CADBB7;
+}
+
+.shopping-cart-container {
+    background-color: #f9fafb;
+    min-height: 100vh;
+    padding: 20px 0;
+}
+
+/* Colores de texto */
+.title-color {
+    color: var(--title-color);
+}
+
+.product-title-color {
+    color: var(--product-title-color);
+}
+
+.price-color {
+    color: var(--price-color);
+}
+
+/* Colores de iconos */
+.icon-color {
+    color: var(--icon-color);
+}
+
+.delete-icon-color {
+    color: var(--delete-icon-color);
+}
+
+.feature-icon-color {
+    color: var(--feature-icon-color);
+}
+
+/* Botones principales */
+.primary-button-bg {
+    background-color: var(--primary-button-bg);
+}
+
+.primary-button-text {
+    color: var(--primary-button-text);
+}
+
+.primary-button-hover:hover {
+    background-color: var(--primary-button-hover);
+}
+
+/* Botones de contorno */
+.outline-button-border {
+    border-color: var(--outline-button-border);
+}
+
+.outline-button-text {
+    color: var(--outline-button-text);
+}
+
+.outline-button-hover:hover {
+    background-color: var(--outline-button-hover);
+}
+
+/* Fondo de la sección de características */
+.features-section-bg {
+    background-color: #CADBB7;
+}
+
+.cart-item {
+    position: relative;
+}
+
+.cart-item:last-child > div {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.quantity-selector {
+    font-size: 0.875rem;
+}
+
+.quantity-selector button {
+    transition: background-color 0.2s ease;
+    font-weight: bold;
+}
+
+button {
+    transition: all 0.2s ease;
+}
+
+/* Media queries para diseño responsive */
+@media (max-width: 768px) {
+    .cart-item {
+        flex-direction: column;
+    }
+    
+    .cart-item-image {
+        margin-bottom: 1rem;
+        margin-right: 0;
+    }
+}
