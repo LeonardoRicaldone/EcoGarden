@@ -41,12 +41,12 @@ body {
 
 
 .nav-link:hover {
-  background-color: #e1f5e5;
+  background-color: #e1f5e5; /* Editar el color a #CADBB7 u otro más opaco en el hover y active / Antiguo: #e1f5e5*/
   text-decoration: none;   /* Elimina el subrayado */
 }
 
 .nav-link.active {
-  background-color: #c8e6c9;
+  background-color: #c8e6c9; /* Editar el color a #CADBB7 en el hover y active / Antiguo: #c8e6c9*/
   font-weight: 600;
   color: #2e7d32;
   text-decoration: none;   /* Elimina el subrayado */
