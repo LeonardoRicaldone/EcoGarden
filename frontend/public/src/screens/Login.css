@@ -45,19 +45,20 @@
   
   .logoLogin h1 {
     font-size: 2rem;
-    color: #2e7d32;
+    color: #485935;
     font-weight: 700;
     letter-spacing: 1px;
   }
+
   
   .login-left h2 {
     font-size: 2rem;
-    color: #333;
+    color: #485935;
     margin-bottom: 10px;
   }
   
   .login-subtitle {
-    color: #666;
+    color: #93A267;
     font-size: 1rem;
     margin-bottom: 0;
   }
@@ -122,6 +123,7 @@
     display: block;
     margin-bottom: 8px;
     font-size: 0.9rem;
+    color: #93A267;
     font-weight: 500;
   }
   
@@ -161,20 +163,20 @@
   
   .forgot-password {
     font-size: 0.9rem;
-    color: #7ba477;
+    color: #CADBB7;
     text-decoration: none;
     transition: color 0.3s;
   }
   
   .forgot-password:hover {
-    color: #2e7d32;
+    color: #93A267;
     text-decoration: underline;
   }
   
   .submit-button {
     width: 100%;
     padding: 16px;
-    background-color: #7ba477;
+    background-color: #93A267;
     color: white;
     border: none;
     border-radius: 12px;
@@ -186,7 +188,7 @@
   }
   
   .submit-button:hover {
-    background-color: #2e7d32;
+    background-color: #485935;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(46, 125, 50, 0.3);
   }
@@ -199,14 +201,14 @@
   }
   
   .register-link {
-    color: #7ba477;
+    color: #93A267;
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s;
   }
   
   .register-link:hover {
-    color: #2e7d32;
+    color: #485935;
     text-decoration: underline;
   }
   

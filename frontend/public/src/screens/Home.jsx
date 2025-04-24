@@ -65,7 +65,7 @@ const Home = () => {
                             Cultiva tu espacio verde con productos ecológicos y sostenibles. ¡Todo lo que necesitas para un jardín vibrante y saludable!
                         </p>
                         <button className="hero-button">
-                            Ver más
+                            <b>Ver más</b>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
                             </svg>
@@ -79,29 +79,29 @@ const Home = () => {
 
             {/* Sección de beneficios */}
             <div className="container mx-auto px-4 py-8">
-                <div className="text-green-700 flex items-center mb-2">
+                <div className="flex items-center mb-2 cambioColor3">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
-                    <span>EcoGarden te da más:</span>
+                    <span><b>EcoGarden te da más:</b></span>
                 </div>
 
-                <div className="bg-green-100 rounded-lg py-4 px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className=" rounded-lg py-4 px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 cambioColor">
                     <div className="flex flex-col items-center text-center">
-                        <MdLocalShipping className="text-green-700 text-4xl mb-2" />
-                        <h3 className="text-gray-800 font-medium">Entrega rápida</h3>
+                        <MdLocalShipping className="text-4xl mb-2 cambioColor2"/>
+                        <h3 className="cambioColor3 font-medium">Entrega rápida</h3>
                     </div>
                     <div className="flex flex-col items-center text-center">
-                        <MdCardGiftcard className="text-green-700 text-4xl mb-2" />
-                        <h3 className="text-gray-800 font-medium">Envío gratis a partir de un gasto de 70 dólares</h3>
+                        <MdCardGiftcard className=" text-4xl mb-2 cambioColor2" />
+                        <h3 className="cambioColor3 font-medium">Envío gratis a partir de un gasto de 70 dólares</h3>
                     </div>
                     <div className="flex flex-col items-center text-center">
-                        <MdVerified className="text-green-700 text-4xl mb-2" />
-                        <h3 className="text-gray-800 font-medium">Mejor calidad</h3>
+                        <MdVerified className=" text-4xl mb-2 cambioColor2" />
+                        <h3 className="cambioColor3 font-medium">Mejor calidad</h3>
                     </div>
                     <div className="flex flex-col items-center text-center">
-                        <MdAttachMoney className="text-green-700 text-4xl mb-2" />
-                        <h3 className="text-gray-800 font-medium">Precios justos</h3>
+                        <MdAttachMoney className=" text-4xl mb-2 cambioColor2" />
+                        <h3 className="cambioColor3 font-medium">Precios justos</h3>
                     </div>
                 </div>
             </div>
