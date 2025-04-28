@@ -1,10 +1,22 @@
-import React from "react";
+import React, { useRef } from "react";
 import "./Home.css";
 import { FaStar, FaRegStar, FaInstagram } from 'react-icons/fa';
 import { MdLocalShipping, MdCardGiftcard, MdVerified, MdAttachMoney } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
-    // Función para renderizar estrellas basadas en puntuación
+    const navigate = useNavigate();
+    const offersRef = useRef(null); // Create a ref for the offers section
+    
+    const handleProductClick = () => {
+        navigate('/product');
+    };
+
+    // Function to scroll to the offers section
+    const scrollToOffers = () => {
+        offersRef.current.scrollIntoView({ behavior: 'smooth' });
+    };
+
     const renderStars = (rating) => {
         const stars = [];
         for (let i = 1; i <= 5; i++) {
@@ -64,7 +76,7 @@ const Home = () => {
                         <p className="hero-description">
                             Cultiva tu espacio verde con productos ecológicos y sostenibles. ¡Todo lo que necesitas para un jardín vibrante y saludable!
                         </p>
-                        <button className="hero-button">
+                        <button className="hero-button" onClick={scrollToOffers}>
                             <b>Ver más</b>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -106,13 +118,17 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* Sección de ofertas */}
-            <div className="container mx-auto px-4 py-8">
+            {/* Sección de ofertas con ref */}
+            <div ref={offersRef} className="container mx-auto px-4 py-8" id="ofertas">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">Ofertas</h2>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {offerProducts.map((product) => (
-                        <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div 
+                            key={product.id} 
+                            className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer" 
+                            onClick={handleProductClick}
+                        >
                             <div className="relative">
                                 <img src={product.img} alt={product.name} className="w-full h-48 object-cover" />
                                 <div className="absolute top-2 right-2 flex space-x-1">
@@ -146,7 +162,11 @@ const Home = () => {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {popularProducts.map((product) => (
-                        <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div 
+                            key={product.id} 
+                            className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer" 
+                            onClick={handleProductClick}
+                        >
                             <div className="relative">
                                 <img src={product.img} alt={product.name} className="w-full h-48 object-cover" />
                                 <div className="absolute top-2 right-2 flex space-x-1">

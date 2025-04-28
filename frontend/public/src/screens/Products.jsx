@@ -1,8 +1,19 @@
 import React, { useState } from "react";
 import "./Products.css";
 import { FaStar, FaRegStar } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const Products = () => {
+
+  // Navigation hook
+      const navigate = useNavigate();
+      
+      // Function to handle card clicks
+      const handleProductClick = () => {
+          navigate('/product'); // This will navigate to the Product.jsx route
+      };
+  
+
   const [rangeValue, setRangeValue] = useState(100);
   
   // Función para renderizar estrellas basadas en puntuación
@@ -127,7 +138,8 @@ const Products = () => {
           
           <div className="products-grid">
             {products.map((product) => (
-              <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden" onClick={handleProductClick} 
+>
                 <div className="relative">
                   <img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
                   <div className="absolute top-2 right-2 flex space-x-1">

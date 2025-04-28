@@ -1,46 +1,47 @@
 import { useState, useEffect } from 'react';
-import { FaHeart, FaSearch, FaUser, FaShoppingCart } from 'react-icons/fa';
+import { FaHeart, FaSearch, FaUser, FaShoppingCart, FaBars } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import './Nav.css';
-import '../../screens/Login.jsx'
 import logo from '../../assets/logo.png';
 
 const Nav = () => {
     const [prevScrollPos, setPrevScrollPos] = useState(0);
     const [visible, setVisible] = useState(true);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
-            // Obtiene la posición actual del scroll
             const currentScrollPos = window.scrollY;
-
-            // Define si la navbar debe ser visible basado en la dirección del scroll
             const isVisible = prevScrollPos > currentScrollPos || currentScrollPos < 10;
-
             setPrevScrollPos(currentScrollPos);
             setVisible(isVisible);
         };
 
-        // Agregar event listener para el scroll
         window.addEventListener('scroll', handleScroll);
 
-        // Limpieza del event listener cuando el componente se desmonte
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
     }, [prevScrollPos]);
 
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+
     return (
         <nav className={`navbar ${visible ? "navbar-visible" : "navbar-hidden"}`}>
-            {/* Logo */}
             <div className="logo-container">
                 <img src={logo} alt="Logo" className="logo" />
             </div>
 
+            {/* Botón Hamburguesa */}
+            <button className="menu-toggle" onClick={toggleMenu}>
+                <FaBars />
+            </button>
+
             {/* Navigation Links */}
-            <div className="nav-links">
+            <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
                 <a href="/" className="nav-link">Inicio</a>
-                <a href="/offers" className="nav-link">Ofertas</a>
                 <a href="/products" className="nav-link">Productos</a>
                 <a href="/favorites" className="nav-link">Favoritos</a>
                 <a href="/contact" className="nav-link">Contáctanos</a>
@@ -64,11 +65,8 @@ const Nav = () => {
                 <Link to="/login" className="icon-button">
                     <FaUser className="person-icon" />
                 </Link>
-                <button className="icon-button">
-                    <FaHeart className='fav-icon' />
-                </button>
-                <Link to="/ShoppingCart"  className="icon-button">
-                    <FaShoppingCart className='cart-icon' />
+                <Link to="/ShoppingCart" className="icon-button">
+                    <FaShoppingCart className="cart-icon" />
                 </Link>
             </div>
         </nav>
