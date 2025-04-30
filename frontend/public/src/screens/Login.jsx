@@ -54,7 +54,7 @@ const Login = () => {
                 <input type="checkbox" id="remember" />
                 <label htmlFor="remember">Recordarme</label>
               </div>
-              <a href="/forgot-password" className="forgot-password">
+              <a href="/login" className="forgot-password">
                 ¿Olvidaste tu contraseña?
               </a>
             </div>
