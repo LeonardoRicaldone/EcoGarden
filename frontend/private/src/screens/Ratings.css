@@ -1,0 +1,55 @@
+.valoracion-card {
+    display: flex;
+    gap: 16px;
+    border: 1px solid #c5dfca;
+    border-radius: 16px;
+    padding: 16px;
+    max-width: 600px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  
+  .valoracion-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+  
+  .valoracion-info h2 {
+    font-size: 18px;
+    color: #276749;
+  }
+  
+  .usuario {
+    font-size: 14px;
+    margin-top: 4px;
+    color: #4a5568;
+  }
+  
+  .estrellas {
+    display: flex;
+    align-items: center;
+    margin: 6px 0;
+  }
+  
+  .estrella {
+    font-size: 16px;
+    color: #cbd5e0;
+  }
+  
+  .estrella.llena {
+    color: #f6c026;
+  }
+  
+  .puntuacion {
+    margin-left: 8px;
+    font-size: 14px;
+    color: #2d3748;
+  }
+  
+  .comentario {
+    font-size: 14px;
+    color: #2d3748;
+    margin-top: 6px;
+  }

@@ -1,4 +1,5 @@
 import OrdersCard from '../components/OrdersCard';
+import "./Orders.css"
 
 const pedidos = [
   {
@@ -35,11 +36,29 @@ const pedidos = [
 
 const Orders = () => {
   return (
-    <div className="p-8 bg-green-50 min-h-screen">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-semibold text-green-900">Pedidos</h1>
-      </div>
 
+    <div className="productos-container">
+      <div className="dashboard-btn">
+        <button>
+          <span className="material-icons">arrow_back</span>
+          Dashboard
+        </button>
+      </div>
+      
+
+      <h1 className="titulo-productos">
+        <span className="material-icons">inventory_2</span>
+        Pedidos
+      </h1>
+
+      <div className="buscador">
+            <span className="material-icons">search</span>
+            <input type="text" placeholder="Buscar" />
+          </div> <br />
+ 
+
+    
+      <div className="scrollable-cards">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-items-center">
         {pedidos.map((pedido, index) => (
           <OrdersCard
@@ -50,6 +69,7 @@ const Orders = () => {
           />
         ))}
       </div>
+    </div>
     </div>
   );
 };

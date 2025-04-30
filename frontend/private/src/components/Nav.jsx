@@ -46,10 +46,10 @@ const Nav = () => {
 
         <div className="nav-section">SUPPORT AND SETTINGS</div>
 
-        <NavLink to="/support" className="nav-link">
+        {/*<NavLink to="/support" className="nav-link">
           <i className="icon">🛟</i> Support
           {location.pathname === '/support' && <span> ☘️</span>}
-        </NavLink>
+        </NavLink>*/}
 
         <NavLink to="/settings" className="nav-link">
           <i className="icon">⚙️</i> Settings
