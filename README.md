@@ -14,8 +14,6 @@ Gabriela Cecibel Arévalo Molina (Directora de Tecnología y Desarrolladora)
 
 Marvin Javier Gutiérrez Coto (Marketing Digital, Atención al Cliente y Desarrollador)
 
-Somos un equipo de estudiantes apasionados por la innovación tecnológica, la sostenibilidad ambiental y el emprendimiento digital.
-
 Tecnologías Utilizadas ⚙️
 Front-End:
 
@@ -48,24 +46,20 @@ Dependencias Principales
 
 npm install express
 npm install cors
+npm install mongoose
 npm install dotenv
-npm install body-parser
-npm install nodemon --save-dev
+npm install nodemon -D
+npm install react-router-dom
+npm install react-icons
 
 Características Principales 
 Plataforma web y móvil para compra de productos de jardinería.
-
-Servicios de mantenimiento de jardines y asesoramiento especializado.
-
-Gestión de stock en tiempo real.
 
 Integración de pagos seguros con tarjeta de crédito.
 
 Sistema de favoritos, valoraciones y filtros avanzados.
 
-Integración con Google Maps para ubicar sucursales.
-
-Marketing digital y estrategias de SEO/SEM.
+Integración con Google para registrarse
 
 Opciones de envío flexibles: domicilio o retiro en tienda.
 
