@@ -5,25 +5,35 @@ import './Nav.css';
 import logo from '../../assets/logo.png';
 
 const Nav = () => {
+    // Guarda la posición anterior del scroll
     const [prevScrollPos, setPrevScrollPos] = useState(0);
+     // Controla la visibilidad de la navbar según el scroll
     const [visible, setVisible] = useState(true);
+     // Controla si el menú móvil (hamburguesa) está abierto o cerrado
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+        // useEffect se ejecuta cuando cambia el scroll
     useEffect(() => {
+        // Función que maneja el comportamiento del scroll
         const handleScroll = () => {
-            const currentScrollPos = window.scrollY;
+                
+            const currentScrollPos = window.scrollY; // Posición actual del scroll
             const isVisible = prevScrollPos > currentScrollPos || currentScrollPos < 10;
-            setPrevScrollPos(currentScrollPos);
-            setVisible(isVisible);
+            // Si el usuario sube o está al principio, se muestra la navbar
+            setPrevScrollPos(currentScrollPos); // Actualiza la posición anterior del scroll
+            setVisible(isVisible); //cambia la visibilidad
         };
 
+        // Agrega el evento de scroll al window
         window.addEventListener('scroll', handleScroll);
 
+        // Limpia el evento de scroll al desmontar el componente
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
-    }, [prevScrollPos]);
+    }, [prevScrollPos]); //Dependencia: solo se ejecuta cuando cambia prevScrollPos
 
+    // Función para alternar el menú móvil (hamburguesa)
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };

@@ -1,17 +1,12 @@
 import React, { useState } from "react";
 import "./Favorites.css";
-import { FaStar, FaRegStar, FaHeart, FaRegHeart, FaPlus } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import ProductCard from "../components/ProductCard/ProductCard";
 
 const Favorites = () => {
     // Navigation hook
     const navigate = useNavigate();
     
-    // Function to handle card clicks
-    const handleProductClick = () => {
-        navigate('/product'); // This will navigate to the Product.jsx route
-    };
-
     // Estado para mantener los productos favoritos
     const [favoriteProducts, setFavoriteProducts] = useState([
         { 
@@ -64,24 +59,13 @@ const Favorites = () => {
         }
     ]);
 
-    // Función para renderizar estrellas basadas en puntuación
-    const renderStars = (rating) => {
-        const stars = [];
-        for (let i = 1; i <= 5; i++) {
-            stars.push(
-                i <= rating 
-                    ? <FaStar key={i} className="text-yellow-500" /> 
-                    : <FaRegStar key={i} className="text-gray-300" />
-            );
-        }
-        return <div className="flex">{stars}</div>;
+    // Function to handle card clicks
+    const handleProductClick = () => {
+        navigate('/product');
     };
 
     // Función para alternar el estado de favorito
-    const toggleFavorite = (id, e) => {
-        // Stop event propagation to prevent navigating when clicking the heart icon
-        e.stopPropagation();
-        
+    const toggleFavorite = (id) => {
         setFavoriteProducts(prevProducts => 
             prevProducts.map(product => 
                 product.id === id 
@@ -89,6 +73,10 @@ const Favorites = () => {
                 : product
             )
         );
+    };
+
+    const handleAddClick = (id) => {
+        console.log(`Añadir producto ${id} al carrito`);
     };
 
     return (
@@ -99,49 +87,13 @@ const Favorites = () => {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
                     {favoriteProducts.map((product) => (
-                        <div 
-                            key={product.id} 
-                            className="simple-card bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"
-                            onClick={handleProductClick} 
-                        >
-                            <div className="relative">
-                                <img 
-                                    src={product.img} 
-                                    alt={product.name} 
-                                    className="w-full h-48 object-cover" 
-                                    onError={(e) => {
-                                        e.target.onerror = null;
-                                        e.target.src = "https://via.placeholder.com/150";
-                                    }}
-                                />
-                                <div className="absolute top-2 right-2 flex space-x-2">
-                                    <button 
-                                        className="bg-white rounded-full p-2 shadow-md"
-                                        onClick={(e) => e.stopPropagation()} // Prevent navigation when clicking plus button
-                                    >
-                                        <FaPlus className="h-4 w-4 text-gray-700" />
-                                    </button>
-                                    <button 
-                                        className="bg-white rounded-full p-2 shadow-md"
-                                        onClick={(e) => toggleFavorite(product.id, e)} // Pass event to stop propagation
-                                    >
-                                        {product.isFavorite ? (
-                                            <FaHeart className="h-4 w-4 text-red-500" />
-                                        ) : (
-                                            <FaRegHeart className="h-4 w-4 text-gray-500" />
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div className="p-4">
-                                <h3 className="text-gray-700 font-medium mb-1">{product.name}</h3>
-                                <p className="text-gray-800 font-bold mb-2">{product.price}</p>
-                                <div className="stars-container">
-                                    {renderStars(product.rating)}
-                                </div>
-                            </div>
-                        </div>
+                        <ProductCard 
+                            key={product.id}
+                            product={product}
+                            onProductClick={handleProductClick}
+                            onToggleFavorite={toggleFavorite}
+                            onAddClick={handleAddClick}
+                        />
                     ))}
                 </div>
             </div>

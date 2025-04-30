@@ -146,9 +146,9 @@ const Product = () => {
                 +
               </button>
             </div>
-            <button className="buy-button">
+            <Link to={"/ShoppingCart"}><button className="buy-button">
               Tramitar compra
-            </button>
+            </button></Link>
           </div>
         </div>
       </div>

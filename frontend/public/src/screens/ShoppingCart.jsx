@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./ShoppingCart.css";
+import { Link } from 'react-router-dom';
 import { FaTrashAlt, FaTruck, FaGift, FaCheck, FaDollarSign } from 'react-icons/fa';
 
 const ShoppingCart = () => {
@@ -122,9 +123,6 @@ const ShoppingCart = () => {
                                             </div>
                                             
                                             <div className="flex justify-between items-center">
-                                                <div>
-                                                    {/* Espacio para información adicional si es necesario */}
-                                                </div>
                                                 <div className="flex items-center">
                                                     <div className="text-right">
                                                         <span className="font-medium">Total: </span>
@@ -157,9 +155,9 @@ const ShoppingCart = () => {
                                     <FaTrashAlt className="mr-2" />
                                     Vaciar carrito
                                 </button>
-                                <button className="flex items-center px-6 py-2 border outline-button-border outline-button-text rounded-full hover:outline-button-hover">
+                                <Link to="/Products"><button className="flex items-center px-6 py-2 border outline-button-border outline-button-text rounded-full hover:outline-button-hover">
                                     Volver a la tienda
-                                </button>
+                                </button></Link>
                             </div>
                         </div>
                     </div>

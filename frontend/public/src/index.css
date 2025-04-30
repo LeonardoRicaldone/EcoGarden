@@ -4,21 +4,20 @@
 
 /* Altura estimada de la barra de navegación */
 :root {
-  --navbar-height: 40px; /* Ajusta esto según la altura real de tu navbar */
+  --navbar-height: 40px; 
 }
 
 /* Aplicar padding-top a todos los contenedores principales para compensar el navbar fijo */
 .page-container {
   padding-top: var(--navbar-height);
-  min-height: 100vh; /* Asegura que las páginas ocupen al menos la altura de la ventana */
+  min-height: 100vh; 
 }
 
-/* Si también quieres garantizar que los links de anclaje (#id) no queden ocultos bajo el navbar */
 html {
   scroll-padding-top: var(--navbar-height);
 }
 
 .main-content {
-  padding-top: var(--navbar-height); /* Usa la misma variable de altura del navbar */
+  padding-top: var(--navbar-height); 
   min-height: calc(100vh - var(--navbar-height));
 }

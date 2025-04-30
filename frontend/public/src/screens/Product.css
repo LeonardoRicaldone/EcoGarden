@@ -233,7 +233,7 @@
   
   .buy-button {
     flex: 1;
-    background-color: #6b7e52; /* Color verde oliva */
+    background-color: #6b7e52; 
     color: white;
     font-weight: 500;
     padding: 0.5rem 1.5rem;
@@ -244,7 +244,7 @@
   }
   
   .buy-button:hover {
-    background-color: #586542; /* Verde oliva más oscuro */
+    background-color: #586542; 
   }
   
   /* Sección de comentarios */

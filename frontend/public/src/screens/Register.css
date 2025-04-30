@@ -78,7 +78,7 @@
 
 
 .half-width {
-    width: calc(50% - 8px); /* Ajuste para considerar el gap */
+    width: calc(50% - 8px); 
 }
 
 .checkbox-container {
