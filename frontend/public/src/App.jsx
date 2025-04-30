@@ -12,6 +12,8 @@ import Profile from './screens/Profile'
 import ShoppingCart from './screens/ShoppingCart'
 import TermsConditions from './screens/TermsConditions'
 import Nav from './components/Nav/Nav'
+import Layout from './components/Layaout';
+import Product from './screens/Product';
 
 
 function App() {
@@ -20,9 +22,12 @@ function App() {
     <>
 
     <Router>
+    <Layout>
     <Nav />
+   
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/Product" element={<Product />} />
         <Route path="/About" element={<About />} />
         <Route path='/Contact' element={<Contact />} />
         <Route path='/Register' element={<Register />} />
@@ -33,6 +38,7 @@ function App() {
         <Route path='/ShoppingCart' element={<ShoppingCart />} />
         <Route path='/TermsConditions' element={<TermsConditions />} />
       </Routes>
+      </Layout>
       <Footer/>
     </Router>
     

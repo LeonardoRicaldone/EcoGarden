@@ -1,0 +1,11 @@
+.favorites-container {
+    padding: 20px 0;
+    background-color: #f9fafb;
+    min-height: 100vh;
+}
+
+@media (max-width: 640px) {
+    .favorites-container {
+        padding: 10px;
+    }
+}

@@ -1,65 +1,86 @@
-import React from "react";
+import React from 'react';
+import './Login.css';
+import logo from '../assets/logo.png';
+import { FaGoogle } from "react-icons/fa";
 
 const Login = () => {
-    return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-                <h1 className="text-2xl font-bold text-gray-800 mb-4 text-center">
-                    Contáctanos
-                </h1>
-                <form className="space-y-4">
-                    <div>
-                        <label
-                            htmlFor="name"
-                            className="block text-sm font-medium text-gray-700"
-                        >
-                            Nombre
-                        </label>
-                        <input
-                            type="text"
-                            id="name"
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Tu nombre"
-                        />
-                    </div>
-                    <div>
-                        <label
-                            htmlFor="email"
-                            className="block text-sm font-medium text-gray-700"
-                        >
-                            Correo Electrónico
-                        </label>
-                        <input
-                            type="email"
-                            id="email"
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Tu correo electrónico"
-                        />
-                    </div>
-                    <div>
-                        <label
-                            htmlFor="message"
-                            className="block text-sm font-medium text-gray-700"
-                        >
-                            Mensaje
-                        </label>
-                        <textarea
-                            id="message"
-                            rows="4"
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Escribe tu mensaje aquí"
-                        ></textarea>
-                    </div>
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition"
-                    >
-                        Enviar
-                    </button>
-                </form>
+  return (
+    
+<div className="page-container">
+    <div className="login-page">
+      <div className="login-container">
+        <div className="login-left">
+          <div className="login-header">
+            <div className="logoLogin">
+              <img src={logo} alt="EcoGarden Logo" className="logoLogin-img" />
+              <h1>EcoGarden</h1>
             </div>
+            <h2>Bienvenido de vuelta</h2>
+            <p className="login-subtitle">Inicia sesión para acceder a tu cuenta</p>
+          </div>
+
+          <button className="google-button">
+            <FaGoogle className="google-icon" /> {/* Icono de Google */}
+            Continuar con Google
+          </button>
+
+          <div className="divider">
+            <span>o inicia con tu correo</span>
+          </div>
+
+          <form className="login-form">
+            <div className="input-group">
+              <label htmlFor="email">Correo electrónico</label>
+              <input 
+                type="email" 
+                id="email"
+                placeholder="correo@gmail.com" 
+                className="login-input"
+              />
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="password">Contraseña</label>
+              <input 
+                type="password" 
+                id="password"
+                placeholder="••••••••" 
+                className="login-input"
+              />
+            </div>
+
+            <div className="login-options">
+              <div className="remember-me">
+                <input type="checkbox" id="remember" />
+                <label htmlFor="remember">Recordarme</label>
+              </div>
+              <a href="/forgot-password" className="forgot-password">
+                ¿Olvidaste tu contraseña?
+              </a>
+            </div>
+
+            <button type="submit" className="submit-button">
+              Iniciar sesión
+            </button>
+          </form>
+
+          <div className="register-section">
+            <p>¿No tienes una cuenta? <a href="/register" className="register-link">Regístrate aquí</a></p>
+          </div>
         </div>
-    );
+
+        <div className="login-right">
+          <div className="image-overlay"></div>
+          <img 
+            src="https://cdn.pixabay.com/photo/2019/03/16/03/37/plants-4058406_960_720.jpg" 
+            alt="Plantas naturales" 
+            className="background-img"
+          />
+        </div>
+      </div>
+    </div>
+ </div>
+  );
 };
 
 export default Login;

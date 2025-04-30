@@ -1,0 +1,212 @@
+.about-us-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    font-family: 'Segoe UI', sans-serif;
+    color: #333;
+}
+
+.about-hero {
+    text-align: center;
+    padding: 4rem 0;
+    position: relative;
+    margin-bottom: 3rem;
+    background: linear-gradient(135deg, #E4EBD9 0%, #5C7052 100%);
+    border-radius: 16px;
+    color: white;
+    overflow: hidden;
+}
+
+.about-hero h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.about-hero p {
+    font-size: 1.2rem;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-decoration .circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+}
+
+.hero-decoration .circle:nth-child(1) {
+    width: 100px;
+    height: 100px;
+    top: 20%;
+    left: 10%;
+}
+
+.hero-decoration .circle:nth-child(2) {
+    width: 150px;
+    height: 150px;
+    bottom: 10%;
+    right: 15%;
+}
+
+.hero-decoration .circle:nth-child(3) {
+    width: 70px;
+    height: 70px;
+    top: 60%;
+    left: 25%;
+}
+
+.about-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.mission {
+    border-top: 4px solid #5C7052;
+}
+
+.vision {
+    border-top: 4px solid #4A6DA7;
+}
+
+.history {
+    border-top: 4px solid #A37C5D;
+}
+
+.icon-container {
+    width: 60px;
+    height: 60px;
+    background: #E4EBD9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.about-icon {
+    font-size: 1.8rem;
+    color: #5C7052;
+}
+
+.about-card h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.about-card p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #555;
+}
+
+.mission-decoration {
+    position: absolute;
+    right: 2rem;
+    bottom: 1rem;
+    opacity: 0.2;
+}
+
+.mission-decoration .decoration-icon {
+    font-size: 4rem;
+    color: #5C7052;
+}
+
+.vision-decoration {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+}
+
+.vision-ring {
+    width: 80px;
+    height: 80px;
+    border: 8px solid rgba(74, 109, 167, 0.2);
+    border-radius: 50%;
+}
+
+.timeline {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 2rem;
+    position: relative;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #E4EBD9;
+    z-index: 1;
+}
+
+.timeline-marker {
+    width: 40px;
+    height: 40px;
+    background: #A37C5D;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+}
+
+.team-section {
+    text-align: center;
+    margin: 4rem 0;
+}
+
+.team-section h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: #5C7052;
+}
+
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.value-item {
+    background: white;
+    padding: 2rem 1rem;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.value-item svg {
+    font-size: 2.5rem;
+    color: #5C7052;
+    margin-bottom: 1rem;
+}
+
+.value-item h3 {
+    font-size: 1.3rem;
+    color: #333;
+}
+
+@media (max-width: 768px) {
+    .about-hero h1 {
+        font-size: 2rem;
+    }
+    
+    .about-card {
+        padding: 1.5rem;
+    }
+}

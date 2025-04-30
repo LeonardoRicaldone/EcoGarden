@@ -1,65 +1,114 @@
-import React from "react";
+import React, { useState } from 'react';
+import './Contact.css';
 
 const Contact = () => {
-    return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-                <h1 className="text-2xl font-bold text-gray-800 mb-4 text-center">
-                    Contáctanos
-                </h1>
-                <form className="space-y-4">
-                    <div>
-                        <label
-                            htmlFor="name"
-                            className="block text-sm font-medium text-gray-700"
-                        >
-                            Nombre
-                        </label>
-                        <input
-                            type="text"
-                            id="name"
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Tu nombre"
-                        />
-                    </div>
-                    <div>
-                        <label
-                            htmlFor="email"
-                            className="block text-sm font-medium text-gray-700"
-                        >
-                            Correo Electrónico
-                        </label>
-                        <input
-                            type="email"
-                            id="email"
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Tu correo electrónico"
-                        />
-                    </div>
-                    <div>
-                        <label
-                            htmlFor="message"
-                            className="block text-sm font-medium text-gray-700"
-                        >
-                            Mensaje
-                        </label>
-                        <textarea
-                            id="message"
-                            rows="4"
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Escribe tu mensaje aquí"
-                        ></textarea>
-                    </div>
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition"
-                    >
-                        Enviar
-                    </button>
-                </form>
+  // Estado para almacenar y gestionar los datos del formulario
+  const [formData, setFormData] = useState({
+    nombre: '',
+    email: '',
+    mensaje: ''
+  });
+
+  // Función para actualizar el estado cuando cambian los campos del formulario
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,      // Mantiene los valores anteriores del formulario
+      [name]: value // Actualiza solo el campo que cambió
+    }));
+  };
+
+  // Función para manejar el envío del formulario
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Evita el comportamiento predeterminado de recarga de página
+    console.log('Formulario enviado:', formData); // Registra los datos en la consola
+    alert('Mensaje enviado con éxito!'); // Muestra confirmación al usuario
+    setFormData({ nombre: '', email: '', mensaje: '' }); // Reinicia el formulario
+  };
+
+  return (
+    <div className="page-container">
+    <div className="contact-container">
+      
+      {/* Encabezado de la página de contacto */}
+      <div className="contact-header">
+        <h1>Contáctanos</h1>
+        <p>Esperamos tu mensaje, estamos listos para atenderte</p>
+      </div>
+
+      <div className="contact-content">
+        {/* Sección de información de contacto */}
+        <div className="contact-info">
+          {/* Método de contacto: teléfono */}
+          <div className="contact-method">
+            <i className="fas fa-phone"></i> {/* Ícono de teléfono */}
+            <div>
+              <h3>Teléfonos</h3>
+              <p>5555-5555</p>
+              <p>4444-4444</p>
             </div>
+          </div>
+
+          {/* Método de contacto: correo electrónico */}
+          <div className="contact-method">
+            <i className="fas fa-envelope"></i> {/* Ícono de correo */}
+            <div>
+              <h3>Correos Electrónicos</h3>
+              <p>ventas@gmail.com</p>
+              <p>info@gmail.com</p>
+            </div>
+          </div>
         </div>
-    );
+
+        {/* Formulario de contacto con manejador de envío */}
+        <form className="contact-form" onSubmit={handleSubmit}>
+          {/* Campo para el nombre */}
+          <div className="form-group">
+            <label htmlFor="nombre">Nombre</label>
+            <input
+              type="text"
+              id="nombre"
+              name="nombre"
+              value={formData.nombre}
+              onChange={handleChange} // Actualiza el estado cuando cambia el input
+              required // Campo obligatorio
+            />
+          </div>
+
+          {/* Campo para el email */}
+          <div className="form-group">
+            <label htmlFor="email">Correo Electrónico</label>
+            <input
+              type="email" // Tipo email para validación básica
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required // Campo obligatorio
+            />
+          </div>
+
+          {/* Campo para el mensaje */}
+          <div className="form-group">
+            <label htmlFor="mensaje">Mensaje</label>
+            <textarea
+              id="mensaje"
+              name="mensaje"
+              value={formData.mensaje}
+              onChange={handleChange}
+              required // Campo obligatorio
+            ></textarea>
+          </div>
+
+          {/* Botón de envío */}
+          <button type="submit" className="submit-btn">
+            Enviar → <i className="fas fa-arrow-right"></i> {/* Ícono de flecha derecha */}
+          </button>
+        </form>
+      </div>
+    </div>
+    </div>
+  );
 };
 
 export default Contact;
