@@ -1,5 +1,11 @@
 import {BrowserRouter as Router, Routes, Route} from 'react-router'
 
+import FirstUserForm from './screens/FirstUserForm'
+import Login from './screens/Login'
+import PasswordRecoveryPT1 from './screens/PasswordRecoveryPT1'
+import PasswordRecoveryPT2 from './screens/PasswordRecoveryPT2'
+import PasswordRecoveryPT3 from './screens/PasswordRecoveryPT3'
+
 import Nav from "./components/Nav"
 import Dashboard from './screens/Dashboard'
 import Products from './screens/Products'

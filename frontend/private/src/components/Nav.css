@@ -46,7 +46,7 @@ body {
 }
 
 .nav-link.active {
-  background-color: #c8e6c9; /* Editar el color a #CADBB7 en el hover y active / Antiguo: #c8e6c9*/
+  background-color: #CADBB7; /* Editar el color a #CADBB7 en el hover y active / Antiguo: #c8e6c9*/
   font-weight: 600;
   color: #2e7d32;
   text-decoration: none;   /* Elimina el subrayado */
