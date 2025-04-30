@@ -34,8 +34,8 @@ const Settings = () => {
               alt="Usuario"
             />
             <div className="user-infoSet">
-              <strong>Marvin Coto</strong>
-              <p>Correo: marvinjaviercoto@ecogarden.com</p> 
+              <strong>Ryan Gosling</strong>
+              <p>Correo: ryangosling@ecogarden.com</p> 
               <p>Contraseña: ************</p> 
               <p>Rol: Administrador</p>
               <p>Creación: 26/02/25</p> 
