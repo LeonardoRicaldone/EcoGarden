@@ -4,9 +4,12 @@ import { FaHeart, FaArrowLeft } from 'react-icons/fa';
 import './Product.css';
 
 const Product = () => {
+  // Estado para la cantidad y el estado de favorito
   const [quantity, setQuantity] = useState(1);
+  // Estado para el botón de favorito
   const [isFavorite, setIsFavorite] = useState(false);
   
+  // Funciones para aumentar y disminuir la cantidad
   const decreaseQuantity = () => {
     if (quantity > 1) {
       setQuantity(quantity - 1);
@@ -17,6 +20,7 @@ const Product = () => {
     setQuantity(quantity + 1);
   };
   
+  // Función para alternar el estado de favorito
   const toggleFavorite = () => {
     setIsFavorite(!isFavorite);
   };
@@ -27,7 +31,7 @@ const Product = () => {
       {/* Navegación de regreso */}
       <div className="back-navigation">
         <Link to="/" className="back-link">
-          <FaArrowLeft className="back-icon" />
+          <FaArrowLeft className="back-icon" /> 
           <span>volver a todas las plantas</span>
         </Link>
       </div>
@@ -95,7 +99,7 @@ const Product = () => {
           <div className="product-header">
             <h1 className="product-title">Girasol</h1>
             <button 
-              onClick={toggleFavorite}
+              onClick={toggleFavorite} // Cambia el estado de favorito
               className={`favorite-button ${isFavorite ? 'favorite-active' : ''}`}
             >
               <FaHeart />
@@ -133,14 +137,14 @@ const Product = () => {
           <div className="purchase-controls">
             <div className="quantity-control">
               <button 
-                onClick={decreaseQuantity}
+                onClick={decreaseQuantity} // Disminuir cantidad
                 className="quantity-button"
               >
                 −
               </button>
               <span className="quantity-display">{quantity}</span>
               <button 
-                onClick={increaseQuantity}
+                onClick={increaseQuantity}  // Aumentar cantidad
                 className="quantity-button"
               >
                 +

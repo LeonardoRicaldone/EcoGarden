@@ -4,6 +4,7 @@ import logo from '../assets/logo.png';
 import { Link, useLocation } from 'react-router-dom';
 
 const Register = () => {
+  // Use useLocation para acceder y pasar a la pagina de Términos y condiciones
   const location = useLocation(); 
   const termsAccepted = location.state?.termsAccepted || false;
 

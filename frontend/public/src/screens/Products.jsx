@@ -4,14 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import ProductCard from "../components/ProductCard/ProductCard";
 
 const Products = () => {
+  // Hook para la navegación
   const navigate = useNavigate();
       
+  // Función para manejar el clic en un producto
   const handleProductClick = () => {
     navigate('/product'); 
   };
 
+  // Estado para el valor del rango
   const [rangeValue, setRangeValue] = useState(100);
   
+  // Función para alternar el estado de favorito
   const toggleFavorite = (id) => {
     console.log(`Toggle favorito para producto ${id}`);
     setProducts(prevProducts => 
@@ -23,10 +27,11 @@ const Products = () => {
     );
   };
 
-  const handleAddClick = (id) => {
+    const handleAddClick = (id) => {
     console.log(`Añadir producto ${id} al carrito`);
   };
   
+  // Estado para los productos
   const [products, setProducts] = useState([
     {
       id: 1,
@@ -91,8 +96,9 @@ const Products = () => {
     { id: 'shovels', name: 'Palas'}
   ];
 
+
   const handleRangeChange = (e) => {
-    setRangeValue(e.target.value);
+    setRangeValue(e.target.value);  //cambia el rango de la barra
   };
 
   return (
@@ -139,6 +145,7 @@ const Products = () => {
             </div>
             
             <div className="products-grid">
+              {/* Mapeo de productos para mostrar en la cuadrícula */}
               {products.map((product) => (
                 <ProductCard 
                   key={product.id}

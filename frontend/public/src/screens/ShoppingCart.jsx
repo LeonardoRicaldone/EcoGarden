@@ -75,6 +75,7 @@ const ShoppingCart = () => {
                     {/* Columna de productos */}
                     <div className="lg:col-span-2">
                         <div className="bg-white rounded-lg shadow-sm p-6">
+                            {/* Mapeo de los productos en el carrito */}
                             {cartItems.map((item) => (
                                 <div key={item.id} className="cart-item">
                                     <div className="flex flex-col md:flex-row items-start md:items-center mb-4 pb-4 border-b border-gray-200">
@@ -130,7 +131,7 @@ const ShoppingCart = () => {
                                                     </div>
                                                     <button 
                                                         className="ml-4 delete-icon-color hover:text-red-500"
-                                                        onClick={() => removeItem(item.id)}
+                                                        onClick={() => removeItem(item.id)}  // Función para eliminar el item
                                                     >
                                                         <FaTrashAlt />
                                                     </button>
@@ -150,7 +151,7 @@ const ShoppingCart = () => {
                             <div className="flex justify-between mt-6">
                                 <button 
                                     className="flex items-center px-6 py-2 border outline-button-border outline-button-text rounded-full hover:outline-button-hover"
-                                    onClick={clearCart}
+                                    onClick={clearCart} // Función para vaciar el carrito
                                 >
                                     <FaTrashAlt className="mr-2" />
                                     Vaciar carrito

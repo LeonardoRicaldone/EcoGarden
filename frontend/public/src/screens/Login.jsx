@@ -5,6 +5,7 @@ import { FaGoogle } from "react-icons/fa";
 
 const Login = () => {
   return (
+    
 <div className="page-container">
     <div className="login-page">
       <div className="login-container">
@@ -19,7 +20,7 @@ const Login = () => {
           </div>
 
           <button className="google-button">
-            <FaGoogle className="google-icon" />
+            <FaGoogle className="google-icon" /> {/* Icono de Google */}
             Continuar con Google
           </button>
 
