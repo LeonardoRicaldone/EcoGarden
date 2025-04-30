@@ -77,7 +77,6 @@
   font-size: 0.9rem;
   flex: 1;
   color: black;
-
 }
 
 .search-button, .filter-button {
@@ -146,8 +145,17 @@
   margin-right: 20px;
 }
 
+/* Mobile menu container */
+.mobile-menu-container {
+  display: none;
+}
+
 /* Responsive Styles */
 @media (max-width: 1200px) {
+  .navbar {
+    justify-content: space-between;
+  }
+  
   .nav-links,
   .search-container,
   .nav-icons {
@@ -158,23 +166,54 @@
     display: block;
   }
 
-  .nav-links.active {
-    display: flex;
+  /* Contenedor del menú móvil cuando está activo */
+  .mobile-menu-container {
+    display: none;
     flex-direction: column;
     position: absolute;
-    top: 80px; 
+    top: 80px;
     left: 0;
     width: 100%;
-    background-color: #CADBB7;
-    padding: 1rem 0;
-    border-top: 1px solid #ddd;
+    background-color: #5C7052;
     z-index: 999;
+    padding-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
 
-  .nav-links.active .nav-link {
-    padding: 1rem;
+  .mobile-menu-container.active {
+    display: flex;
+  }
+
+  /* Estilo para los enlaces en el menú móvil */
+  .mobile-menu-container .nav-links {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 10px 0;
+    border-radius: 0;
+    background-color: transparent;
+  }
+
+  .mobile-menu-container .nav-link {
+    padding: 12px 20px;
     text-align: center;
     font-size: 18px;
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Estilo para la barra de búsqueda en el menú móvil */
+  .mobile-menu-container .search-container {
+    display: flex;
+    width: 90%;
+    margin: 15px auto;
+    max-width: none;
+  }
+
+  /* Estilo para los iconos en el menú móvil */
+  .mobile-menu-container .nav-icons {
+    display: flex;
+    justify-content: center;
+    margin: 15px auto;
   }
 }
-
