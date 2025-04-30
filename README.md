@@ -80,8 +80,7 @@ Integración con Google para registrarse
 
 Opciones de envío flexibles: domicilio o retiro en tienda.
 
-Visión a Futuro 
-Implementar inteligencia artificial para asesoría automatizada.
+### Visión a Futuro 
 
 Integrar métodos de pago adicionales (PayPal, criptomonedas).
 
