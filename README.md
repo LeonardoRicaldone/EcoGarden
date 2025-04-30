@@ -44,13 +44,14 @@ GitHub
 Dependencias Principales 
 (Estas se deben instalar para correr el proyecto)
 
-npm install express
+``npm install express``
 npm install cors
 npm install mongoose
 npm install dotenv
 npm install nodemon -D
 npm install react-router-dom
 npm install react-icons
+npm install framer-motion
 
 Características Principales 
 Plataforma web y móvil para compra de productos de jardinería.
