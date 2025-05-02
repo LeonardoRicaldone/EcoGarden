@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import "./Analytics.css"
 
 const Analytics = () => {
@@ -10,10 +11,10 @@ const Analytics = () => {
 <div className="estadisticas-container">
       {/* Encabezado */}
         <div className="dashboard-btn">
-          <button>
+        <Link to={"/"}><button>
             <span className="material-icons">arrow_back</span>
             Dashboard
-          </button>
+          </button></Link>
         </div>
 
         <h1 className="titulo-analytics">
