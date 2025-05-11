@@ -9,6 +9,9 @@ import PasswordRecoveryPT3 from './screens/PasswordRecoveryPT3'
 import Nav from "./components/Nav"
 import Dashboard from './screens/Dashboard'
 import Products from './screens/Products.jsx'
+import AddProduct from './screens/AddProduct.jsx'
+import Inventary from './screens/Inventary.jsx'
+import Categories from './screens/Categories.jsx'
 import Orders from './screens/Orders'
 import Analytics from './screens/Analytics'
 import Ratings from './screens/Ratings'
@@ -28,6 +31,9 @@ function App() {
     <Routes>
       <Route path="/" element={<Dashboard/>}/>
       <Route path="/products" element={<Products/>}/>
+      <Route path="/products/addproduct" element={<AddProduct/>}/>
+      <Route path='/products/inventary' element={<Inventary/>}/>
+      <Route path='/products/categories' element={<Categories/>}/>
       <Route path="/orders" element={<Orders/>}/>
       <Route path="/analytics" element={<Analytics/>}/>
       <Route path="/ratings" element={<Ratings/>}/>

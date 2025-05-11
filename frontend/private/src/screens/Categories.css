@@ -1,0 +1,119 @@
+.categorias-container {
+    padding: 2rem;
+    background-color: #f3f5f3;
+    border-radius: 1rem;
+    min-height: 100vh;
+  }
+  
+  .categorias-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .dashboard-button {
+    background-color: #d5e4c3;
+    color: #164a41;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .categorias-title {
+    background-color: #d5e4c3;
+    color: #164a41;
+    padding: 0.5rem 1.5rem;
+    border-radius: 1rem;
+    font-weight: bold;
+    font-size: 1.125rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .categorias-content {
+    display: flex;
+    gap: 3rem;
+  }
+  
+  .agregar-categoria {
+    width: 50%;
+  }
+  
+  .agregar-categoria h2,
+  .listado-categorias h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #164a41;
+    margin-bottom: 1.5rem;
+  }
+  
+  .agregar-categoria label {
+    display: block;
+    color: #a3b18a;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .input-categoria {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    outline: none;
+  }
+  
+  .input-categoria:focus {
+    border-color: #a3b18a;
+    box-shadow: 0 0 0 2px #a3b18a33;
+  }
+  
+  .registrar-button {
+    background-color: #a3b18a;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .registrar-button:hover {
+    background-color: #8b9e6d;
+  }
+  
+  .separador {
+    width: 4px;
+    background-color: #164a41;
+  }
+  
+  .listado-categorias {
+    width: 50%;
+  }
+  
+  .categoria-lista {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .categoria-item {
+    background-color: #d5e4c3;
+    color: #164a41;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  

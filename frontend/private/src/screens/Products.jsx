@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import "./Products.css"
 import "./AddProduct.jsx"
+import "./Inventary.jsx"
+import "./Categories.jsx"
 import { NavLink } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
@@ -16,7 +18,7 @@ const Products = () => {
 
 <div className="productos-container">
       <div className="dashboard-btn">
-        <Link to={"/"}><button>
+        <Link to={"/"}><button> 
         <span className="material-icons">arrow_back</span>
           Dashboard
         </button></Link>
@@ -30,24 +32,24 @@ const Products = () => {
       </h1>
 
       <div className="opciones-grid">
-        <div className="opcion-card">
+      <Link to={"/products/addproduct"}><div className="opcion-card">
           <div className="opcion-titulo">Registrar productos</div>
           <div className="opcion-icono">
             <span className="material-icons">add_box</span>
           </div>
-        </div>
-        <div className="opcion-card">
+        </div></Link>
+        <Link to={"/products/inventary"}><div className="opcion-card">
           <div className="opcion-titulo">Inventario</div>
           <div className="opcion-icono">
             <span className="material-icons">shopping_cart</span>
           </div>
-        </div>
-        <div className="opcion-card">
+        </div></Link>
+        <Link to={"/products/categories"}><div className="opcion-card">
           <div className="opcion-titulo">Categorías</div>
           <div className="opcion-icono">
             <span className="material-icons">park</span>
           </div>
-        </div>
+        </div></Link>
         <div className="opcion-card">
           <div className="opcion-titulo">Reporte general</div>
           <div className="opcion-icono">
