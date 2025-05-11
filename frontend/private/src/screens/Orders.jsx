@@ -1,4 +1,5 @@
 import OrdersCard from '../components/OrdersCard';
+import { Link } from 'react-router-dom';
 import "./Orders.css"
 
 const pedidos = [
@@ -39,10 +40,10 @@ const Orders = () => {
 
     <div className="productos-container">
       <div className="dashboard-btn">
-        <button>
+        <Link to={"/"}><button>
           <span className="material-icons">arrow_back</span>
           Dashboard
-        </button>
+        </button></Link>
       </div>
       
 

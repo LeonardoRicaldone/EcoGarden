@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import "./Products.css"
 import "./AddProduct.jsx"
 import { NavLink } from 'react-router-dom';
@@ -15,10 +16,10 @@ const Products = () => {
 
 <div className="productos-container">
       <div className="dashboard-btn">
-        <button>
-          <span className="material-icons">arrow_back</span>
+        <Link to={"/"}><button>
+        <span className="material-icons">arrow_back</span>
           Dashboard
-        </button>
+        </button></Link>
       </div>
       
       
