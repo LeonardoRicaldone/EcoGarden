@@ -1,9 +1,13 @@
 import React from 'react';
 import "./Products.css"
+import "./AddProduct.jsx"
 import { NavLink } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 const Products = () => {
+
 
     return (
 
@@ -16,6 +20,7 @@ const Products = () => {
           Dashboard
         </button>
       </div>
+      
       
 
       <h1 className="titulo-productos">

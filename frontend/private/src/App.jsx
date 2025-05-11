@@ -8,7 +8,7 @@ import PasswordRecoveryPT3 from './screens/PasswordRecoveryPT3'
 
 import Nav from "./components/Nav"
 import Dashboard from './screens/Dashboard'
-import Products from './screens/Products'
+import Products from './screens/Products.jsx'
 import Orders from './screens/Orders'
 import Analytics from './screens/Analytics'
 import Ratings from './screens/Ratings'
