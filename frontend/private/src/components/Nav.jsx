@@ -2,18 +2,67 @@ import React from "react";
 import "./Nav.css"
 import { NavLink } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 const Nav = () => {
 
-  const location = useLocation();
+  
+    // Para simular useLocation en este ejemplo
+    const location = { pathname: window.location.pathname };
+    const [isOpen, setIsOpen] = useState(true);
+    const [isMobile, setIsMobile] = useState(false);
+  
+    // Función para manejar cambios en el tamaño de la ventana
+    useEffect(() => {
+      const checkSize = () => {
+        if (window.innerWidth <= 768) {
+          setIsMobile(true);
+          setIsOpen(false);
+        } else {
+          setIsMobile(false);
+          setIsOpen(true);
+        }
+      };
+  
+      // Verificar tamaño al montar el componente
+      checkSize();
+      
+      // Agregar event listener para cambios de tamaño
+      window.addEventListener('resize', checkSize);
+
+          // Limpieza del event listener
+    return () => window.removeEventListener('resize', checkSize);
+  }, []);
+
+  // Toggle para mostrar/ocultar el sidebar en móvil
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+
+
+    
 
     return(
 
+
+
         <>
 
+<div className="sidebar-container">
+      {/* Botón hamburguesa para móvil */}
+      {isMobile && (
+        <button 
+          className="hamburger-btn"
+          onClick={toggleSidebar}
+          aria-label="Toggle menu"
+        >
+          {isOpen ? '✕' : '☰'}
+        </button>
+      )}
+        
         
 
-<aside class="sidebar">
+<aside className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
   <div class="logo">🌱 EcoGarden</div>
 
   <div class="nav-section">GENERAL</div>
@@ -57,12 +106,13 @@ const Nav = () => {
         </NavLink>
   </nav>
 </aside>
+
         
-        
+        </div>
         </>
 
     )
+  }
 
-}
 //🌿
 export default Nav;
