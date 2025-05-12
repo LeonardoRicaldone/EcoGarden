@@ -1,6 +1,7 @@
 import React from 'react';
 import RatingsCard from '../components/RatingsCard';
 import './Ratings.css';
+import { Link } from 'react-router-dom';
 
 const valoraciones = [
     {
@@ -55,10 +56,10 @@ const Ratings = () => {
 
 <div className="productos-container">
       <div className="dashboard-btn">
-        <button>
+      <Link to={"/"}><button>
           <span className="material-icons">arrow_back</span>
           Dashboard
-        </button>
+        </button></Link>
       </div>
 
       <h1 className="titulo-productos">

@@ -1,6 +1,6 @@
 import React from "react";
 
-const OrdersCard = ({ name, date, imageUrl }) => {
+const OrdersCard = ({ name, date, imageUrl, onDetailsClick}) => {
   return (
     <div className="bg-white border border-green-200 rounded-lg p-4 w-64 flex flex-col items-center shadow-sm hover:shadow-md transition">
       {/* Imagen */}
@@ -26,7 +26,7 @@ const OrdersCard = ({ name, date, imageUrl }) => {
       
       {/* Botones */}
       <div className="mt-2 w-full flex flex-col gap-2">
-        <button className="bg-green-100 text-green-700 rounded-full py-1 text-sm font-medium hover:bg-green-200 transition">
+        <button onClick={onDetailsClick} className="bg-green-100 text-green-700 rounded-full py-1 text-sm font-medium hover:bg-green-200 transition"> 
           Ver detalles
         </button>
         <button className="bg-green-100 text-green-700 rounded-full py-1 text-sm font-medium hover:bg-green-200 transition flex items-center justify-center">

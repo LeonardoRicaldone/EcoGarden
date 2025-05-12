@@ -5,6 +5,10 @@
     color: #1f2937;
   }
 
+  .estadisticas-container a {
+  text-decoration: none;
+}
+
 .analytics-btn {
     background: none;
     border: none;

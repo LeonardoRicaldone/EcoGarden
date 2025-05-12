@@ -1,5 +1,6 @@
 import React from 'react';
 import './Settings.css';
+import { Link } from 'react-router-dom';
 
 const Settings = () => {
 
@@ -10,10 +11,10 @@ const Settings = () => {
 
 <div className="productos-container">
       <div className="dashboard-btn">
-        <button>
-          <span className="material-icons">arrow_back</span>
+      <Link to={"/"}><button>
+        <span className="material-icons">arrow_back</span>
           Dashboard
-        </button>
+        </button></Link>
       </div>
 
       <h1 className="titulo-productos">

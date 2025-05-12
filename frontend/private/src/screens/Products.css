@@ -4,11 +4,17 @@
     background-color: #f9fafb;
     color: #1f2937;
     min-height: 100vh;
+    text-decoration: none;
   }
+
+.productos-container a {
+  text-decoration: none;
+}
   
   .dashboard-btn {
     margin-bottom: 1rem;
   }
+  
   
   .dashboard-btn button {
     background: none;
@@ -36,6 +42,8 @@
     gap: 1rem;
     margin-bottom: 2rem;
   }
+
+  
   
   .opcion-card {
     background-color: white;
