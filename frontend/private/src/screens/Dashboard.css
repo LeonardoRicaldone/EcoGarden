@@ -5,6 +5,8 @@
   min-height: 100vh;
   font-family: sans-serif;
   color: #0E6251;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Encabezado */
@@ -21,12 +23,14 @@
   color: #6b7280;
   font-weight: 600;
   font-size: 18px;
+  margin-bottom: 4px;
 }
 
 .user-name {
   color: #0E6251;
   font-size: 24px;
   font-weight: bold;
+  margin-top: 0;
 }
 
 .header-right {
@@ -40,13 +44,13 @@
 .date,
 .user-info {
   background-color: #ffffff;
-  padding: 8px 12px; /* antes era 12px 16px */
+  padding: 8px 12px;
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   display: flex;
   align-items: center;
-  min-height: 56px;  /* antes era 64px */
-  height: 56px;      /* antes era 64px */
+  min-height: 56px;
+  height: 56px;
   box-sizing: border-box;
 }
 
@@ -78,6 +82,7 @@
   font-weight: 600;
   line-height: 1.2;
   margin-bottom: 2px;
+  margin-top: 0;
 }
 
 .user-email {
@@ -85,6 +90,11 @@
   color: #0E6251;
   line-height: 1.2;
   margin-top: 0;
+  margin-bottom: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
 }
 
 .settings-button {
@@ -92,6 +102,7 @@
   background: none;
   border: none;
   cursor: pointer;
+  padding: 4px;
 }
 
 /* Tarjetas */
@@ -107,7 +118,7 @@
   height: 128px;
   object-fit: cover;
   border-radius: 12px;
-  grid-column: span 1;
+  grid-column: span 1; /* Esto es lo importante */
 }
 
 .card {
@@ -126,11 +137,13 @@
   font-size: 20px;
   color: #003c1d;
   font-weight: bold;
+  margin-bottom: 4px;
 }
 
 .card-subtitle {
   font-size: 14px;
   color: #6b7280;
+  margin-top: 0;
 }
 
 /* Texto principal */
@@ -161,4 +174,128 @@
   line-height: 1.2;
   justify-content: center;
   height: 100%;
+}
+
+/* Media queries para responsive design */
+
+/* Pantallas grandes (1200px y más) */
+@media (min-width: 1200px) {
+  .dashboard-container {
+    padding: 32px;
+  }
+}
+
+/* Pantallas medianas (992px - 1199px) */
+@media (max-width: 1199px) {
+  .cards-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .banner-img {
+    grid-column: span 3;
+  }
+}
+
+/* Tablets (768px - 991px) */
+@media (max-width: 991px) {
+  .cards-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .banner-img {
+    grid-column: span 2;
+  }
+  
+  .header-right {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  
+  .time, .date {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .welcome-text {
+    font-size: 28px;
+  }
+}
+
+/* Tablets pequeñas y móviles grandes (576px - 767px) */
+@media (max-width: 767px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .header-right {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .time, .date {
+    width: calc(50% - 8px);
+    justify-content: center;
+  }
+  
+  .user-info {
+    width: 100%;
+    justify-content: flex-start;
+    margin-top: 8px;
+  }
+  
+  .welcome-text {
+    font-size: 24px;
+  }
+}
+
+/* Móviles (hasta 575px) */
+@media (max-width: 575px) {
+  .dashboard-container {
+    padding: 16px;
+  }
+  
+  .cards-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .banner-img {
+    grid-column: span 1;
+    height: 100px;
+  }
+  
+  .time, .date {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .user-email {
+    max-width: 140px;
+  }
+  
+  .user-info {
+    justify-content: space-between;
+  }
+  
+  .welcome-text {
+    font-size: 22px;
+    margin: 16px 0;
+  }
+}
+
+/* Móviles muy pequeños (hasta 350px) */
+@media (max-width: 350px) {
+  .user-email {
+    max-width: 100px;
+  }
+  
+  .greeting-text {
+    font-size: 16px;
+  }
+  
+  .user-name {
+    font-size: 20px;
+  }
 }

@@ -28,7 +28,7 @@ const Login = () => {
 
         <br />
 
-        <div class="separator">━━━━━━━━ o correo y contraseña ━━━━━━━━</div> <br />
+        <div class="separator">o correo y contraseña</div> <br />
         
 
         <Imput label={"Correo electrónico"} placeholder={"Escribe tu correo electrónico"}/> <br />
