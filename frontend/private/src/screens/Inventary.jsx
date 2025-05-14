@@ -1,5 +1,6 @@
 import ProductsCard from '../components/ProductsCard';
 import { Link } from "react-router-dom"
+import "./Inventary.css"
 
 const Inventary = () => {
 

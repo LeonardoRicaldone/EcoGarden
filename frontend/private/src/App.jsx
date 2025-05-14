@@ -24,6 +24,7 @@ function App() {
   return (
 
     <>
+
     {/*<Router>*/}
     <div style={{ display: 'flex', minHeight: '100vh' }}>
     <Nav />
@@ -44,6 +45,12 @@ function App() {
     </div>
     
     {/*</Router>*/}
+
+{/*<FirstUserForm/>*/}
+{/*<Login/>*/}
+{/*<PasswordRecoveryPT1/>*/}
+{/*<PasswordRecoveryPT2/>*/}
+{/*<PasswordRecoveryPT3/>*/}
 
     
       

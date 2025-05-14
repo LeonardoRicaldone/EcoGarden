@@ -1,6 +1,6 @@
 import Imput from "../components/Imput"
 import Button from "../components/Button"
-import './Inventary.css';
+import './FirstUserForm.css';
 
 const FirstUserForm = () => {
 
