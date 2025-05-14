@@ -32,6 +32,13 @@
     padding-right: 10px; /* opcional: espacio para que no tape el scroll */
   }
 
+  .products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
   .buscador {
     display: flex;
     align-items: center;
@@ -48,66 +55,3 @@
     outline: none;
   }
 
-  .cardPlant {
-    width: 200px;
-    background-color: #ffffff;
-    border: 2px solid #e6f0e8;
-    border-radius: 12px;
-    padding: 16px;
-    text-align: center;
-    font-family: 'Segoe UI', sans-serif;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .plant-image {
-    width: 100%;
-    border-radius: 8px;
-    object-fit: cover;
-  }
-  
-  .plant-name {
-    font-size: 16px;
-    color: #2c3e50;
-    margin: 0;
-    font-weight: 500;
-  }
-  
-  .price {
-    font-size: 18px;
-    color: #2e7d32;
-    font-weight: bold;
-    margin: 4px 0;
-  }
-  
-  .btn {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  
-  .details {
-    background-color: #e8f5e9;
-    color: #2e7d32;
-  }
-  
-  .details:hover {
-    background-color: #d0ebd8;
-  }
-  
-  .edit {
-    background-color: #dcefe5;
-    color: #2e7d32;
-  }
-  
-  .edit:hover {
-    background-color: #c8e0d0;
-  }
-  
-
- 

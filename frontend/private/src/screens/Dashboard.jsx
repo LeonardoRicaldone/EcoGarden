@@ -45,7 +45,7 @@ const Dashboard = () => {
 
       <h2 className="welcome-text">Welcome Administrator!</h2>
 
-      <div className="image-container">
+      <div className="image-container-dash">
         <img
           src="https://plus.unsplash.com/premium_photo-1661962492248-a0b5fb53538c?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGxhbnRhY2klQzMlQjNufGVufDB8fDB8fHww"
           alt="Field of flowers"

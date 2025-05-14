@@ -59,7 +59,7 @@ const Inventary = () => {
       </div> <br />
 
       <div className="scrollable-cards">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-items-center">
+        <div className="products-grid">
           {products.map((item, index) => (
             <ProductsCard
               key={index}
