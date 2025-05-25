@@ -3,6 +3,7 @@ import RatingsCard from '../components/RatingsCard';
 import './Ratings.css';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
+import Searcher from '../components/Searcher';
 
 const valoraciones = [
     {
@@ -58,10 +59,7 @@ const Ratings = () => {
 <div className="productos-container">
       <Header title={"Ratings"} where={"/"}/>
 
-      <div className="buscador">
-        <span className="material-icons">search</span>
-        <input type="text" placeholder="Buscar valoraciones" />
-      </div> <br />
+      <Searcher placeholder={"Buscar comentario"}/>
 
       <div className="scrollable-cards">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-items-center">

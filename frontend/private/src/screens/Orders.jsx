@@ -2,6 +2,7 @@ import OrdersCard from '../components/OrdersCard';
 import { Link } from 'react-router-dom';
 import "./Orders.css"
 import Header from '../components/Header';
+import Searcher from '../components/Searcher';
 
 const pedidos = [
   {
@@ -42,10 +43,7 @@ const Orders = () => {
     <div className="productos-container">
     <Header title={"Orders"}/>
 
-      <div className="buscador">
-            <span className="material-icons">search</span>
-            <input type="text" placeholder="Buscar" />
-          </div> <br />
+    <Searcher placeholder={"Buscar ordenes"}/>
  
 
     

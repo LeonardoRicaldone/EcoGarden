@@ -2,6 +2,7 @@ import ProductsCard from '../components/ProductsCard';
 import { Link } from "react-router-dom"
 import "./Inventary.css"
 import HeaderProducts from '../components/HeaderProducts';
+import Searcher from '../components/Searcher';
 
 const Inventary = () => {
 
@@ -45,10 +46,7 @@ const Inventary = () => {
 <div className="productos-container">
       <HeaderProducts title={"Inventary"}/>
 
-      <div className="buscador">
-        <span className="material-icons">search</span>
-        <input type="text" placeholder="Buscar productos" />
-      </div> <br />
+      <Searcher placeholder={"Buscar producto"}/>
 
       <div className="scrollable-cards">
         <div className="products-grid">
