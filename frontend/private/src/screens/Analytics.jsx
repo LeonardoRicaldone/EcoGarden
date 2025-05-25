@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import "./Analytics.css"
+import Header from '../components/Header';
 
 const Analytics = () => {
 
@@ -9,18 +10,7 @@ const Analytics = () => {
         <>
 
 <div className="estadisticas-container">
-      {/* Encabezado */}
-        <div className="dashboard-btn">
-        <Link to={"/"}><button>
-            <span className="material-icons">arrow_back</span>
-            Dashboard
-          </button></Link>
-        </div>
-
-        <h1 className="titulo-analytics">
-          <span className="material-icons">inventory_2</span>
-          Estadísticas
-        </h1>
+      <Header title={"Analytics"}/>
 
       {/* Tarjetas resumen */}
       <div className="estadisticas-cards">

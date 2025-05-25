@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom"
 import "./Categories.css"
+import HeaderProducts from '../components/HeaderProducts';
 
 const Categories = () => {
 
@@ -8,17 +9,7 @@ const Categories = () => {
         <>
 
 <div className="productos-container">
-<div className="dashboard-btn">
-      <Link to={"/products"}><button>
-          <span className="material-icons">arrow_back</span>
-          Regresar
-        </button></Link>
-      </div>
-
-      <h1 className="titulo-productos">
-        <span className="material-icons">inventory_2</span>
-        Categorías
-      </h1>
+<HeaderProducts title={"Categories"}/>
 
       {/* Contenido */}
       <div className="categorias-content">

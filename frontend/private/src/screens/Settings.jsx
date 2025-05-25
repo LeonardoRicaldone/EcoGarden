@@ -1,6 +1,6 @@
 import React from 'react';
 import './Settings.css';
-import { Link } from 'react-router-dom';
+import Header from '../components/Header';
 
 const Settings = () => {
 
@@ -10,17 +10,7 @@ const Settings = () => {
 
 
 <div className="productos-container">
-      <div className="dashboard-btn">
-      <Link to={"/"}><button>
-        <span className="material-icons">arrow_back</span>
-          Dashboard
-        </button></Link>
-      </div>
-
-      <h1 className="titulo-productos">
-        <span className="material-icons">reviews</span>
-        Ajustes
-      </h1>
+      <Header title={"Settings"}/>
 
       <div className="config-content">
         <div className="user-section">
@@ -40,7 +30,7 @@ const Settings = () => {
               <p>Contraseña: ************</p> 
               <p>Rol: Administrador</p>
               <p>Creación: 26/02/25</p> 
-              <button className="delete-btn">Eliminar cuenta</button>
+              <button className="delete-btn" >Eliminar cuenta</button>
             </div>
           </div>
 

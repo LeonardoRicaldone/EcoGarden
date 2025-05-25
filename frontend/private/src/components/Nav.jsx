@@ -22,44 +22,55 @@ const Nav = () => {
 
   <div class="nav-section">GENERAL</div>
 
-  <nav class="nav">
-        <NavLink to="/" className="nav-link">
-        <i class="icon">🏠</i> Dashboard
-        {location.pathname === '/' && <span> ☘️</span>}
-        </NavLink>
+  <nav className="nav">
+  <NavLink to="/" className="nav-link">
+    <i className="material-icons icon">home</i> Dashboard
+    {location.pathname === '/' && <span>☘️</span>}
+  </NavLink>
 
-        <NavLink to="/products" className="nav-link">
-          <i className="icon">📦</i> Products
-          {location.pathname === '/products' && <span> ☘️</span>}
-        </NavLink>
+  <NavLink to="/products" className="nav-link">
+    <i className="material-icons icon">inventory_2</i> Products
+    {location.pathname === '/products' && <span>☘️</span>}
+  </NavLink>
 
-        <NavLink to="/orders" className="nav-link">
-          <i className="icon">🛒</i> Orders
-          {location.pathname === '/orders' && <span> ☘️</span>}
-        </NavLink>
+  <NavLink to="/orders" className="nav-link">
+    <i className="material-icons icon">shopping_cart</i> Orders
+    {location.pathname === '/orders' && <span>☘️</span>}
+  </NavLink>
 
-        <NavLink to="/analytics" className="nav-link">
-          <i className="icon">📊</i> Analytics
-          {location.pathname === '/analytics' && <span> ☘️</span>}
-        </NavLink>
+  <NavLink to="/sales" className="nav-link">
+    <i className="material-icons icon">local_mall</i> Sales
+    {location.pathname === '/sales' && <span>☘️</span>}
+  </NavLink>
 
-        <NavLink to="/ratings" className="nav-link">
-          <i className="icon">⭐</i> Ratings
-          {location.pathname === '/ratings' && <span> ☘️</span>}
-        </NavLink>
+  <NavLink to="/employees" className="nav-link">
+    <i className="material-icons icon">badge</i> Employees
+    {location.pathname === '/employees' && <span>☘️</span>}
+  </NavLink>
 
-        <div className="nav-section">SUPPORT AND SETTINGS</div>
+  <NavLink to="/analytics" className="nav-link">
+    <i className="material-icons icon">bar_chart</i> Analytics
+    {location.pathname === '/analytics' && <span>☘️</span>}
+  </NavLink>
 
-        {/*<NavLink to="/support" className="nav-link">
-          <i className="icon">🛟</i> Support
-          {location.pathname === '/support' && <span> ☘️</span>}
-        </NavLink>*/}
+  <NavLink to="/ratings" className="nav-link">
+    <i className="material-icons icon">star</i> Ratings
+    {location.pathname === '/ratings' && <span>☘️</span>}
+  </NavLink>
 
-        <NavLink to="/settings" className="nav-link">
-          <i className="icon">⚙️</i> Settings
-          {location.pathname === '/settings' && <span> ☘️</span>}
-        </NavLink>
-  </nav>
+  <div className="nav-section">SUPPORT AND SETTINGS</div>
+
+  <NavLink to="/settings" className="nav-link">
+    <i className="material-icons icon">settings</i> Settings
+    {location.pathname === '/settings' && <span>☘️</span>}
+  </NavLink>
+
+    {/* Botón de cerrar sesión */}
+  <button  className="nav-link logout-button">
+    <i className="material-icons icon">logout</i> Logout
+  </button>
+
+</nav>
 </aside>
 
 

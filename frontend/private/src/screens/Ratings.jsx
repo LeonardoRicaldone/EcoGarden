@@ -2,6 +2,7 @@ import React from 'react';
 import RatingsCard from '../components/RatingsCard';
 import './Ratings.css';
 import { Link } from 'react-router-dom';
+import Header from '../components/Header';
 
 const valoraciones = [
     {
@@ -55,17 +56,7 @@ const Ratings = () => {
         <>
 
 <div className="productos-container">
-      <div className="dashboard-btn">
-      <Link to={"/"}><button>
-          <span className="material-icons">arrow_back</span>
-          Dashboard
-        </button></Link>
-      </div>
-
-      <h1 className="titulo-productos">
-        <span className="material-icons">reviews</span>
-        Valoraciones
-      </h1>
+      <Header title={"Ratings"} where={"/"}/>
 
       <div className="buscador">
         <span className="material-icons">search</span>

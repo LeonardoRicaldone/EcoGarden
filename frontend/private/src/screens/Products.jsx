@@ -4,6 +4,8 @@ import "./Products.css"
 import "./AddProduct.jsx"
 import "./Inventary.jsx"
 import "./Categories.jsx"
+import Header from "../components/Header"
+import ProductsNav from '../components/ProductsNav';
 import { NavLink } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
@@ -17,46 +19,9 @@ const Products = () => {
         <>
 
 <div className="productos-container">
-      <div className="dashboard-btn">
-        <Link to={"/"}><button> 
-        <span className="material-icons">arrow_back</span>
-          Dashboard
-        </button></Link>
-      </div>
-      
-      
+     <Header title={"Products"}/>
 
-      <h1 className="titulo-productos">
-        <span className="material-icons">inventory_2</span>
-        Productos
-      </h1>
-
-      <div className="opciones-grid">
-      <Link to={"/products/addproduct"}><div className="opcion-card">
-          <div className="opcion-titulo">Registrar productos</div>
-          <div className="opcion-icono">
-            <span className="material-icons">add_box</span>
-          </div>
-        </div></Link>
-        <Link to={"/products/inventary"}><div className="opcion-card">
-          <div className="opcion-titulo">Inventario</div>
-          <div className="opcion-icono">
-            <span className="material-icons">shopping_cart</span>
-          </div>
-        </div></Link>
-        <Link to={"/products/categories"}><div className="opcion-card">
-          <div className="opcion-titulo">Categorías</div>
-          <div className="opcion-icono">
-            <span className="material-icons">park</span>
-          </div>
-        </div></Link>
-        <div className="opcion-card">
-          <div className="opcion-titulo">Reporte general</div>
-          <div className="opcion-icono">
-            <span className="material-icons">description</span>
-          </div>
-        </div>
-      </div>
+     <ProductsNav/>
 
       <div className="tabla-container">
         <div className="tabla-header">

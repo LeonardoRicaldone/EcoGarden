@@ -1,6 +1,7 @@
 import ProductsCard from '../components/ProductsCard';
 import { Link } from "react-router-dom"
 import "./Inventary.css"
+import HeaderProducts from '../components/HeaderProducts';
 
 const Inventary = () => {
 
@@ -42,17 +43,7 @@ const Inventary = () => {
         <>
 
 <div className="productos-container">
-      <div className="dashboard-btn">
-      <Link to={"/products"}><button>
-          <span className="material-icons">arrow_back</span>
-          Regresar
-        </button></Link>
-      </div>
-
-      <h1 className="titulo-productos">
-        <span className="material-icons">inventory_2</span>
-        Inventario
-      </h1>
+      <HeaderProducts title={"Inventary"}/>
 
       <div className="buscador">
         <span className="material-icons">search</span>
