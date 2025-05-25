@@ -9,7 +9,7 @@
 
 import { Schema, model } from "mongoose";
 
-const administratorsSchema = new Schema(
+const employeesSchema = new Schema(
     {
         name: {
             type: String,
@@ -37,4 +37,4 @@ const administratorsSchema = new Schema(
     }
 );
 
-export default model("Administrators", administratorsSchema);
+export default model("Employees", employeesSchema);

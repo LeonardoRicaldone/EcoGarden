@@ -1,16 +1,16 @@
 //Array de metodos (C R U D)
-const administratorsController = {};
+const employeesController = {};
 import { json } from "express";
-import Administrators from "../models/administrators.js";
+import Administrators from "../models/Employees.js";
 
 //SELECT
-administratorsController.getAdministrators = async (req, res) => {
+employeesController.getEmployees = async (req, res) => {
     const administrators = await Administrators.find()
     res.json(administrators)
 }
 
 //INSERT
-administratorsController.createAdministrators = async (req, res) => {
+employeesController.createEmployees = async (req, res) => {
     const { name, lastname, phone, email, password} = req.body;
     const newAdministrator = new Administrators({
         name,
@@ -20,17 +20,17 @@ administratorsController.createAdministrators = async (req, res) => {
         password
     });
     await newAdministrator.save()
-    res.json({ message: "Administrators saved" });
+    res.json({ message: "Employee saved" });
 }
 
 //DELETE
-administratorsController.deleteAdministrators = async (req, res) => {
+employeesController.deleteEmployees = async (req, res) => {
     await Administrators.findOneAndDelete(req.params.id)
-    res.json({ message: "Administrators delete" });
+    res.json({ message: "Employee deleted" });
 }
 
 //UPDATE
-administratorsController.updateAdministrators = async (req, res) => {
+employeesController.updateEmployees = async (req, res) => {
     //Solicito todos los valores
     const { name,
         lastname,
@@ -48,7 +48,7 @@ administratorsController.updateAdministrators = async (req, res) => {
         { new: true }
     );
     //Muestro un mensaje que todo se actualizo
-    res.json({ message: "Administrators update" });
+    res.json({ message: "Employee updated" });
 };
 
-export default administratorsController;
+export default employeesController;

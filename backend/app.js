@@ -1,10 +1,11 @@
 //express es un servidor que me dara una red
+import cors from "cors";
 
 //importo todo lo de la libreria de express
 import express from "express";
 import categoriesRoutes from "./src/routes/categories.js";
 import ratingsRoutes from "./src/routes/ratings.js";
-import administratorsRoutes from "./src/routes/administrators.js"
+import employeesRoutes from "./src/routes/employees.js"
 import clientsRoutes from "./src/routes/clients.js"
 import favoritesRoutes from "./src/routes/favorites.js"
 import productsRoutes from "./src/routes/products.js"
@@ -18,13 +19,14 @@ import shoppingCartRoutes from "./src/routes/shoppingCart.js"
 //crear constante que es igual a la libreria que importe
 const app = express();
 
+app.use(cors());
 //Que acepte datos de json
 app.use(express.json());
 
 //Definir las rutas de las funciones que tendra la pagina web
 app.use("/api/categories", categoriesRoutes);
 app.use("/api/ratings", ratingsRoutes);
-app.use("/api/administrators", administratorsRoutes);
+app.use("/api/employees", employeesRoutes);
 app.use("/api/clients", clientsRoutes);
 app.use("/api/favorites", favoritesRoutes);
 app.use("/api/products", productsRoutes);
