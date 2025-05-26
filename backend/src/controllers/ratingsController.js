@@ -18,7 +18,7 @@ ratingsController.createRatings = async (req, res) => {
 
 //DELETE
 ratingsController.deleteRatings = async (req, res) => {
-    await Ratings.findOneAndDelete(req.params.id)
+    await Ratings.findByIdAndDelete(req.params.id)
     res.json({message: "Ratings delete"});
 }
 

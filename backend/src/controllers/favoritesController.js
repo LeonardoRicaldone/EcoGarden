@@ -20,7 +20,7 @@ favoritesController.createFavorites = async (req, res) => {
  
 //DELETE
 favoritesController.deleteFavorites = async (req, res) => {
-    await Favorites.findOneAndDelete(req.params.id)
+    await Favorites.findByIdAndDelete(req.params.id)
     res.json({message: "Favorites delete"});
 }
  

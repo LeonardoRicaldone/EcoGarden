@@ -38,7 +38,7 @@ salesController.createSales = async (req, res) => {
 
 //DELETE
 salesController.deleteSales = async (req, res) => {
-    await Sales.findOneAndDelete(req.params.id)
+    await Sales.findByIdAndDelete(req.params.id)
     res.json({ message: "Sales delete" });
 }
 
