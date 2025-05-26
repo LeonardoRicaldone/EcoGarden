@@ -11,10 +11,12 @@ const ListEmployees = ({
 }) => {
   return (
     <>
-      <h1 className="text-2xl font-bold underline text-center">Listado de empleados</h1>
-      <div className="flex flex-wrap gap-4 justify-center mt-5">
-        {loading && <div className="text-center text-gray-500">Loading...</div>}
+    <div className="w-full h-[50vh] overflow-y-auto px-4">
+      <h1 className="text-2xl font-bold underline text-center mb-4">Listado de empleados</h1>
 
+      {loading && <div className="text-center text-gray-500">Cargando...</div>}
+
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
         {employees?.map((employee) => (
           <CardEmployee
             key={employee._id}
@@ -25,6 +27,7 @@ const ListEmployees = ({
           />
         ))}
       </div>
+    </div>
     </>
   );
 };

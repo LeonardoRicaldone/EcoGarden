@@ -27,9 +27,7 @@ const Employees = () => {
     resetForm,
   } = useDataEmployees();
 
-  useEffect(() => {
-    document.title = "Empleados";
-  }, []);
+
 
   useEffect(() => {
     if (editingEmployee) {
@@ -56,8 +54,7 @@ const Employees = () => {
       <Header title="Employees" />
       <Searcher placeholder="Buscar empleados" />
 
-      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">Empleados</h1>
+      <div className="w-full bg-white shadow-md rounded-lg p-6">
 
         <button
           onClick={() => {
