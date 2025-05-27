@@ -27,6 +27,23 @@ const Employees = () => {
     resetForm,
   } = useDataEmployees();
 
+  // Función para manejar el cambio en el campo teléfono
+  const handlePhoneChange = (value) => {
+    // Solo permite números, espacios, guiones y paréntesis
+    const phoneRegex = /^[0-9\s\-\(\)]*$/;
+    if (phoneRegex.test(value)) {
+      setPhone(value);
+    }
+  };
+
+  // Función alternativa más estricta (solo números)
+  const handlePhoneChangeStrict = (value) => {
+    // Solo permite números
+    const phoneRegex = /^[0-9]*$/;
+    if (phoneRegex.test(value)) {
+      setPhone(value);
+    }
+  };
 
 // Efecto para cargar los datos del empleado en el formulario cuando se edita
   // Este efecto se ejecuta cuando editingEmployee cambia
@@ -69,7 +86,6 @@ const Employees = () => {
           Nuevo Empleado
         </button>
 
-
         <ListEmployees
         // lista de empleados, funciones para editar y eliminar
           deleteEmployee={deleteEmployee}
@@ -79,7 +95,6 @@ const Employees = () => {
           setShowModal={setShowModal}
         />
 
-
         {/* Modal para registrar o editar empleados */}
         <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
           <RegisterEmployees
@@ -88,7 +103,7 @@ const Employees = () => {
             lastname={lastname}
             setLastName={setLastName}
             phone={phone}
-            setPhone={setPhone}
+            setPhone={handlePhoneChangeStrict} // Usa la función de validación
             email={email}
             setEmail={setEmail}
             password={password}
@@ -103,4 +118,3 @@ const Employees = () => {
 };
 
 export default Employees;
-
