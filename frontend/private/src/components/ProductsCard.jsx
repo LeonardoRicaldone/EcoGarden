@@ -1,31 +1,70 @@
-import React from "react";
-import "./ProductsCard.css"
+import React, { useState } from 'react';
+import './ProductsCard.css';
 
-const ProductCard = ({ name, price, imageUrl }) => {
+const ProductsCard = ({ 
+  name, 
+  price, 
+  imageUrl, 
+  descripcion, 
+  stock, 
+  category, 
+  onEdit, 
+  onDelete, 
+  showActions = false 
+}) => {
+  const [imageError, setImageError] = useState(false);
 
-    return (
+  const handleImageError = () => {
+    setImageError(true);
+  };
 
-        <>
-
-    <div className="cardPlant">
-      <div className="centralDivPlant">
-        <div className="imageContainerPlant">
-          <img src={imageUrl} alt={name} className="plant-image" />
-        </div>
-        <div className="infoContainerPlant">
-          <h3 className="plant-name">{name}</h3>
-          <p className="price">$ <span>{price}</span></p>
-          <div className="buttonGroup">
-            <button className="btn details">Ver detalles</button>
-            <button className="btn edit">Editar</button>
+  return (
+    <div className="product-card">
+      <div className="product-image">
+        {imageError || !imageUrl ? (
+          <div className="image-placeholder">
+            <span>📷</span>
+            <p>Sin imagen</p>
           </div>
+        ) : (
+          <img 
+            src={imageUrl} 
+            alt={name}
+            onError={handleImageError}
+          />
+        )}
+      </div>
+      
+      <div className="product-info">
+        <h3 className="product-name">{name}</h3>
+        {descripcion && <p className="product-description">{descripcion}</p>}
+        <div className="product-details">
+          <p className="product-price">${price}</p>
+          {stock !== undefined && <p className="product-stock">Stock: {stock}</p>}
+          {category && <p className="product-category">Categoría: {category}</p>}
         </div>
       </div>
+      
+      {showActions && (
+        <div className="product-actions">
+          <button 
+            onClick={onEdit}
+            className="edit-btn"
+            title="Editar producto"
+          >
+            ✏️ Editar
+          </button>
+          <button 
+            onClick={onDelete}
+            className="delete-btn"
+            title="Eliminar producto"
+          >
+            🗑️ Eliminar
+          </button>
+        </div>
+      )}
     </div>
+  );
+};
 
-        
-        </>
-    )
-}
-
-export default ProductCard;
+export default ProductsCard;

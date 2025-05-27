@@ -1,16 +1,27 @@
-const Searcher = ({placeholder}) => {
+import React, { useState } from 'react';
 
-    return (
+const Searcher = ({ placeholder, onSearch }) => {
+  const [searchTerm, setSearchTerm] = useState('');
 
-        <>
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    if (onSearch) {
+      onSearch(value);
+    }
+  };
 
-        <div className="buscador">
-        <span className="material-icons">search</span>
-        <input type="text" placeholder={placeholder} />
-        </div> <br />
-        
-        </>
-    )
-}
+  return (
+    <div className="buscador">
+      <span>🔍</span>
+      <input
+        type="text"
+        placeholder={placeholder || "Buscar..."}
+        value={searchTerm}
+        onChange={handleChange}
+      />
+    </div>
+  );
+};
 
 export default Searcher;

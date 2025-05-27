@@ -1,15 +1,24 @@
-import express from "express";
 import productsController from "../controllers/productsController.js";
+import { Router } from "express";
 
-//Router nos ayuda a colocar los métodos que tendrá mi ruta
-const router = express.Router();
+const router = Router();
 
-router.route("/")
-.get(productsController.getProducts)
-.post(productsController.createProducts)
+// GET - Obtener todos los productos
+router.get("/", productsController.getProducts);
 
-router.route("/:id")
-.put(productsController.updateProducts)
-.delete(productsController.deleteProducts);
+// POST - Crear nuevo producto (con imagen)
+router.post("/", 
+    productsController.uploadImage, 
+    productsController.createProducts
+);
+
+// PUT - Actualizar producto (con imagen opcional)
+router.put("/:id", 
+    productsController.uploadImage, 
+    productsController.updateProducts
+);
+
+// DELETE - Eliminar producto
+router.delete("/:id", productsController.deleteProducts);
 
 export default router;
