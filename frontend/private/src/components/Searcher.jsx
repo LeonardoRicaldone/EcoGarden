@@ -25,3 +25,4 @@ const Searcher = ({ placeholder, onSearch }) => {
 };
 
 export default Searcher;
+
