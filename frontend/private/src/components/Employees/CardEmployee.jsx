@@ -1,4 +1,5 @@
 import React from "react";
+import Swal from "sweetalert2";
 
 const CardEmployee = ({ employee, deleteEmployee, setEditingEmployee, setShowModal }) => {
   return (
@@ -19,7 +20,23 @@ const CardEmployee = ({ employee, deleteEmployee, setEditingEmployee, setShowMod
         </button>
         <button
           className="bg-red-500 text-white px-2 py-1 rounded"
-          onClick={() => deleteEmployee(employee._id)}
+          onClick={() => {
+            Swal.fire({
+              title: "¿Eliminar empleado?",
+              text: "Esta acción no se puede deshacer",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#d33",
+              cancelButtonColor: "#3085d6",
+              confirmButtonText: "Sí, eliminar",
+              cancelButtonText: "Cancelar"
+            }).then((result) => {
+              if (result.isConfirmed) {
+                deleteEmployee(employee._id);
+                Swal.fire("Eliminado", "El empleado ha sido eliminado.", "success");
+              }
+            });
+          }}
         >
           Eliminar
         </button>
