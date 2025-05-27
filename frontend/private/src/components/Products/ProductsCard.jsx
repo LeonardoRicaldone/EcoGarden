@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './ProductsCard.css';
 
+
 const ProductsCard = ({ 
   name, 
   price, 
@@ -12,8 +13,10 @@ const ProductsCard = ({
   onDelete, 
   showActions = false 
 }) => {
+  // Estado para manejar el error de carga de imagen
   const [imageError, setImageError] = useState(false);
 
+  // Función para manejar el error de carga de imagen
   const handleImageError = () => {
     setImageError(true);
   };

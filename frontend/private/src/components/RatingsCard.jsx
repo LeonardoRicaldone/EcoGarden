@@ -9,9 +9,11 @@ const RatingsCard = ({ name, user, rating, imageUrl, comentario }) => {
         <h2>{name}</h2>
         <p className="usuario">Usuario: <span>{user}</span></p>
         <div className="estrellas">
+          {/* Muestra las estrellas según la puntuación */}
           {Array.from({ length: 5 }).map((_, i) => (
             <span key={i} className={i < rating ? "estrella llena" : "estrella"}>★</span>
           ))}
+          {/* Muestra la puntuación con un decimal */}
           <span className="puntuacion">{rating.toFixed(1)}</span>
         </div>
         <p className="comentario"><strong>Comentario:</strong> <br />{comentario}</p>

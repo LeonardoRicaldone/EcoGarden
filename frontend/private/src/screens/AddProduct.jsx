@@ -1,103 +1,42 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "./AddProduct.css";
 import HeaderProducts from '../components/HeaderProducts';
+import useDataProducts from '../components/Products/hooks/useDataProducts';
+import { useCustomAlert } from '../components/CustomAlert'; // Importar el hook
 
 const AddProduct = () => {
-  const [categories, setCategories] = useState([]);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    descripcion: "",
-    price: "",
-    stock: "",
-    idCategory: ""
-  });
+  const {
+    categories,
+    formData,
+    selectedImage,
+    imagePreview,
+    handleInputChange,
+    handleImageChange,
+    createProduct,
+    resetForm
+  } = useDataProducts();
 
-  // Fetch solo categorías
-  const fetchCategories = async () => {
-    try {
-      const categoriesResponse = await fetch("http://localhost:4000/api/categories");
-      const categoriesData = await categoriesResponse.json();
-      setCategories(categoriesData);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
+  // Usar el hook de alertas personalizadas
+  const { showSuccess, showError,  AlertComponent } = useCustomAlert();
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  // Manejar cambios en el formulario
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  // Manejar selección de imagen
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // Crear producto
+  // Manejar envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Crear FormData para enviar archivo
-    const formDataToSend = new FormData();
-    formDataToSend.append('name', formData.name);
-    formDataToSend.append('descripcion', formData.descripcion);
-    formDataToSend.append('price', formData.price);
-    formDataToSend.append('stock', formData.stock);
-    formDataToSend.append('idCategory', formData.idCategory);
+    const result = await createProduct(formData, selectedImage);
     
-    // Solo agregar imagen si hay una seleccionada
-    if (selectedImage) {
-      formDataToSend.append('image', selectedImage);
+    if (result.success) {
+      showSuccess(
+        '🎉 ¡Producto Registrado!',
+        `El producto "${formData.name}" se ha agregado exitosamente al inventario.`
+      );
+      resetForm(); // Limpiar formulario después del éxito
+    } else {
+      showError(
+        '❌ Error al Registrar',
+        result.message || 'No se pudo registrar el producto. Por favor, intenta nuevamente.'
+      );
     }
-
-    try {
-      const response = await fetch("http://localhost:4000/api/products", {
-        method: 'POST',
-        body: formDataToSend
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        resetForm();
-        alert(result.message || 'Producto creado exitosamente');
-      } else {
-        alert(`Error: ${result.message}`);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Error al crear el producto');
-    }
-  };
-
-  // Resetear formulario
-  const resetForm = () => {
-    setFormData({
-      name: "",
-      descripcion: "",
-      price: "",
-      stock: "",
-      idCategory: ""
-    });
-    setSelectedImage(null);
-    setImagePreview(null);
   };
 
   return (
@@ -206,6 +145,9 @@ const AddProduct = () => {
           </div>
         </form>
       </div>
+
+      {/* Componente de alerta personalizada */}
+      <AlertComponent />
     </div>
   );
 };

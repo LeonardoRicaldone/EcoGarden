@@ -1,76 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import "./Products.css"
-import "./AddProduct.jsx"
-import "./Inventary.jsx"
-import "./Categories.jsx"
-import Header from "../components/Header"
-import ProductsNav from '../components/ProductsNav';
+import "./Products.css";
+import "./AddProduct.jsx";
+import "./Inventary.jsx";
+import "./Categories.jsx";
+import Header from "../components/Header";
+import ProductsNav from '../components/Products/ProductsNav.jsx';
 import { NavLink } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
+import useDataProducts from '../components/Products/hooks/useDataProducts';
 
 const Products = () => {
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    filteredProducts,
+    searchTerm,
+    loading,
+    error,
+    handleSearch,
+    fetchProducts,
+    calculateStats
+  } = useDataProducts();
 
-  // Función para obtener productos del backend
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('http://localhost:4000/api/products');
-      
-      if (!response.ok) {
-        throw new Error('Error al obtener los productos');
-      }
-      
-      const data = await response.json();
-      setProducts(data);
-      setFilteredProducts(data);
-      setError(null);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      setError('Error al cargar los productos. Verifica que el servidor esté funcionando.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  // Función para manejar la búsqueda
-  const handleSearch = (e) => {
-    const term = e.target.value.toLowerCase();
-    setSearchTerm(term);
-    
-    if (term === '') {
-      setFilteredProducts(products);
-    } else {
-      const filtered = products.filter(product =>
-        product.name.toLowerCase().includes(term) ||
-        (product.descripcion && product.descripcion.toLowerCase().includes(term)) ||
-        (product.idCategory?.name && product.idCategory.name.toLowerCase().includes(term))
-      );
-      setFilteredProducts(filtered);
-    }
-  };
-
-  // Función para calcular estadísticas simuladas (puedes ajustar según tu lógica de negocio)
-  const calculateStats = (product) => {
-    // Simulamos ventas y ingresos basados en el stock (puedes reemplazar con datos reales)
-    const salesSimulated = Math.floor(Math.random() * product.stock * 0.3);
-    const revenueSimulated = salesSimulated * product.price;
-    
-    return {
-      sales: salesSimulated,
-      revenue: revenueSimulated
-    };
+  // Función para manejar la búsqueda con evento
+  const handleSearchInput = (e) => {
+    const term = e.target.value;
+    handleSearch(term);
   };
 
   return (
@@ -88,7 +44,7 @@ const Products = () => {
                 type="text" 
                 placeholder="Buscar productos..." 
                 value={searchTerm}
-                onChange={handleSearch}
+                onChange={handleSearchInput}
               />
             </div>
           </div>

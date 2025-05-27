@@ -12,12 +12,14 @@ import {
 } from "react-icons/fa";
 
 const CardSale = ({ sale, updateSaleStatus }) => {
+  // useState para manejar el estado de edición, el nuevo estado y si se está actualizando
   const [isEditing, setIsEditing] = useState(false);
   const [newStatus, setNewStatus] = useState(sale.status);
   const [isUpdating, setIsUpdating] = useState(false);
 
   const statusOptions = ['pendiente', 'recibido'];
 
+  // Función para obtener el color del estado basado en el valor
   const getStatusColor = (status) => {
     const colors = {
       'pendiente': 'bg-yellow-100 text-yellow-800 border-yellow-200',
@@ -26,6 +28,7 @@ const CardSale = ({ sale, updateSaleStatus }) => {
     return colors[status] || 'bg-gray-100 text-gray-800 border-gray-200';
   };
 
+  // Función para formatear la fecha
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
@@ -38,14 +41,17 @@ const CardSale = ({ sale, updateSaleStatus }) => {
     });
   };
 
+  // Función para manejar la actualización del estado
   const handleStatusUpdate = async () => {
     if (newStatus === sale.status) {
       setIsEditing(false);
       return;
     }
 
+    // Validar que el nuevo estado sea diferente al actual
     setIsUpdating(true);
     try {
+      // Aquí se llamaría a la función para actualizar el estado de la venta
       const success = await updateSaleStatus(sale._id, newStatus);
       if (success) {
         setIsEditing(false);
@@ -56,19 +62,23 @@ const CardSale = ({ sale, updateSaleStatus }) => {
         alert('Error al actualizar el estado. Inténtalo de nuevo.');
       }
     } catch (error) {
+      // Manejo de errores
       console.error("Error al actualizar:", error);
       setNewStatus(sale.status);
       alert('Error al actualizar el estado. Inténtalo de nuevo.');
     } finally {
+      // Restablecer el estado de actualización
       setIsUpdating(false);
     }
   };
 
+  // Función para manejar la cancelación de la edición
   const handleCancelEdit = () => {
     setNewStatus(sale.status);
     setIsEditing(false);
   };
 
+  // Función para iniciar la edición del estado
   const handleStartEdit = () => {
     setNewStatus(sale.status);
     setIsEditing(true);
@@ -92,17 +102,23 @@ const CardSale = ({ sale, updateSaleStatus }) => {
             <div className="flex items-center gap-1">
               <select
                 value={newStatus}
+                // Selecciona el nuevo estado
                 onChange={(e) => setNewStatus(e.target.value)}
                 className={`px-2 py-1 rounded text-xs font-medium border ${getStatusColor(newStatus)} focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 disabled={isUpdating}
               >
+
+  
+
                 {statusOptions.map(option => (
+                  // Mapea las opciones de estado
                   <option key={option} value={option}>
                     {option.charAt(0).toUpperCase() + option.slice(1)}
                   </option>
                 ))}
               </select>
               <button
+                // Maneja la actualización del estado
                 onClick={handleStatusUpdate}
                 disabled={isUpdating}
                 className="p-1 text-green-600 hover:text-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -115,6 +131,7 @@ const CardSale = ({ sale, updateSaleStatus }) => {
                 )}
               </button>
               <button
+                // Cancela la edición
                 onClick={handleCancelEdit}
                 disabled={isUpdating}
                 className="p-1 text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -126,9 +143,11 @@ const CardSale = ({ sale, updateSaleStatus }) => {
           ) : (
             <div className="flex items-center gap-1">
               <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(sale.status)}`}>
+                {/* Muestra el estado con la primera letra en mayúscula */}
                 {sale.status.charAt(0).toUpperCase() + sale.status.slice(1)}
               </span>
               <button
+                // Inicia la edición del estado
                 onClick={handleStartEdit}
                 className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
                 title="Editar estado"

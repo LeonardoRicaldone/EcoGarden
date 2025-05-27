@@ -4,10 +4,13 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 
 const CardCategory = ({ category, deleteCategory, setEditingCategory, setShowModal }) => {
   const handleEdit = () => {
+    // Configurar la categoría para editar
+    // Esto asume que tienes un estado en el componente padre para manejar la categoría en edición
     setEditingCategory(category);
     setShowModal(true);
   };
 
+  // Función para manejar la eliminación de la categoría
  const handleDelete = async () => {
   const result = await Swal.fire({
     title: `Eliminar categoría`,
@@ -29,6 +32,7 @@ const CardCategory = ({ category, deleteCategory, setEditingCategory, setShowMod
 
   if (result.isConfirmed) {
     try {
+      // Aquí llamas a la función para eliminar la categoría
       await deleteCategory(category._id);
       await Swal.fire(
         '¡Eliminado!',
@@ -37,7 +41,7 @@ const CardCategory = ({ category, deleteCategory, setEditingCategory, setShowMod
       );
     } catch (error) {
       await Swal.fire(
-        'Error',
+        error,
         'Ocurrió un error al eliminar la categoría',
         'error'
       );

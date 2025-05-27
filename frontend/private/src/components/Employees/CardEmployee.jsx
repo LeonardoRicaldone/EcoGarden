@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 
 const CardEmployee = ({ employee, deleteEmployee, setEditingEmployee, setShowModal }) => {
   const handleDelete = () => {
+    // Mostrar alerta de confirmación antes de eliminar
     Swal.fire({
       title: "¿Eliminar empleado?",
       text: "Esta acción no se puede deshacer",
@@ -27,6 +28,7 @@ const CardEmployee = ({ employee, deleteEmployee, setEditingEmployee, setShowMod
       <div className="absolute top-2 right-2 flex space-x-2">
         <button
           onClick={() => {
+            // Configurar el empleado para editar
             setEditingEmployee(employee);
             setShowModal(true);
           }}

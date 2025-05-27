@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
 const useDataCategories = () => {
+  // Estados para manejar los datos del formulario y la lista de categorías
   const [id, setId] = useState("");
   const [categoryName, setCategoryName] = useState("");
   const [categories, setCategories] = useState([]);
@@ -12,6 +13,7 @@ const useDataCategories = () => {
 
   const fetchCategories = async () => {
     try {
+      // Obtener categorías del backend
       const response = await fetch(API);
       const data = await response.json();
       setCategories(data);
@@ -27,16 +29,19 @@ const useDataCategories = () => {
   }, []);
 
   const saveCategory = async () => {
+    // Validar que el nombre de la categoría no esté vacío
     if (!categoryName.trim()) {
       toast.error("El nombre de la categoría es requerido");
       return;
     }
 
+    // Crear un nuevo objeto de categoría
     const newCategory = {
       name: categoryName.trim(),
     };
 
     try {
+      // Verificar si el ID está vacío para determinar si es un nuevo registro
       const response = await fetch(API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -51,6 +56,8 @@ const useDataCategories = () => {
     }
   };
 
+
+  // Función para eliminar una categoría
   const deleteCategory = async (id) => {
     try {
       await fetch(`${API}/${id}`, { method: "DELETE" });
@@ -61,6 +68,8 @@ const useDataCategories = () => {
     }
   };
 
+
+  // Función para editar una categoría
   const handleEdit = async () => {
     if (!categoryName.trim()) {
       toast.error("El nombre de la categoría es requerido");
@@ -72,6 +81,7 @@ const useDataCategories = () => {
     };
 
     try {
+      // Verificar si el ID está vacío para determinar si es un nuevo registro
       const response = await fetch(`${API}/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },

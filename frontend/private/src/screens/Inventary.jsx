@@ -1,169 +1,79 @@
-import React, { useState, useEffect } from "react";
-import ProductsCard from '../components/ProductsCard';
-import { Link } from "react-router-dom"
-import "./Inventary.css"
+import React from "react";
+import ProductsCard from '../components/Products/ProductsCard';
+import { Link } from "react-router-dom";
+import "./Inventary.css";
 import HeaderProducts from '../components/HeaderProducts';
 import Searcher from '../components/Searcher';
+import useDataProducts from '../components/Products/hooks/useDataProducts';
+import { useCustomAlert } from '../components/CustomAlert'; // Importar el hook
 
 const Inventary = () => {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [editingProduct, setEditingProduct] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    descripcion: "",
-    price: "",
-    stock: "",
-    idCategory: ""
-  });
+  const {
+    filteredProducts,
+    categories,
+    editingProduct,
+    formData,
+    selectedImage,
+    imagePreview,
+    handleSearch,
+    handleInputChange,
+    handleImageChange,
+    updateProduct,
+    deleteProduct,
+    startEditProduct,
+    resetForm
+  } = useDataProducts();
 
-  // Fetch productos y categorías
-  const fetchData = async () => {
-    try {
-      const productsResponse = await fetch("http://localhost:4000/api/products");
-      const categoriesResponse = await fetch("http://localhost:4000/api/categories");
+  // Usar el hook de alertas personalizadas
+  const { showSuccess, showError, showConfirm, AlertComponent } = useCustomAlert();
 
-      const productsData = await productsResponse.json();
-      const categoriesData = await categoriesResponse.json();
-
-      setProducts(productsData);
-      setCategories(categoriesData);
-      setFilteredProducts(productsData);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  // Filtrar productos por búsqueda
-  useEffect(() => {
-    const filtered = products.filter(product =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.descripcion?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredProducts(filtered);
-  }, [products, searchTerm]);
-
-  // Manejar búsqueda
-  const handleSearch = (term) => {
-    setSearchTerm(term);
-  };
-
-  // Manejar cambios en el formulario
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  // Manejar selección de imagen
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // Actualizar producto
+  // Manejar actualización del producto
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!editingProduct) return;
 
-    const formDataToSend = new FormData();
-    formDataToSend.append('name', formData.name);
-    formDataToSend.append('descripcion', formData.descripcion);
-    formDataToSend.append('price', formData.price);
-    formDataToSend.append('stock', formData.stock);
-    formDataToSend.append('idCategory', formData.idCategory);
-
-    if (selectedImage) {
-      formDataToSend.append('image', selectedImage);
+    const result = await updateProduct(editingProduct._id, formData, selectedImage);
+    
+    if (result.success) {
+      showSuccess(
+        '✨ ¡Producto Actualizado!',
+        `Los cambios en "${formData.name}" se han guardado correctamente.`
+      );
+      resetForm(); // Cerrar modal después del éxito
+    } else {
+      showError(
+        '❌ Error al Actualizar',
+        result.message || 'No se pudieron guardar los cambios. Por favor, intenta nuevamente.'
+      );
     }
+  };
 
-    try {
-      const response = await fetch(`http://localhost:4000/api/products/${editingProduct._id}`, {
-        method: 'PUT',
-        body: formDataToSend
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        fetchData();
-        resetForm();
-        alert(result.message);
+  // Manejar eliminación del producto con alerta de confirmación personalizada
+  const handleDelete = async (product) => {
+    // Mostrar alerta de confirmación personalizada
+    const confirmed = await showConfirm({
+      title: '🚨 ¿Eliminar Producto?',
+      message: `¿Estás seguro de que deseas eliminar "${product.name}"?\n\nEsta acción no se puede deshacer y se perderá toda la información del producto.`,
+      confirmText: 'Sí, Eliminar',
+      cancelText: 'Cancelar'
+    });
+    
+    if (confirmed) {
+      const result = await deleteProduct(product._id);
+      
+      if (result.success) {
+        showSuccess(
+          '🗑️ Producto Eliminado',
+          `"${product.name}" ha sido eliminado del inventario exitosamente.`
+        );
       } else {
-        alert(`Error: ${result.message}`);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Error al actualizar el producto');
-    }
-  };
-
-  // Eliminar producto
-  const handleDelete = async (id) => {
-    if (window.confirm('¿Estás seguro de eliminar este producto?')) {
-      try {
-        const response = await fetch(`http://localhost:4000/api/products/${id}`, {
-          method: 'DELETE'
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          fetchData();
-          alert(result.message);
-        } else {
-          alert(`Error: ${result.message}`);
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Error al eliminar el producto');
+        showError(
+          '❌ Error al Eliminar',
+          result.message || 'No se pudo eliminar el producto. Por favor, intenta nuevamente.'
+        );
       }
     }
-  };
-
-  // Editar producto
-  const handleEdit = (product) => {
-    setEditingProduct(product);
-    setFormData({
-      name: product.name,
-      descripcion: product.descripcion || '',
-      price: product.price.toString(),
-      stock: product.stock.toString(),
-      idCategory: product.idCategory._id || product.idCategory
-    });
-    setImagePreview(product.imgProduct);
-    setSelectedImage(null);
-  };
-
-  // Resetear formulario
-  const resetForm = () => {
-    setFormData({
-      name: "",
-      descripcion: "",
-      price: "",
-      stock: "",
-      idCategory: ""
-    });
-    setSelectedImage(null);
-    setImagePreview(null);
-    setEditingProduct(null);
   };
 
   return (
@@ -307,16 +217,19 @@ const Inventary = () => {
                 descripcion={product.descripcion}
                 stock={product.stock}
                 category={product.idCategory?.name}
-                onEdit={() => handleEdit(product)}
-                onDelete={() => handleDelete(product._id)}
+                onEdit={() => startEditProduct(product)}
+                onDelete={() => handleDelete(product)} // Pasar el objeto completo del producto
                 showActions={true}
               />
             ))}
           </div>
         </div>
       </div>
+
+      {/* Componente de alerta personalizada */}
+      <AlertComponent />
     </>
-  )
-}
+  );
+};
 
 export default Inventary;

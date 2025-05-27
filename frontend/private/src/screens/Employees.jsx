@@ -28,7 +28,8 @@ const Employees = () => {
   } = useDataEmployees();
 
 
-
+// Efecto para cargar los datos del empleado en el formulario cuando se edita
+  // Este efecto se ejecuta cuando editingEmployee cambia
   useEffect(() => {
     if (editingEmployee) {
       setId(editingEmployee._id);
@@ -58,6 +59,7 @@ const Employees = () => {
 
         <button
           onClick={() => {
+            // Resetea el formulario y abre el modal para crear un nuevo empleado
             setEditingEmployee(null);
             resetForm();
             setShowModal(true);
@@ -67,7 +69,9 @@ const Employees = () => {
           Nuevo Empleado
         </button>
 
+
         <ListEmployees
+        // lista de empleados, funciones para editar y eliminar
           deleteEmployee={deleteEmployee}
           employees={employees}
           loading={loading}
@@ -75,6 +79,8 @@ const Employees = () => {
           setShowModal={setShowModal}
         />
 
+
+        {/* Modal para registrar o editar empleados */}
         <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
           <RegisterEmployees
             name={name}

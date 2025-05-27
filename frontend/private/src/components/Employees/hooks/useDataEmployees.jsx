@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
 const useDataEmployees = () => {
+  // Estados para manejar los datos del formulario y la lista de empleados
   const [id, setId] = useState("");
   const [nameEmployee, setNameEmployee] = useState("");
   const [lastnameEmployee, setLastnameEmployee] = useState("");
@@ -14,6 +15,8 @@ const useDataEmployees = () => {
   // URL fija directamente en el código
   const API = "http://localhost:4000/api/employees";
 
+  // Función para obtener empleados del backend
+  // Esta función se ejecuta al cargar el componente
   const fetchEmployees = async () => {
     try {
       const response = await fetch(API);
@@ -39,6 +42,7 @@ const useDataEmployees = () => {
     };
 
     try {
+      // Verificar si el ID está vacío para determinar si es un nuevo registro
       const response = await fetch(API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -52,7 +56,7 @@ const useDataEmployees = () => {
       toast.error("Error al registrar el empleado");
     }
   };
-
+// Función para eliminar un empleado
   const deleteEmployee = async (id) => {
     try {
       await fetch(`${API}/${id}`, { method: "DELETE" });
@@ -62,7 +66,7 @@ const useDataEmployees = () => {
       toast.error("Error al eliminar empleado");
     }
   };
-
+// Función para editar un empleado
   const handleEdit = async () => {
     const editEmployee = {
       name: nameEmployee,
@@ -73,6 +77,7 @@ const useDataEmployees = () => {
     };
 
     try {
+      // Verificar si el ID está vacío para determinar si es un nuevo registro
       const response = await fetch(`${API}/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
