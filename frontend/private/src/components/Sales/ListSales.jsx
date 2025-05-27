@@ -1,11 +1,12 @@
 import React from "react";
 import CardSale from "./CardSale";
+import { FaFileAlt, FaSpinner } from "react-icons/fa";
 
-const ListSales = ({ sales, loading, filteredCount, totalSales }) => {
+const ListSales = ({ sales, loading, filteredCount, totalSales, updateSaleStatus }) => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <FaSpinner className="animate-spin text-blue-600 text-2xl" />
         <span className="ml-3 text-gray-600">Cargando ventas...</span>
       </div>
     );
@@ -29,7 +30,7 @@ const ListSales = ({ sales, loading, filteredCount, totalSales }) => {
       {sales.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-gray-400 mb-4">
-            <span className="text-6xl">📋</span>
+            <FaFileAlt className="text-5xl mx-auto" />
           </div>
           <h3 className="text-lg font-medium text-gray-600 mb-2">
             No se encontraron ventas
@@ -41,7 +42,11 @@ const ListSales = ({ sales, loading, filteredCount, totalSales }) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {sales.map((sale) => (
-            <CardSale key={sale._id} sale={sale} />
+            <CardSale 
+              key={sale._id} 
+              sale={sale} 
+              updateSaleStatus={updateSaleStatus}
+            />
           ))}
         </div>
       )}

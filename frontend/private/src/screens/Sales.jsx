@@ -12,7 +12,8 @@ const Sales = () => {
     searchTerm,
     filterSales,
     totalSales,
-    filteredCount
+    filteredCount,
+    updateSaleStatus
   } = useDataSales();
 
   return (
@@ -31,6 +32,7 @@ const Sales = () => {
           loading={loading}
           filteredCount={filteredCount}
           totalSales={totalSales}
+          updateSaleStatus={updateSaleStatus}
         />
       </div>
     </>
