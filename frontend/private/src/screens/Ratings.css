@@ -1,55 +1,368 @@
-.valoracion-card {
-    display: flex;
-    gap: 16px;
-    border: 1px solid #c5dfca;
-    border-radius: 16px;
-    padding: 16px;
+/* Estilos para la página de Ratings */
+.ratings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1rem;
+}
+
+/* Estadísticas */
+.ratings-stats {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.ratings-stats h2 {
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.stat-card h3 {
+  margin-bottom: 1rem;
+  color: #666;
+  font-size: 1rem;
+}
+
+.average-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.score-large {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #4CAF50;
+}
+
+.stars-large {
+  display: flex;
+  gap: 2px;
+}
+
+.stars-large .star {
+  font-size: 1.5rem;
+}
+
+.total-reviews {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #2196F3;
+}
+
+/* Distribución de puntuaciones */
+.score-distribution {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.score-distribution h3 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.score-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.score-label {
+  min-width: 40px;
+  font-weight: bold;
+  color: #666;
+}
+
+.bar-container {
+  flex: 1;
+  height: 20px;
+  background: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50, #8BC34A);
+  transition: width 0.3s ease;
+}
+
+.score-count {
+  min-width: 80px;
+  text-align: right;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Separador */
+.separador {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #ddd, transparent);
+  margin: 1rem 0;
+}
+
+/* Sección de reseñas */
+.listado-ratings {
+  padding: 2rem;
+}
+
+.listado-ratings h2 {
+  margin-bottom: 2rem;
+  color: #333;
+  font-size: 1.8rem;
+  text-align: center;
+}
+
+/* Grid de 2 columnas para las tarjetas */
+.ratings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Tarjeta de rating - diseño como la imagen */
+.rating-card {
+  background: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rating-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Imagen del producto */
+.product-image {
+  flex-shrink: 0;
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+/* Contenido de la tarjeta */
+.rating-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+/* Nombre del producto*/
+.product-name {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #485935;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Nombre del cliente*/
+.client-name {
+  font-size: 1rem;
+  color: #888;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Sección de calificación */
+.rating-score {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.3rem 0;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.star {
+  font-size: 1.3rem;
+  transition: color 0.2s ease;
+}
+
+.star.filled {
+  color: #FFD700;
+}
+
+.star.empty {
+  color: #ddd;
+}
+
+.score-number {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-left: 0.3rem;
+}
+
+/* Sección de comentario */
+.comment-section {
+  margin-top: 0.5rem;
+}
+
+.comment-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+}
+
+.comment-text {
+  font-size: 0.95rem;
+  color: #666;
+  line-height: 1.4;
+  margin: 0;
+  text-align: justify;
+}
+
+/* Estados de carga y vacío */
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
+.no-ratings {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #999;
+  background: white;
+  border-radius: 20px;
+  border: 2px dashed #ddd;
+  font-size: 1.1rem;
+  grid-column: 1 / -1;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .ratings-grid {
+    grid-template-columns: 1fr;
     max-width: 600px;
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+}
+
+@media (max-width: 768px) {
+  .ratings-content {
+    padding: 0.5rem;
+    gap: 1rem;
   }
   
-  .valoracion-img {
+  .ratings-stats,
+  .listado-ratings {
+    padding: 1rem;
+  }
+  
+  .ratings-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .rating-card {
+    padding: 1.2rem;
+    gap: 1rem;
+  }
+  
+  .product-image {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .product-name {
+    font-size: 1.2rem;
+  }
+  
+  .client-name {
+    font-size: 0.9rem;
+  }
+  
+  .star {
+    font-size: 1.1rem;
+  }
+  
+  .score-number {
+    font-size: 1rem;
+  }
+  
+  .comment-text {
+    font-size: 0.9rem;
+  }
+  
+  .score-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .score-count {
+    text-align: left;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .rating-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .product-image {
+    align-self: center;
     width: 100px;
     height: 100px;
-    object-fit: cover;
-    border-radius: 12px;
   }
   
-  .valoracion-info h2 {
-    font-size: 18px;
-    color: #276749;
-  }
-  
-  .usuario {
-    font-size: 14px;
-    margin-top: 4px;
-    color: #4a5568;
-  }
-  
-  .estrellas {
-    display: flex;
+  .rating-content {
     align-items: center;
-    margin: 6px 0;
+    text-align: center;
   }
   
-  .estrella {
-    font-size: 16px;
-    color: #cbd5e0;
+  .comment-text {
+    text-align: left;
   }
-  
-  .estrella.llena {
-    color: #f6c026;
-  }
-  
-  .puntuacion {
-    margin-left: 8px;
-    font-size: 14px;
-    color: #2d3748;
-  }
-  
-  .comentario {
-    font-size: 14px;
-    color: #2d3748;
-    margin-top: 6px;
-  }
+}

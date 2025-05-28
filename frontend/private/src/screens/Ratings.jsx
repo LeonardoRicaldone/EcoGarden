@@ -1,85 +1,108 @@
-import React from 'react';
-import RatingsCard from '../components/RatingsCard';
-import './Ratings.css';
-import { Link } from 'react-router-dom';
-import Header from '../components/Header';
-import Searcher from '../components/Searcher';
-
-const valoraciones = [
-    {
-      name: 'Pachira aquatica Mini',
-      user: 'Gabriel Soto',
-      rating: 5.0,
-      imageUrl: 'https://res.cloudinary.com/fronda/image/upload/f_auto,q_auto,c_fill,g_center,w_702,h_936/productos/fol/10000/10000482_1.jpg?12-08-2024',
-      comentario: '¡Increíble calidad! La Monstera llegó en perfecto estado, con hojas grandes y sanas. Se nota que la cuidan bien antes de enviarla. Además, el empaque fue excelente, sin daños en el transporte. Definitivamente compraré más plantas aquí.',
-    },
-    {
-      name: 'Helecho Adiantum raddinum',
-      user: 'Luis Rodríguez',
-      rating: 4.0,
-      imageUrl: 'https://res.cloudinary.com/fronda/image/upload/f_auto,q_auto,c_fill,g_center,w_702,h_936/productos/fol/10003/10003600_1.jpg?14-09-2023',
-      comentario: 'Me encantó esta suculenta, es aún más bonita en persona. Llegó muy bien protegida y en excelente estado. No necesita muchos cuidados, perfecta para decorar mi escritorio. ¡Recomendada al 100%!',
-    },
-    {
-      name: 'Monstera deliciosa silvestre',
-      user: 'Javier Castillo',
-      rating: 4.0,
-      imageUrl: 'https://res.cloudinary.com/fronda/image/upload/f_auto,q_auto,c_fill,g_center,w_702,h_936/productos/fol/10093/10093154_1.jpg?12-11-2024',
-      comentario: '¡Hermosa y elegante! Las flores son espectaculares y duraderas, la recibí bien hidratada y en floración, lista para decorar mi sala. El servicio fue muy amable y resolvió todas mis dudas. ¡Volveré a comprar!',
-    },
-    {
-        name: "Peperomia 'Bohemian Bravour'",
-        user: 'Paula Vasquez',
-        rating: 5.0,
-        imageUrl: 'https://res.cloudinary.com/fronda/image/upload/f_auto,q_auto,c_fill,g_center,w_702,h_936/productos/fol/11203/11203807_1.jpg?18-09-2023',
-        comentario: 'Excelente opción para empezar a cultivar en casa. Las semillas germinaron rápido y el sustrato era de gran calidad. Súper recomendada para principiantes.',
-      },
-    {
-      name: "Pachira aquatica Mini'",
-      user: 'Sandra Barrera',
-      rating: 5.0,
-      imageUrl: 'https://res.cloudinary.com/fronda/image/upload/f_auto,q_auto,c_fill,g_center,w_702,h_936/productos/fol/10000/10000482_1.jpg?12-08-2024',
-      comentario: 'Excelente opción para empezar a cultivar en casa. Las semillas germinaron rápido y el sustrato era de gran calidad. Súper recomendada para principiantes.',
-    },
-    {
-        name: "Helecho Adiantum raddinum'",
-        user: 'Ariel Castillo',
-        rating: 3.0,
-        imageUrl: 'https://res.cloudinary.com/fronda/image/upload/f_auto,q_auto,c_fill,g_center,w_702,h_936/productos/fol/10003/10003600_1.jpg?14-09-2023',
-        comentario: 'Excelente opción para empezar a cultivar en casa. Las semillas germinaron rápido y el sustrato era de gran calidad. Súper recomendada para principiantes.',
-      },
-  ];
+import React from "react";
+import "./Ratings.css";
+import HeaderProducts from '../components/HeaderProducts';
+import CardRating from '../components/Ratings/CardRating';
+import useDataRatings from '../components/Ratings/hooks/useDataRatings';
 
 const Ratings = () => {
+  const {
+    ratings,
+    loading,
+  } = useDataRatings();
 
-    return (
+  // Calcular estadísticas
+  const totalRatings = ratings.length;
+  const averageScore = totalRatings > 0 
+    ? (ratings.reduce((sum, rating) => sum + rating.score, 0) / totalRatings).toFixed(1)
+    : 0;
 
-        <>
+  const scoreDistribution = [5, 4, 3, 2, 1].map(score => ({
+    score,
+    count: ratings.filter(rating => rating.score === score).length,
+    percentage: totalRatings > 0 
+      ? ((ratings.filter(rating => rating.score === score).length / totalRatings) * 100).toFixed(1)
+      : 0
+  }));
 
-<div className="productos-container">
-      <Header title={"Ratings"} where={"/"}/>
+  return (
+    <>
+      <div className="productos-container">
+        <HeaderProducts title={"Ratings"} />
 
-      <Searcher placeholder={"Buscar comentario"}/>
+        {/* Contenido */}
+        <div className="ratings-content">
+          {/* Sección de estadísticas */}
+          <div className="ratings-stats">
+            <h2>Estadísticas de Calificaciones</h2>
+            <div className="stats-grid">
+              <div className="stat-card">
+                <h3>Promedio General</h3>
+                <div className="average-score">
+                  <span className="score-large">{averageScore}</span>
+                  <div className="stars-large">
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <span 
+                        key={star} 
+                        className={star <= Math.round(averageScore) ? "star filled" : "star empty"}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="stat-card">
+                <h3>Total de Reseñas</h3>
+                <span className="total-reviews">{totalRatings}</span>
+              </div>
+            </div>
 
-      <div className="scrollable-cards">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-items-center">
-          {valoraciones.map((item, index) => (
-            <RatingsCard
-              key={index}
-              name={item.name}
-              user={item.user}
-              rating={item.rating}
-              imageUrl={item.imageUrl}
-              comentario={item.comentario}
-            />
-          ))}
+            {/* Distribución de puntuaciones */}
+            <div className="score-distribution">
+              <h3>Distribución de Puntuaciones</h3>
+              {scoreDistribution.map(({ score, count, percentage }) => (
+                <div key={score} className="score-bar">
+                  <span className="score-label">{score} ★</span>
+                  <div className="bar-container">
+                    <div 
+                      className="bar-fill" 
+                      style={{ width: `${percentage}%` }}
+                    ></div>
+                  </div>
+                  <span className="score-count">{count} ({percentage}%)</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Separador */}
+          <div className="separador"></div>
+
+          {/* Sección Listado de Ratings */}
+          <div className="listado-ratings">
+            <h2>Reseñas de Productos</h2>
+            {loading ? (
+              <div className="loading">Cargando reseñas...</div>
+            ) : (
+              <div className="ratings-grid">
+                {ratings.length === 0 ? (
+                  <div className="no-ratings">No hay reseñas registradas</div>
+                ) : (
+                  ratings.map((rating) => (
+                    <CardRating
+                      key={rating._id}
+                      rating={rating}
+                    />
+                  ))
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-        
-        </>
-        
-    )
-}
+    </>
+  );
+};
 
 export default Ratings;
