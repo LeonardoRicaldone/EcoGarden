@@ -6,10 +6,6 @@ import "./Inventary.jsx";
 import "./Categories.jsx";
 import Header from "../components/Header";
 import ProductsNav from '../components/Products/ProductsNav.jsx';
-import { NavLink } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
-import { useNavigate } from "react-router-dom";
-import { Outlet } from "react-router-dom";
 import useDataProducts from '../components/Products/hooks/useDataProducts';
 
 const Products = () => {
@@ -99,8 +95,8 @@ const Products = () => {
                               <img 
                                 src={product.imgProduct} 
                                 alt={product.name}
-                                onError={(e) => {
-                                  e.target.src = 'https://via.placeholder.com/32x32?text=IMG';
+                                onError={() => {
+                                 
                                 }}
                               />
                             ) : (
