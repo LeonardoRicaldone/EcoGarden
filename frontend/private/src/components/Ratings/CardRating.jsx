@@ -17,6 +17,11 @@ const CardRating = ({ rating }) => {
     return stars;
   };
 
+  // Función para mostrar el score con .0 solo si es entero
+  const formatScore = (score) => {
+    return Number.isInteger(score) ? `${score}.0` : score;
+  };
+
   return (
     <div className="rating-card">
       {/* Imagen del producto */}
@@ -47,7 +52,7 @@ const CardRating = ({ rating }) => {
           <div className="stars">
             {renderStars(rating.score)}
           </div>
-          <span className="score-number">{rating.score}.0</span>
+          <span className="score-number">{formatScore(rating.score)}</span>
         </div>
         
         {/* Comentario */}

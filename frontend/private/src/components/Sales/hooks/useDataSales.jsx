@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
+
 
 const useDataSales = () => {
   const [sales, setSales] = useState([]);
@@ -44,6 +46,8 @@ const useDataSales = () => {
 
       const updatedSale = await response.json();
       console.log('Venta actualizada:', updatedSale);
+      toast.success("Estado actualizado");
+
 
       // Actualización del estado local
       const updateSaleInArray = (prevSales) => 

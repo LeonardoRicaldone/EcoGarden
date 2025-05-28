@@ -16,11 +16,14 @@ const Ratings = () => {
     ? (ratings.reduce((sum, rating) => sum + rating.score, 0) / totalRatings).toFixed(1)
     : 0;
 
+  // Función para redondear las calificaciones
+  const roundScore = (score) => Math.round(score);
+
   const scoreDistribution = [5, 4, 3, 2, 1].map(score => ({
     score,
-    count: ratings.filter(rating => rating.score === score).length,
+    count: ratings.filter(rating => roundScore(rating.score) === score).length,
     percentage: totalRatings > 0 
-      ? ((ratings.filter(rating => rating.score === score).length / totalRatings) * 100).toFixed(1)
+      ? ((ratings.filter(rating => roundScore(rating.score) === score).length / totalRatings) * 100).toFixed(1)
       : 0
   }));
 
