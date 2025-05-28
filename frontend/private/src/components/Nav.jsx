@@ -23,7 +23,7 @@ const Nav = () => {
   <div class="nav-section">GENERAL</div>
 
   <nav className="nav">
-  <NavLink to="/" className="nav-link">
+  <NavLink to="/dashboard" className="nav-link">
     <i className="material-icons icon">home</i> Dashboard
     {location.pathname === '/' && <span>☘️</span>}
   </NavLink>
@@ -33,10 +33,6 @@ const Nav = () => {
     {location.pathname === '/products' && <span>☘️</span>}
   </NavLink>
 
-  <NavLink to="/orders" className="nav-link">
-    <i className="material-icons icon">shopping_cart</i> Orders
-    {location.pathname === '/orders' && <span>☘️</span>}
-  </NavLink>
 
   <NavLink to="/sales" className="nav-link">
     <i className="material-icons icon">local_mall</i> Sales

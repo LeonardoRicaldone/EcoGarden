@@ -12,52 +12,46 @@ import Products from './screens/Products.jsx'
 import AddProduct from './screens/AddProduct.jsx'
 import Inventary from './screens/Inventary.jsx'
 import Categories from './screens/Categories.jsx'
-import Orders from './screens/Orders'
 import Sales from './screens/Sales'
 import Employees from './screens/Employees'
 import Analytics from './screens/Analytics'
 import Ratings from './screens/Ratings'
-import Support from './screens/Support'
 import Settings from './screens/Settings'
-
+import { AuthProvider } from "./context/AuthContext";
+import { Toaster } from "react-hot-toast";
+import { BrowserRouter } from 'react-router-dom';
+import { PrivateRoute } from './components/PrivateRoute.jsx'
+import PrivateLayout from "./components/PrivateLayout.jsx"
 
 function App() {
 
   return (
 
     <>
+      <AuthProvider>
+        
+      <Routes>
+      {/* Ruta pública */}
+      <Route path="/" element={<Login />} />
 
-    {/*<Router>*/}
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
-    <Nav />
-    <div style={{ flex: 1}}>
-    <Routes>
-      <Route path="/" element={<Dashboard/>}/>
-      <Route path="/products" element={<Products/>}/>
-      <Route path="/products/addproduct" element={<AddProduct/>}/>
-      <Route path='/products/inventary' element={<Inventary/>}/>
-      <Route path='/products/categories' element={<Categories/>}/>
-      <Route path="/orders" element={<Orders/>}/>
-      <Route path='/employees' element={<Employees/>}/>
-      <Route path='/sales' element={<Sales/>}/>
-      <Route path="/analytics" element={<Analytics/>}/>
-      <Route path="/ratings" element={<Ratings/>}/>
-      {/*<Route path="/support" element={<Support/>}/>*/}
-      <Route path="/settings" element={<Settings/>}/>
+      {/* Rutas privadas protegidas */}
+      <Route element={<PrivateRoute />}>
+        <Route element={<PrivateLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/addproduct" element={<AddProduct />} />
+          <Route path="/products/inventary" element={<Inventary />} />
+          <Route path="/products/categories" element={<Categories />} />
+          <Route path="/employees" element={<Employees />} />
+          <Route path="/sales" element={<Sales />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/ratings" element={<Ratings />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
+      </Route>
     </Routes>
-    </div>
-    </div>
-    
-    {/*</Router>*/}
+    </AuthProvider>
 
-{/*<FirstUserForm/>*/}
-{/*<Login/>*/}
-{/*<PasswordRecoveryPT1/>*/}
-{/*<PasswordRecoveryPT2/>*/}
-{/*<PasswordRecoveryPT3/>*/}
-
-    
-      
     </>
   )
 }

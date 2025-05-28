@@ -15,6 +15,7 @@ const Searcher = ({ placeholder, onSearch }) => {
   };
 
   return (
+    <>
     <div className="buscador">
       <span>🔍</span>
       <input
@@ -24,7 +25,8 @@ const Searcher = ({ placeholder, onSearch }) => {
         // Elimina el valor del input al hacer clic en el icono de búsqueda
         onChange={handleChange}
       />
-    </div>
+    </div> <br />
+    </>
   );
 };
 

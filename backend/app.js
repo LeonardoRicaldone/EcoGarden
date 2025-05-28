@@ -11,17 +11,29 @@ import favoritesRoutes from "./src/routes/favorites.js"
 import productsRoutes from "./src/routes/products.js"
 import salesRoutes from "./src/routes/sales.js"
 import shoppingCartRoutes from "./src/routes/shoppingCart.js"
+import loginRoutes from "./src/routes/login.js"
+import logoutRoutes from "./src/routes/logout.js"
 
-
-
-
+import cookieParser from "cookie-parser";
+/*import { validateAuthToken } from "../src/middlewares/ValidateAuthToken.js";*/
 
 //crear constante que es igual a la libreria que importe
 const app = express();
 
-app.use(cors());
+app.use(
+    cors({
+      origin: "http://localhost:5173",
+      // Permitir envío de cookies y credenciales
+      credentials: true
+    })
+);
+
 //Que acepte datos de json
 app.use(express.json());
+
+//Que postman acepte guardar cookies
+app.use(cookieParser());
+
 
 //Definir las rutas de las funciones que tendra la pagina web
 app.use("/api/categories", categoriesRoutes);
@@ -33,8 +45,8 @@ app.use("/api/products", productsRoutes);
 app.use("/api/sales", salesRoutes);
 app.use("/api/shoppingCart", shoppingCartRoutes);
 
-
-
+app.use("/api/login", loginRoutes)
+app.use("/api/logout", logoutRoutes)
 
 //exporto la constante para poder usar express en otros archivos
 export default app;
