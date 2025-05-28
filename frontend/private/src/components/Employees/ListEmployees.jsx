@@ -3,7 +3,6 @@ import CardEmployee from "../Employees/CardEmployee";
 
 const ListEmployees = ({
   deleteEmployee,
-  updateEmployees,
   loading,
   employees,
   setEditingEmployee,
@@ -11,7 +10,7 @@ const ListEmployees = ({
 }) => {
   return (
     <>
-    <div className="w-full h-[50vh] overflow-y-auto px-4">
+    <div className="w-full px-4">
       <h1 className="text-2xl font-bold underline text-center mb-4">Listado de empleados</h1>
 
       {loading && <div className="text-center text-gray-500">Cargando...</div>}

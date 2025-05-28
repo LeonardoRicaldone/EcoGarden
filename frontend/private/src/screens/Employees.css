@@ -12,3 +12,135 @@
 .employees-container a {
   text-decoration: none;
 }
+
+/* Botón sin contenedor - directamente en el fondo */
+.new-employee-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #2563eb;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+  margin-bottom: 2rem; /* Separación con las cards */
+}
+
+.new-employee-btn:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+}
+
+.new-employee-btn:active {
+  transform: translateY(0);
+}
+
+.new-employee-btn i {
+  font-size: 1.2rem;
+}
+
+/* Contenedor para la lista de empleados - sin estilos de contenedor */
+.employees-list-container {
+  width: 100%;
+}
+
+/* Cards de empleados directamente en el fondo */
+.employee-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.employee-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Grid para las cards en desktop */
+.employees-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* Estados de carga */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  color: #6b7280;
+}
+
+.no-employees {
+  text-align: center;
+  padding: 3rem;
+  color: #6b7280;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* RESPONSIVE DESIGN */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .employees-container {
+    padding: 1.5rem;
+  }
+  
+  .new-employee-btn {
+    margin-bottom: 1.5rem;
+  }
+  
+  .employees-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+}
+
+/* Móvil */
+@media (max-width: 768px) {
+  .employees-container {
+    padding: 1rem;
+  }
+  
+  .new-employee-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .employees-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .employee-card {
+    padding: 1rem;
+  }
+}
+
+/* Móvil pequeño */
+@media (max-width: 480px) {
+  .employees-container {
+    padding: 0.5rem;
+  }
+  
+  .new-employee-btn {
+    font-size: 0.9rem;
+    padding: 0.75rem;
+  }
+}

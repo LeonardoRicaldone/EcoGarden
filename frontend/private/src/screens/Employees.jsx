@@ -1,11 +1,11 @@
+import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
 import "./Employees.css";
 import Searcher from "../components/Searcher";
-import React, { useState, useEffect } from "react";
 import RegisterEmployees from "../components/Employees/RegisterEmployees";
 import ListEmployees from "../components/Employees/ListEmployees";
 import Modal from "../components/Employees/ModalEmployee";
-import { Toaster } from "react-hot-toast";
+// import { Toaster } from "react-hot-toast"; // Removido para evitar duplicados
 import useDataEmployees from "../components/Employees/hooks/useDataEmployees";
 
 const Employees = () => {
@@ -27,26 +27,15 @@ const Employees = () => {
     resetForm,
   } = useDataEmployees();
 
-  // Función para manejar el cambio en el campo teléfono
-  const handlePhoneChange = (value) => {
-    // Solo permite números, espacios, guiones y paréntesis
-    const phoneRegex = /^[0-9\s\-\(\)]*$/;
-    if (phoneRegex.test(value)) {
-      setPhone(value);
-    }
-  };
-
-  // Función alternativa más estricta (solo números)
+  // Función para manejar el cambio en el campo teléfono (solo números)
   const handlePhoneChangeStrict = (value) => {
-    // Solo permite números
     const phoneRegex = /^[0-9]*$/;
     if (phoneRegex.test(value)) {
       setPhone(value);
     }
   };
 
-// Efecto para cargar los datos del empleado en el formulario cuando se edita
-  // Este efecto se ejecuta cuando editingEmployee cambia
+  // Efecto para cargar los datos del empleado en el formulario cuando se edita
   useEffect(() => {
     if (editingEmployee) {
       setId(editingEmployee._id);
@@ -72,47 +61,46 @@ const Employees = () => {
       <Header title="Employees" />
       <Searcher placeholder="Buscar empleados" />
 
-      <div className="w-full bg-white shadow-md rounded-lg p-6">
+      {/* Botón sin contenedor - directamente en el fondo */}
+      <button
+        onClick={() => {
+          setEditingEmployee(null);
+          resetForm();
+          setShowModal(true);
+        }}
+        className="new-employee-btn"
+      >
+        <i className="material-icons">add</i>
+        Nuevo Empleado
+      </button>
 
-        <button
-          onClick={() => {
-            // Resetea el formulario y abre el modal para crear un nuevo empleado
-            setEditingEmployee(null);
-            resetForm();
-            setShowModal(true);
-          }}
-          className="mb-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          Nuevo Empleado
-        </button>
+      {/* Lista de empleados - directamente en el fondo */}
+      <ListEmployees
+        deleteEmployee={deleteEmployee}
+        employees={employees}
+        loading={loading}
+        setEditingEmployee={setEditingEmployee}
+        setShowModal={setShowModal}
+      />
 
-        <ListEmployees
-        // lista de empleados, funciones para editar y eliminar
-          deleteEmployee={deleteEmployee}
-          employees={employees}
-          loading={loading}
-          setEditingEmployee={setEditingEmployee}
-          setShowModal={setShowModal}
+      {/* Modal para registrar o editar empleados */}
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+        <RegisterEmployees
+          name={name}
+          setName={setName}
+          lastname={lastname}
+          setLastName={setLastName}
+          phone={phone}
+          setPhone={handlePhoneChangeStrict}
+          email={email}
+          setEmail={setEmail}
+          password={password}
+          setPassword={setPassword}
+          handleSubmit={handleSubmit}
         />
+      </Modal>
 
-        {/* Modal para registrar o editar empleados */}
-        <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-          <RegisterEmployees
-            name={name}
-            setName={setName}
-            lastname={lastname}
-            setLastName={setLastName}
-            phone={phone}
-            setPhone={handlePhoneChangeStrict} // Usa la función de validación
-            email={email}
-            setEmail={setEmail}
-            password={password}
-            setPassword={setPassword}
-            handleSubmit={handleSubmit}
-          />
-        </Modal>
-      </div>
-      <Toaster toastOptions={{ duration: 1000 }} />
+      {/* Toaster removido - debe estar solo en App.js o componente raíz */}
     </div>
   );
 };

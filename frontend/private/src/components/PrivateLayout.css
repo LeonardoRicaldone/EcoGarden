@@ -1,0 +1,98 @@
+/* PrivateLayout.css */
+
+.private-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f9fafb;
+  }
+  
+  .content-area {
+    flex: 1;
+    margin-left: 250px; /* Espacio para el sidebar en desktop */
+    min-height: 100vh;
+    overflow-x: auto; /* Para tablas anchas */
+    transition: margin-left 0.3s ease;
+  }
+  
+  /* Contenedor interno para el padding del contenido */
+  .content-wrapper {
+    padding: 2rem;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* RESPONSIVE DESIGN */
+  
+  /* Tablet y móvil */
+  @media (max-width: 768px) {
+    .content-area {
+      margin-left: 0; /* Sin margen en móvil */
+      padding-top: 70px; /* Espacio para el botón hamburguesa */
+    }
+    
+    .content-wrapper {
+      padding: 1rem;
+    }
+  }
+  
+  /* Tablet específico */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .content-area {
+      margin-left: 220px; /* Ajustado al ancho del sidebar en tablet */
+    }
+    
+    .content-wrapper {
+      padding: 1.5rem;
+    }
+  }
+  
+  /* Móvil específico */
+  @media (max-width: 480px) {
+    .content-area {
+      padding-top: 60px;
+    }
+    
+    .content-wrapper {
+      padding: 0.5rem;
+    }
+  }
+  
+  /* Para pantallas muy grandes */
+  @media (min-width: 1400px) {
+    .content-area {
+      margin-left: 280px; /* Ajustado al ancho del sidebar grande */
+    }
+    
+    .content-wrapper {
+      padding: 2.5rem;
+      max-width: 1400px;
+    }
+  }
+  
+  /* Estilos para hacer el contenido más responsive */
+  .content-area h1,
+  .content-area h2,
+  .content-area h3 {
+    margin-top: 0;
+  }
+  
+  /* Para tablas o contenido que necesite scroll horizontal */
+  .content-area .table-container,
+  .content-area .wide-content {
+    overflow-x: auto;
+    width: 100%;
+  }
+  
+  /* Ajustes para formularios en móvil */
+  @media (max-width: 768px) {
+    .content-area form {
+      width: 100%;
+    }
+    
+    .content-area input,
+    .content-area select,
+    .content-area textarea {
+      width: 100%;
+      box-sizing: border-box;
+    }
+  }
