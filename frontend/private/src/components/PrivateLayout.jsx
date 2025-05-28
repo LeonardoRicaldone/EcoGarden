@@ -1,3 +1,7 @@
+import Nav from "./Nav"
+import { Outlet } from "react-router-dom";
+
+
 const PrivateLayout = () => (
   <div style={{ display: 'flex', minHeight: '100vh' }}>
     <Nav />

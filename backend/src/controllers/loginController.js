@@ -74,4 +74,28 @@ loginController.login = async(req, res) => {
     }
 };
 
+    // 🔐 VERIFY TOKEN
+loginController.verify = (req, res) => {
+  const token = req.cookies.authToken;
+
+  if (!token) {
+    return res.status(401).json({ ok: false, message: "No token provided" });
+  }
+
+  jsonwebtoken.verify(token, config.JWT.secret, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ ok: false, message: "Invalid token" });
+    }
+
+    res.json({
+      ok: true,
+      user: {
+        id: decoded.id,
+        userType: decoded.userType,
+      },
+    });
+  });
+  };
+
+
 export default loginController;

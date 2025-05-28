@@ -1,122 +1,108 @@
-import Imput from "../components/Imput"
-import Button from "../components/Button"
-import './Login.css';
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
-import { useNavigate, Navigate } from "react-router-dom";
-import Cookies from 'js-cookie';
+import "./Login.css";
 
 const Login = () => {
-
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { user, Login, logout, authCokie, setAuthCokie } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!email || !password) {
       toast.error("Por favor, complete todos los campos.");
       return;
     }
-    const result = await Login(email, password);
+
+    const result = await login(email, password);
+    console.log("Resultado login:", result);
 
     if (!result.success) {
-      toast.error(result.message || "Credenciales incorrectas.");
+      toast.error("Credenciales incorrectas.");
       return;
     }
+
+    if (result.success) {
+      navigate("/dashboard", { state: { fromLogin: true } });
+    }
     
-    navigate('/dashboard');
     
   };
 
-useEffect(() => {
-  const token = Cookies.get('authToken');
-  console.log(token, 'authToken desde cookie');
-}, []);
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
 
-    return (
-        
-        <>
-
-        <div className="contenedor-principal-Login">
-
-        <div id="DivPrincipal-Login">
-
+  return (
+    <div className="contenedor-principal-Login">
+      <div id="DivPrincipal-Login">
         <div className="logo-contenedor">
-        <img src="src/img/logo.png" alt="" />
-        <h3>EcoGarden</h3> <br />
-        </div> <br />
-
+          <img src="src/img/logo.png" alt="Logo EcoGarden" />
+          <h3>EcoGarden</h3>
+          <br />
+        </div>
+        <br />
         <h5>Inicia sesión con tu cuenta</h5>
-
         <br />
-
-        <button class="google-btn">
-        <span class="google-icon">G</span>
-        <span class="google-text">Google</span>
+        <button className="google-btn">
+          <span className="google-icon">G</span>
+          <span className="google-text">Google</span>
         </button>
-
+        <br />
+        <div className="separator">o correo y contraseña</div>
         <br />
 
-        <div class="separator">o correo y contraseña</div> <br />
-        
-            <label
-              htmlFor="email"
-              className="block text-gray-700 font-medium mb-2"
-            >
-              Correo Electrónico
-            </label>
-              <input
-              type="text"
-              id="email"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            /> <br />
-
-            <label
-              htmlFor="password"
-              className="block text-gray-700 font-medium mb-2"
-            >
-              Contraseña
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            /> <br />
-
-        <p>¿Olvidaste tu contraseña? <a href="https://youtu.be/tQN9hdPNVS4?si=T9NAuKCSqhZ0_kCT">Recuperar</a> </p> <br />
-
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
+            Correo Electrónico
+          </label>
+          <input
+            type="text"
+            id="email"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <br />
+          <label htmlFor="password" className="block text-gray-700 font-medium mb-2">
+            Contraseña
+          </label>
+          <input
+            type="password"
+            id="password"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <br />
+          <p>
+            ¿Olvidaste tu contraseña?{" "}
+            <a href="https://youtu.be/tQN9hdPNVS4?si=T9NAuKCSqhZ0_kCT">Recuperar</a>
+          </p>
+          <br />
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200"
           >
             Iniciar Sesión
           </button>
+        </form>
+      </div>
 
-        </div>
-        <Toaster
-          toastOptions={{
-            duration: 2000,
-          }}
-        />
+      <Toaster toastOptions={{ duration: 2000 }} />
 
-        <div class="imagen-lateral">
+      <div className="imagen-lateral">
         <img src="src/img/sunflowers.png" alt="Fondo" />
-        </div>
-
-
-        </div>
-
-
-
-        </>
-    )
-}
+      </div>
+    </div>
+  );
+};
 
 export default Login;

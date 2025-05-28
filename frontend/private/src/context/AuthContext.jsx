@@ -1,30 +1,43 @@
-import React from "react";
-import { createContext, useContext, useState, useEffect } from "react";
-const API = "http://localhost:4000/api";
-const AuthContext = createContext();
+import { createContext, useState, useContext } from "react";
+
+export const AuthContext = createContext();
+
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [authCokie, setAuthCokie] = useState(null);
+  const [user, setUser] = useState(null); 
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const Login = async (email, password) => {
+  const API = "http://localhost:4000/api";
+
+  const login = async (email, password) => {
     try {
       const response = await fetch(`${API}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error en la autenticación");
+        throw new Error(data.message || "Error en la autenticación");
       }
 
-      const data = await response.json();
-      localStorage.setItem("authToken", data.token);
-      localStorage.setItem("user", JSON.stringify({ email }));
-      setAuthCokie(data.token);
-      setUser({ email });
+      const verifyRes = await fetch(`${API}/login/verify`, {
+        credentials: "include",
+      });
+
+      const verifyData = await verifyRes.json();
+
+      if (verifyData.ok) {
+        setIsAuthenticated(true);
+        setUser(verifyData.user);
+      } else {
+        setIsAuthenticated(false);
+        setUser(null);
+      }
 
       return { success: true, message: data.message };
     } catch (error) {
@@ -32,34 +45,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = async () => {
-    // Si luego agregas logout en backend, puedes mantener el fetch aquí.
-    // En logout
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
-    setAuthCokie(null);
+  const Logout = async () => {
+    await fetch(`${API}/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+    setIsAuthenticated(false);
     setUser(null);
   };
 
-  // En useEffect
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    const savedUser = localStorage.getItem("user");
-    if (token) {
-      setAuthCokie(token);
-      if (savedUser) {
-        setUser(JSON.parse(savedUser));
-      }
-    }
-  }, []);
-
   return (
-    <AuthContext.Provider
-      value={{ user, Login, logout, authCokie, setAuthCokie, API }}
-    >
+    <AuthContext.Provider value={{ user, isAuthenticated, login, Logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
-export const useAuth = () => useContext(AuthContext);

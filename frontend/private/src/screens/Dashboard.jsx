@@ -1,7 +1,20 @@
 import React from 'react';
 import "./Dashboard.css"
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 const Dashboard = () => {
+
+    const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.fromLogin) {
+      toast.success("¡Inicio de sesión exitoso!");
+      // Limpiar el estado para que no muestre el toast otra vez si se recarga
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
     return (
 
