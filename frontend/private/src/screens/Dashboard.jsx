@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import "./Dashboard.css"
 import { useLocation } from "react-router-dom";
-import { toast } from "react-hot-toast";
+import { toast, Toaster } from "react-hot-toast";
 import useDashboardData from '../components/Dashboard/hooks/useDashboardData';
 
 const Dashboard = () => {
@@ -31,8 +31,20 @@ const Dashboard = () => {
 
   // Toast de bienvenida
   useEffect(() => {
-    if (location.state?.fromLogin) {
-      toast.success("¡Inicio de sesión exitoso!");
+    console.log("Dashboard mounted, location.state:", location.state);
+    
+    if (location.state?.fromLogin || location.state?.showSuccessToast) {
+      console.log("Showing success toast");
+      
+      // Usar setTimeout para asegurar que el componente esté completamente montado
+      setTimeout(() => {
+        toast.success("¡Inicio de sesión exitoso! 🎉", {
+          duration: 4000,
+          position: 'top-center',
+        });
+      }, 100);
+      
+      // Limpiar el estado para que no muestre el toast otra vez si se recarga
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);
@@ -68,117 +80,161 @@ const Dashboard = () => {
   // Mostrar loading o error si es necesario
   if (error) {
     return (
-      <div className="dashboard-container">
-        <div className="error-message" style={{
-          background: '#fee2e2',
-          color: '#dc2626',
-          padding: '16px',
-          borderRadius: '8px',
-          textAlign: 'center',
-          margin: '20px 0'
-        }}>
-          <p>Error al cargar los datos: {error}</p>
-          <button 
-            onClick={refreshDashboardData}
-            style={{
-              background: '#dc2626',
-              color: 'white',
-              border: 'none',
-              padding: '8px 16px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              marginTop: '8px'
-            }}
-          >
-            Reintentar
-          </button>
+      <>
+        <div className="dashboard-container">
+          <div className="error-message" style={{
+            background: '#fee2e2',
+            color: '#dc2626',
+            padding: '16px',
+            borderRadius: '8px',
+            textAlign: 'center',
+            margin: '20px 0'
+          }}>
+            <p>Error al cargar los datos: {error}</p>
+            <button 
+              onClick={refreshDashboardData}
+              style={{
+                background: '#dc2626',
+                color: 'white',
+                border: 'none',
+                padding: '8px 16px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                marginTop: '8px'
+              }}
+            >
+              Reintentar
+            </button>
+          </div>
         </div>
-      </div>
+        
+        {/* Toaster con configuración más específica */}
+        <Toaster 
+          position="top-center"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#10B981',
+              color: '#fff',
+              fontSize: '16px',
+              fontWeight: '500',
+            },
+            success: {
+              iconTheme: {
+                primary: '#fff',
+                secondary: '#10B981',
+              },
+            },
+          }} 
+        />
+      </>
     );
   }
 
   return (
-    <div className="dashboard-container">
-      <div className="dashboard-header">
-        <div>
-          <h2 className="greeting-text">{getGreeting()}</h2>
-          <h1 className="user-name">Marvin Gutiérrez Coto</h1>
-        </div>
-        <div className="header-right">
-          <div className="time">{formatTime(currentTime)}</div>
-          <div className="date">{formatDate(currentTime)} 📆</div>
-          <div className="user-info">
-            <img 
-              src="https://avatars.githubusercontent.com/u/139492302?v=4" 
-              alt="avatar" 
-              className="avatar" 
-            />
-            <div>
-              <p className="user-fullname">Marvin Coto</p>
-              <p className="user-email">marvinjaviercoto@ecogarden.com</p>
+    <>
+      <div className="dashboard-container">
+        <div className="dashboard-header">
+          <div>
+            <h2 className="greeting-text">{getGreeting()}</h2>
+            <h1 className="user-name">Marvin Gutiérrez Coto</h1>
+          </div>
+          <div className="header-right">
+            <div className="time">{formatTime(currentTime)}</div>
+            <div className="date">{formatDate(currentTime)} 📆</div>
+            <div className="user-info">
+              <img 
+                src="https://avatars.githubusercontent.com/u/139492302?v=4" 
+                alt="avatar" 
+                className="avatar" 
+              />
+              <div>
+                <p className="user-fullname">Marvin Coto</p>
+                <p className="user-email">marvinjaviercoto@ecogarden.com</p>
+              </div>
+              <button 
+                className="settings-button"
+                onClick={refreshDashboardData}
+                title="Actualizar datos"
+              >
+                ⚙️
+              </button>
             </div>
-            <button 
-              className="settings-button"
-              onClick={refreshDashboardData}
-              title="Actualizar datos"
-            >
-              ⚙️
-            </button>
           </div>
         </div>
+
+        <div className="cards-container">
+          <img 
+            src="https://media.istockphoto.com/id/576892122/es/foto/camino-en-el-bosque.jpg?s=612x612&w=0&k=20&c=ZPTXqHkGLSS14nbdtJUewERi3TK0a2BAT60cYOgthbc=" 
+            alt="Forest" 
+            className="banner-img" 
+          />
+          
+          <div className="card">
+            <h3 className="card-title">
+              {loading ? (
+                <span style={{ color: '#6b7280' }}>Cargando...</span>
+              ) : (
+                `$${formatNumber(totalRevenue)}`
+              )}
+            </h3>
+            <p className="card-subtitle">Ganancias totales</p>
+          </div>
+          
+          <div className="card">
+            <h3 className="card-title">
+              {loading ? (
+                <span style={{ color: '#6b7280' }}>Cargando...</span>
+              ) : (
+                formatNumber(totalProducts)
+              )}
+            </h3>
+            <p className="card-subtitle">Número de productos</p>
+          </div>
+          
+          <div className="card">
+            <h3 className="card-title">
+              {loading ? (
+                <span style={{ color: '#6b7280' }}>Cargando...</span>
+              ) : (
+                formatNumber(totalSales)
+              )}
+            </h3>
+            <p className="card-subtitle">Cantidad de ventas</p>
+          </div>
+        </div>
+
+        <h2 className="welcome-text">Welcome Administrator!</h2>
+
+        <div className="image-container-dash">
+          <img
+            src="https://plus.unsplash.com/premium_photo-1661962492248-a0b5fb53538c?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGxhbnRhY2klQzMlQjNufGVufDB8fDB8fHww"
+            alt="Field of flowers"
+            className="main-img"
+          />
+        </div>
       </div>
 
-      <div className="cards-container">
-        <img 
-          src="https://media.istockphoto.com/id/576892122/es/foto/camino-en-el-bosque.jpg?s=612x612&w=0&k=20&c=ZPTXqHkGLSS14nbdtJUewERi3TK0a2BAT60cYOgthbc=" 
-          alt="Forest" 
-          className="banner-img" 
-        />
-        
-        <div className="card">
-          <h3 className="card-title">
-            {loading ? (
-              <span style={{ color: '#6b7280' }}>Cargando...</span>
-            ) : (
-              `$${formatNumber(totalRevenue)}`
-            )}
-          </h3>
-          <p className="card-subtitle">Ganancias totales</p>
-        </div>
-        
-        <div className="card">
-          <h3 className="card-title">
-            {loading ? (
-              <span style={{ color: '#6b7280' }}>Cargando...</span>
-            ) : (
-              formatNumber(totalProducts)
-            )}
-          </h3>
-          <p className="card-subtitle">Número de productos</p>
-        </div>
-        
-        <div className="card">
-          <h3 className="card-title">
-            {loading ? (
-              <span style={{ color: '#6b7280' }}>Cargando...</span>
-            ) : (
-              formatNumber(totalSales)
-            )}
-          </h3>
-          <p className="card-subtitle">Cantidad de ventas</p>
-        </div>
-      </div>
-
-      <h2 className="welcome-text">Welcome Administrator!</h2>
-
-      <div className="image-container-dash">
-        <img
-          src="https://plus.unsplash.com/premium_photo-1661962492248-a0b5fb53538c?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGxhbnRhY2klQzMlQjNufGVufDB8fDB8fHww"
-          alt="Field of flowers"
-          className="main-img"
-        />
-      </div>
-    </div>
+      {/* Toaster con configuración más específica */}
+      <Toaster 
+        position="top-center"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#10B981',
+            color: '#fff',
+            fontSize: '16px',
+            fontWeight: '500',
+          },
+          success: {
+            iconTheme: {
+              primary: '#fff',
+              secondary: '#10B981',
+            },
+          },
+        }} 
+      />
+    </>
   );
 };
 

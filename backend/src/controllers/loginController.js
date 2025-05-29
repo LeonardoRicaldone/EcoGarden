@@ -39,7 +39,7 @@ loginController.login = async(req, res) => {
 
         //Si no encontramos a ningun usuario con esas credenciales
         if(!userFound){
-            return res.json({message: "User not found"});
+          return res.status(401).json({ success: false, message: "User not found" });
         }
 
         //Validar la contraseña
@@ -47,7 +47,7 @@ loginController.login = async(req, res) => {
         if(userType !== "admin") {
             const isMatch = await bcryptjs.compare(password, userFound.password)
             if(!isMatch){
-                return res.json({message: "Invalid password"})
+              return res.status(401).json({ success: false, message: "Invalid password" });
             }
         }
 
@@ -62,15 +62,19 @@ loginController.login = async(req, res) => {
             {expiresIn: config.JWT.expiresIn},
             //4- Función flecha
             (error, token) => {
-                if(error) console.log("error" + error)
-                res.cookie("authToken", token)
-                res.json({message: "Login succesful"})
+              if (error) {
+                console.log("error " + error);
+                return res.status(500).json({ success: false, message: "Error en el servidor" });
+            }
+            res.cookie("authToken", token);
+            res.json({ success: true, message: "Login exitoso" });
             }
 
         )
 
     } catch (error) {
         console.log("error" + error);
+        res.status(500).json({ success: false, message: "Error en el servidor" });
     }
 };
 
