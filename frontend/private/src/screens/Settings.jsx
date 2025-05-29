@@ -1,10 +1,26 @@
 import React from 'react';
 import './Settings.css';
 import Header from '../components/Header';
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { toast } from "react-hot-toast";
 
 const Settings = () => {
 
+  const { Logout } = useAuth();
+
+  const handleLogout = async () => {
+    await Logout();
+    toast.success("Sesión cerrada correctamente");
+    navigate("/");
+    if (isMobile) {
+      setIsOpen(false);
+    }
+  };
+
     return (
+
+      
 
         <>
 
@@ -30,13 +46,12 @@ const Settings = () => {
               <p>Contraseña: ************</p> 
               <p>Rol: Administrador</p>
               <p>Creación: 26/02/25</p> 
-              <button className="delete-btn" >Eliminar cuenta</button>
             </div>
           </div>
 
           
 
-          <button className="logout-btn">Cerrar Sesión</button>
+          <button onClick={handleLogout} className="logout-btn">Cerrar Sesión</button>
         </div>
 
         <div className="settings-section">
