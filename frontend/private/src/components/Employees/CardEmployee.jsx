@@ -48,18 +48,15 @@ const CardEmployee = ({ employee, deleteEmployee, setEditingEmployee, setShowMod
 
       <h2 className="font-bold mt-6 text-lg">{employee.name} {employee.lastname}</h2>
 
-<p>
-  <span className="font-bold text-slate-600">Tel:</span>{" "}
-  <span className="text-gray-800">{employee.phone}</span>
-</p>
-<p>
-  <span className="font-bold text-slate-600">Email:</span>{" "}
-  <span className="text-gray-800">{employee.email}</span>
-</p>
-<p>
-  <span className="font-bold text-slate-600">Password:</span>{" "}
-  <span className="text-gray-800">{employee.password}</span>
-</p>
+      <p>
+        <span className="font-bold text-slate-600">Tel:</span>{" "}
+        <span className="text-gray-800">{employee.phone}</span>
+      </p>
+      <p>
+        <span className="font-bold text-slate-600">Email:</span>{" "}
+        <span className="text-gray-800">{employee.email}</span>
+      </p>
+      {/* Contraseña removida - no se muestra en las cards */}
     </div>
   );
 };
