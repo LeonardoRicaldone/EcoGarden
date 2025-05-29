@@ -11,6 +11,8 @@ import useDataEmployees from "../components/Employees/hooks/useDataEmployees";
 const Employees = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
+  // Estado para el término de búsqueda
+  const [searchTerm, setSearchTerm] = useState('');
 
   const {
     id, setId,
@@ -26,6 +28,24 @@ const Employees = () => {
     deleteEmployee,
     resetForm,
   } = useDataEmployees();
+
+  // Función para filtrar empleados basada en el término de búsqueda
+  const filteredEmployees = employees.filter(employee => {
+    if (!searchTerm) return true; // Si no hay término de búsqueda, mostrar todos
+    
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      (employee.name && employee.name.toLowerCase().includes(searchLower)) ||
+      (employee.lastname && employee.lastname.toLowerCase().includes(searchLower)) ||
+      (employee.email && employee.email.toLowerCase().includes(searchLower)) ||
+      (employee.phone && employee.phone.includes(searchTerm))
+    );
+  });
+
+  // Función para manejar la búsqueda
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+  };
 
   // Función para manejar el cambio en el campo teléfono (solo números)
   const handlePhoneChangeStrict = (value) => {
@@ -59,7 +79,10 @@ const Employees = () => {
   return (
     <div className="employees-container">
       <Header title="Employees" />
-      <Searcher placeholder="Buscar empleados" />
+      <Searcher 
+        placeholder="Buscar empleados" 
+        onSearch={handleSearch}
+      />
 
       {/* Botón sin contenedor - directamente en el fondo */}
       <button
@@ -77,7 +100,7 @@ const Employees = () => {
       {/* Lista de empleados - directamente en el fondo */}
       <ListEmployees
         deleteEmployee={deleteEmployee}
-        employees={employees}
+        employees={filteredEmployees} // Pasar empleados filtrados en lugar de todos
         loading={loading}
         setEditingEmployee={setEditingEmployee}
         setShowModal={setShowModal}
