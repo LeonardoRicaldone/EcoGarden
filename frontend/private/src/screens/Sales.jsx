@@ -13,6 +13,8 @@ const Sales = () => {
     filterSales,
     totalSales,
     filteredCount,
+    totalRevenue,
+    filteredRevenue,
     updateSaleStatus
   } = useDataSales();
 
@@ -32,6 +34,8 @@ const Sales = () => {
           loading={loading}
           filteredCount={filteredCount}
           totalSales={totalSales}
+          totalRevenue={totalRevenue}
+          filteredRevenue={filteredRevenue}
           updateSaleStatus={updateSaleStatus}
         />
       </div>

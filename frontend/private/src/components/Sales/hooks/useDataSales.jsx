@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
-
 const useDataSales = () => {
   const [sales, setSales] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,7 +47,6 @@ const useDataSales = () => {
       console.log('Venta actualizada:', updatedSale);
       toast.success("Estado actualizado");
 
-
       // Actualización del estado local
       const updateSaleInArray = (prevSales) => 
         prevSales.map(sale => 
@@ -85,7 +83,8 @@ const useDataSales = () => {
           sale.status?.toLowerCase(),
           sale.phone?.toString(),
           sale.zipCode?.toString(),
-          sale._id?.slice(-8)
+          sale._id?.slice(-8),
+          sale.total?.toString() // Añadido el campo total a la búsqueda
         ];
         
         return searchFields.some(field => 
@@ -94,6 +93,14 @@ const useDataSales = () => {
       });
       setFilteredSales(filtered);
     }
+  };
+
+  // Función para calcular el total de ingresos
+  const calculateTotalRevenue = (salesArray) => {
+    return salesArray.reduce((total, sale) => {
+      const saleTotal = sale.total || 0;
+      return total + saleTotal;
+    }, 0);
   };
 
   // Refrescar ventas manualmente
@@ -123,6 +130,8 @@ const useDataSales = () => {
     filterSales,
     totalSales: sales.length,
     filteredCount: filteredSales.length,
+    totalRevenue: calculateTotalRevenue(sales),
+    filteredRevenue: calculateTotalRevenue(filteredSales),
     updateSaleStatus,
     refreshSales
   };

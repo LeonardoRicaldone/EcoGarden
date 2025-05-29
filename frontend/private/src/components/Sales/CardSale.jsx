@@ -8,7 +8,8 @@ import {
   FaSyncAlt,
   FaCheck,
   FaEdit,
-  FaTimes
+  FaTimes,
+  FaDollarSign
 } from "react-icons/fa";
 
 const CardSale = ({ sale, updateSaleStatus }) => {
@@ -39,6 +40,16 @@ const CardSale = ({ sale, updateSaleStatus }) => {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  // Función para formatear el precio
+  const formatPrice = (price) => {
+    if (!price && price !== 0) return 'N/A';
+    return new Intl.NumberFormat('es-ES', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2
+    }).format(price);
   };
 
   // Función para manejar la actualización del estado
@@ -107,9 +118,6 @@ const CardSale = ({ sale, updateSaleStatus }) => {
                 className={`px-2 py-1 rounded text-xs font-medium border ${getStatusColor(newStatus)} focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 disabled={isUpdating}
               >
-
-  
-
                 {statusOptions.map(option => (
                   // Mapea las opciones de estado
                   <option key={option} value={option}>
@@ -178,6 +186,16 @@ const CardSale = ({ sale, updateSaleStatus }) => {
         <p className="text-sm text-gray-600">
           <span className="font-medium">Dirección:</span> {sale.address || 'N/A'}
         </p>
+      </div>
+
+      {/* Campo Total añadido */}
+      <div className="mb-4 p-3 bg-blue-50 rounded border border-blue-200">
+        <div className="flex items-center gap-2 text-sm">
+          <FaDollarSign className="text-blue-500 text-sm" />
+          <span className="text-blue-700 font-medium">
+            Total: {formatPrice(sale.total)}
+          </span>
+        </div>
       </div>
 
       <div className="mb-4 p-3 bg-gray-50 rounded">

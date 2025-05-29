@@ -9,6 +9,7 @@
     zipCode,
     address,
     creditCard,
+    total,
     status
 */
 
@@ -51,6 +52,10 @@ const salesSchema = new Schema(
             required: true
         },
         creditCard: {
+            type: Number,
+            required: true
+        },
+        total:{
             type: Number,
             required: true
         },
