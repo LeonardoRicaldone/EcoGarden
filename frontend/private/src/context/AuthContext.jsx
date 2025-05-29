@@ -1,14 +1,45 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 
 export const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Nuevo estado para manejar la carga inicial
 
   const API = "http://localhost:4000/api";
+
+  // Verificar sesión al cargar la aplicación
+  const checkAuthStatus = async () => {
+    try {
+      const verifyRes = await fetch(`${API}/login/verify`, {
+        credentials: "include",
+      });
+
+      const verifyData = await verifyRes.json();
+
+      if (verifyData.ok) {
+        setIsAuthenticated(true);
+        setUser(verifyData.user);
+      } else {
+        setIsAuthenticated(false);
+        setUser(null);
+      }
+    } catch (error) {
+      console.error("Error verificando autenticación:", error);
+      setIsAuthenticated(false);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Ejecutar verificación al montar el componente
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
 
   const login = async (email, password) => {
     try {
@@ -39,23 +70,37 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
       }
 
-      return { success: true, message: data.message };
+      return { success: data.success, message: data.message };
     } catch (error) {
       return { success: false, message: error.message };
     }
   };
 
   const Logout = async () => {
-    await fetch(`${API}/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
-    setIsAuthenticated(false);
-    setUser(null);
+    try {
+      await fetch(`${API}/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    } finally {
+      setIsAuthenticated(false);
+      setUser(null);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, Logout }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        isAuthenticated, 
+        isLoading, 
+        login, 
+        Logout,
+        checkAuthStatus 
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

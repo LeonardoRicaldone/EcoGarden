@@ -14,6 +14,7 @@ import Settings from './screens/Settings'
 import { AuthProvider } from "./context/AuthContext";
 import { PrivateRoute } from './components/PrivateRoute.jsx'
 import PrivateLayout from "./components/PrivateLayout.jsx"
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
         </Route>
       </Routes>
     </AuthProvider>
+    
   )
 }
 

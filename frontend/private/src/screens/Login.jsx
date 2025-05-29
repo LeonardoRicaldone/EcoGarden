@@ -5,7 +5,6 @@ import { Toaster, toast } from "react-hot-toast";
 import "./Login.css";
 
 const Login = () => {
-  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login, isAuthenticated } = useAuth();
@@ -19,19 +18,29 @@ const Login = () => {
       return;
     }
 
-    const result = await login(email, password);
-    console.log("Resultado login:", result);
+    try {
+      const result = await login(email, password);
+      console.log("Resultado login:", result);
 
-    if (!result.success) {
-      toast.error("Credenciales incorrectas.");
-      return;
-    }
+      if (!result.success) {
+        // Mostrar el mensaje específico del servidor o uno genérico
+        toast.error("Credenciales incorrectas");
+        console.log("Credenciales incorrectas", result);
+        return;
+      }
 
-    if (result.success) {
-      navigate("/dashboard", { state: { fromLogin: true } });
+      if (result.success) {
+        
+        
+        // Esperar un poco para que se vea el toast
+        setTimeout(() => {
+          navigate("/dashboard", { state: { fromLogin: true, showSuccessToast: true } });
+        }, 500);
+      }
+    } catch (error) {
+      console.error("Error inesperado en login:", error);
+      toast.error("Error al iniciar sesión. Intente nuevamente.");
     }
-    
-    
   };
 
   useEffect(() => {
