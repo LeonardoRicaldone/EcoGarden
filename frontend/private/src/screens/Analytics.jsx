@@ -1,105 +1,240 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import "./Analytics.css"
+import React, { useRef, useEffect } from 'react';
+import * as Chart from 'chart.js';
+import './Analytics.css';
 import Header from '../components/Header';
+import useAnalyticsData from '../components/Analytics/hooks/useAnalyticsData';
+
+// Registrar todos los componentes necesarios de Chart.js
+Chart.Chart.register(...Chart.registerables);
 
 const Analytics = () => {
+  const {
+    totalRevenue,
+    totalProducts,
+    totalSales,
+    averageRating,
+    salesByMonth,
+    salesByStatus,
+    loading,
+    error,
+    formatCurrency,
+    formatNumber,
+    refreshAnalyticsData
+  } = useAnalyticsData();
 
+  // Referencias para los canvas de las gráficas
+  const salesChartRef = useRef(null);
+  const statusChartRef = useRef(null);
+
+  // Referencias para las instancias de Chart.js
+  const chartsRef = useRef({});
+
+  // Colores para las gráficas
+  const COLORS = [
+    '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', 
+    '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
+  ];
+
+  // Efecto para crear/actualizar las gráficas
+  useEffect(() => {
+    if (loading || error) return;
+
+    // Destruir gráficas existentes
+    Object.values(chartsRef.current).forEach(chart => {
+      if (chart) chart.destroy();
+    });
+    chartsRef.current = {};
+
+    // Crear gráfica de ventas por mes (combinada)
+    if (salesChartRef.current && salesByMonth.length > 0) {
+      const ctx = salesChartRef.current.getContext('2d');
+      chartsRef.current.sales = new Chart.Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: salesByMonth.map(item => item.month),
+          datasets: [
+            {
+              label: 'Ventas',
+              data: salesByMonth.map(item => item.sales),
+              backgroundColor: 'rgba(52, 211, 153, 0.8)',
+              borderColor: 'rgba(52, 211, 153, 1)',
+              borderWidth: 1,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Ingresos',
+              data: salesByMonth.map(item => item.revenue),
+              type: 'line',
+              backgroundColor: 'rgba(255, 115, 0, 0.1)',
+              borderColor: 'rgba(255, 115, 0, 1)',
+              borderWidth: 3,
+              fill: false,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              title: {
+                display: true,
+                text: 'Número de Ventas'
+              }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: {
+                display: true,
+                text: 'Ingresos (CRC)'
+              },
+              grid: {
+                drawOnChartArea: false,
+              },
+            }
+          },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  if (context.dataset.label === 'Ingresos') {
+                    return `Ingresos: ${formatCurrency(context.parsed.y)}`;
+                  }
+                  return `${context.dataset.label}: ${context.parsed.y}`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Crear gráfica de estados de ventas
+    if (statusChartRef.current && salesByStatus.length > 0) {
+      const ctx = statusChartRef.current.getContext('2d');
+      chartsRef.current.status = new Chart.Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: salesByStatus.map(item => item.name),
+          datasets: [{
+            data: salesByStatus.map(item => item.count),
+            backgroundColor: COLORS.slice(0, salesByStatus.length),
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 10,
+                usePointStyle: true
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Cleanup function
+    return () => {
+      Object.values(chartsRef.current).forEach(chart => {
+        if (chart) chart.destroy();
+      });
+    };
+  }, [loading, error, salesByMonth, salesByStatus, formatCurrency]);
+
+  if (loading) {
     return (
+      <div className="estadisticas-container">
+        <Header title="Analytics" />
+        <div style={{ textAlign: 'center', padding: '2rem' }}>
+          <div style={{ fontSize: '1.2rem', color: '#666' }}>
+            Cargando analytics...
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-        <>
+  if (error) {
+    return (
+      <div className="estadisticas-container">
+        <Header title="Analytics" />
+        <div style={{ textAlign: 'center', padding: '2rem', color: '#ef4444' }}>
+          <p>Error: {error}</p>
+          <button 
+            onClick={refreshAnalyticsData}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '0.5rem',
+              cursor: 'pointer',
+              marginTop: '1rem'
+            }}
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-<div className="estadisticas-container">
-      <Header title={"Analytics"}/>
+  return (
+    <div className="estadisticas-container">
+      <Header title="Analytics" />
 
       {/* Tarjetas resumen */}
       <div className="estadisticas-cards">
         <div className="estadisticas-card">
-          <h2>118.73 mill.</h2>
-          <p>Suma de Sales</p>
+          <h2>{formatCurrency(totalRevenue)}</h2>
+          <p>Ganancias Totales</p>
         </div>
         <div className="estadisticas-card">
-          <h2>700</h2>
-          <p>Recuento de Product</p>
+          <h2>{formatNumber(totalProducts)}</h2>
+          <p>Número de Productos</p>
         </div>
         <div className="estadisticas-card">
-          <h2>68 mil</h2>
-          <p>Suma de Manufacturing Price</p>
+          <h2>{formatNumber(totalSales)}</h2>
+          <p>Cantidad de Ventas</p>
+        </div>
+        <div className="estadisticas-card">
+          <h2>{averageRating.toFixed(1)} ★</h2>
+          <p>Rating Promedio</p>
         </div>
       </div>
 
       {/* Gráficas */}
       <div className="estadisticas-charts">
+        {/* Ventas e ingresos por mes */}
         <div className="estadisticas-chart">
-          <h3>Suma de Sales por Country</h3>
-          <div className="chart-bars">
-            {[28, 27, 27, 26, 23].map((value, i) => (
-              <div
-                key={i}
-                className="bar"
-                style={{ height: `${value * 4}px` }}
-              ></div>
-            ))}
-          </div>
-          <div className="chart-labels">
-            {['USA', 'Canada', 'France', 'Germany', 'Mexico'].map((label, i) => (
-              <span key={i}>{label}</span>
-            ))}
+          <h3>Ventas e Ingresos por Mes</h3>
+          <div style={{ position: 'relative', height: '220px' }}>
+            <canvas ref={salesChartRef}></canvas>
           </div>
         </div>
 
+        {/* Estados de ventas */}
         <div className="estadisticas-chart">
-          <h3>Suma de Units Sold, Sale Price y Profit por Segment</h3>
-          <div className="chart-multi-bars">
-            {[[-80, 50, 30], [-40, 60, 35], [20, 50, 50], [50, 50, 40], [60, 60, 60]].map(
-              (group, i) => (
-                <div key={i} className="bar-group">
-                  {group.map((val, j) => (
-                    <div
-                      key={j}
-                      className={`bar-segment ${j === 2 ? 'profit' : 'price'}`}
-                      style={{ height: `${Math.abs(val)}px`, marginTop: val < 0 ? `${Math.abs(val)}px` : '0' }}
-                    ></div>
-                  ))}
-                </div>
-              )
-            )}
-          </div>
-          <div className="chart-labels">
-            {['Government', 'Midmarket', 'Enterprise', 'Channel Partners', 'Small Business'].map((label, i) => (
-              <span key={i}>{label}</span>
-            ))}
-          </div>
-        </div>
-
-        <div className="estadisticas-line-chart">
-          <h3>Suma de Sales por Año, Trimestre, Mes y Día</h3>
-          <div className="line-chart">
-            <svg className="line-chart-svg">
-              <polyline
-                fill="none"
-                stroke="#34D399"
-                strokeWidth="3"
-                points="0,140 40,80 80,120 120,100 160,110 200,90 240,130 280,70 320,140"
-              />
-            </svg> <br />
-            <div className="line-chart-labels">
-              <span>ene 2014</span>
-              <span>jul 2014</span>
-              <span>Año</span>
-            </div>
+          <h3>Estados de Ventas</h3>
+          <div style={{ position: 'relative', height: '220px' }}>
+            <canvas ref={statusChartRef}></canvas>
           </div>
         </div>
       </div>
     </div>
-
-      
-    
-
-        
-        </>
-        
-    )
-}
+  );
+};
 
 export default Analytics;

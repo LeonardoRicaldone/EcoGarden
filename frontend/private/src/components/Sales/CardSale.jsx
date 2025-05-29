@@ -189,10 +189,10 @@ const CardSale = ({ sale, updateSaleStatus }) => {
       </div>
 
       {/* Campo Total añadido */}
-      <div className="mb-4 p-3 bg-blue-50 rounded border border-blue-200">
+      <div className="mb-4 p-3 bg-gray-50 rounded">
         <div className="flex items-center gap-2 text-sm">
-          <FaDollarSign className="text-blue-500 text-sm" />
-          <span className="text-blue-700 font-medium">
+          <FaDollarSign className="text-black-500 text-sm" />
+          <span className="text-gray-700 font-medium">
             Total: {formatPrice(sale.total)}
           </span>
         </div>
@@ -209,10 +209,7 @@ const CardSale = ({ sale, updateSaleStatus }) => {
 
       <div className="border-t pt-3 text-xs text-gray-500">
         <div className="flex justify-between">
-          <span className="flex items-center gap-1">
-            <FaCalendarAlt className="text-gray-400" />
-            Creada: {formatDate(sale.createdAt)}
-          </span>
+         
           {sale.updatedAt && (
             <span className="flex items-center gap-1">
               <FaSyncAlt className="text-gray-400" />
