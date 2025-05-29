@@ -177,6 +177,9 @@ npm install lucide-react
 ```
 npm install sweetalert2
 ```
+```
+npm install chart.js
+```
 ### Ejecucion del frontend
 ```
 npm run dev
