@@ -1,8 +1,8 @@
 import React from "react";
 import CardSale from "./CardSale";
-import { FaFileAlt, FaSpinner } from "react-icons/fa";
+import { FaFileAlt, FaSpinner, FaDollarSign } from "react-icons/fa";
 
-const ListSales = ({ sales, loading, filteredCount, totalSales, updateSaleStatus }) => {
+const ListSales = ({ sales, loading, filteredCount, totalSales, updateSaleStatus, totalRevenue, filteredRevenue }) => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -12,17 +12,43 @@ const ListSales = ({ sales, loading, filteredCount, totalSales, updateSaleStatus
     );
   }
 
+  // Función para formatear el precio
+  const formatPrice = (price) => {
+    if (!price && price !== 0) return '$0.00';
+    return new Intl.NumberFormat('es-ES', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2
+    }).format(price);
+  };
+
   return (
     <div>
       {/* Estadísticas */}
-      <div className="mb-6 flex justify-between items-center">
-        <div className="text-sm text-gray-600">
-          Mostrando {filteredCount} de {totalSales} ventas
-        </div>
-        <div className="flex gap-4 text-sm">
-          <span className="text-green-600 font-medium">
-            Total ventas: {totalSales.toLocaleString()}
-          </span>
+      <div className="mb-6 bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="text-sm text-blue-600 font-medium">Ventas Mostradas</div>
+            <div className="text-xl font-bold text-blue-800">{filteredCount}</div>
+          </div>
+          <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
+            <div className="text-sm text-green-600 font-medium">Total Ventas</div>
+            <div className="text-xl font-bold text-green-800">{totalSales}</div>
+          </div>
+          <div className="text-center p-3 bg-purple-50 rounded-lg border border-purple-200">
+            <div className="text-sm text-purple-600 font-medium flex items-center justify-center gap-1">
+              <FaDollarSign className="text-xs" />
+              Ingresos Mostrados
+            </div>
+            <div className="text-xl font-bold text-purple-800">{formatPrice(filteredRevenue)}</div>
+          </div>
+          <div className="text-center p-3 bg-orange-50 rounded-lg border border-orange-200">
+            <div className="text-sm text-orange-600 font-medium flex items-center justify-center gap-1">
+              <FaDollarSign className="text-xs" />
+              Ingresos Totales
+            </div>
+            <div className="text-xl font-bold text-orange-800">{formatPrice(totalRevenue)}</div>
+          </div>
         </div>
       </div>
 
