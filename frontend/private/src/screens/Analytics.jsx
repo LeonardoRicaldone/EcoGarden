@@ -199,6 +199,7 @@ const Analytics = () => {
       <div className="estadisticas-cards">
         <div className="estadisticas-card">
           <h2>{formatCurrency(totalRevenue)}</h2>
+
           <p>Ganancias Totales</p>
         </div>
         <div className="estadisticas-card">

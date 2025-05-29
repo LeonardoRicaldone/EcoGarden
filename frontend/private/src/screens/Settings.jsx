@@ -17,7 +17,7 @@ const Settings = () => {
           <div className="user-card">
             <div className="user-header">
               <h3>Tu cuenta</h3>
-              <button className="edit-btn">✎</button>
+              
             </div>
             <img
               className="user-image"

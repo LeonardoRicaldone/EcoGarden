@@ -197,9 +197,9 @@ const useAnalyticsData = () => {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('es-CR', {
+    return new Intl.NumberFormat('es-US', {
       style: 'currency',
-      currency: 'CRC',
+      currency: 'USD',
       minimumFractionDigits: 0
     }).format(amount);
   };
