@@ -19,13 +19,12 @@ loginController.login = async(req, res) => {
 
         let userFound; //Guarda el usuario encontrado
         let userType;  //Guarda el tipo de usuario encontrado
-        let userData;  // ✅ NUEVO: Para almacenar los datos del usuario que devolveremos
+        let userData;  //Guarda los datos del usuario encontrado (para enviar al frontend)
 
         //1. Admin
         if(email === config.ADMIN.emailAdmin && password === config.ADMIN.password) {
             userType = "admin";
             userFound = {_id: "admin"}
-            // ✅ NUEVO: Datos del admin
             userData = {
                 id: "admin",
                 email: config.ADMIN.emailAdmin,
@@ -39,7 +38,6 @@ loginController.login = async(req, res) => {
             
             if(userFound) {
                 userType = "employee"
-                // ✅ NUEVO: Datos del empleado
                 userData = {
                     id: userFound._id,
                     email: userFound.email,
@@ -52,7 +50,6 @@ loginController.login = async(req, res) => {
                 userFound = await customersModel.findOne({email})
                 if(userFound) {
                     userType = "customer"
-                    // ✅ NUEVO: Datos del cliente
                     userData = {
                         id: userFound._id,
                         email: userFound.email,
@@ -94,7 +91,6 @@ loginController.login = async(req, res) => {
                 return res.status(500).json({ success: false, message: "Error en el servidor" });
             }
             
-            // ✅ MODIFICADO: Configurar cookie con opciones mejoradas
             res.cookie("authToken", token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
@@ -103,12 +99,11 @@ loginController.login = async(req, res) => {
                 path: '/' // Asegurar que esté disponible en toda la app
             });
             
-            // ✅ MODIFICADO: Devolver éxito CON los datos del usuario Y el token
             res.json({ 
                 success: true, 
                 message: "Login exitoso",
-                user: userData, // ✅ Incluir datos del usuario
-                token: token    // ✅ NUEVO: Incluir token para localStorage
+                user: userData, 
+                token: token    
             });
             }
         )
@@ -119,9 +114,7 @@ loginController.login = async(req, res) => {
     }
 };
 
-// 🔐 VERIFY TOKEN - DUAL AUTH (Cookie + Header)
 loginController.verify = async (req, res) => {
-  // ✅ NUEVO: Intentar obtener token de ambas fuentes
   let token = req.cookies.authToken; // Primero intentar cookie
   
   // Si no hay cookie, intentar header Authorization
@@ -147,7 +140,6 @@ loginController.verify = async (req, res) => {
       return res.status(401).json({ ok: false, message: "Invalid token" });
     }
 
-    // ✅ MEJORADO: Devolver más información del usuario en verify
     try {
       let userData;
       
@@ -185,7 +177,6 @@ loginController.verify = async (req, res) => {
       res.json({
         ok: true,
         user: userData,
-        // ✅ OPCIONAL: Devolver token renovado si quieres renovar la sesión
         token: token
       });
     } catch (error) {
@@ -195,7 +186,6 @@ loginController.verify = async (req, res) => {
   });
 };
 
-// ✅ NUEVO: Logout mejorado que limpia cookie
 loginController.logout = async (req, res) => {
   try {
     // Limpiar la cookie
