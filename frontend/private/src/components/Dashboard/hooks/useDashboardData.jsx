@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import API from '../../../api/URL.js'
+
 
 const useDashboardData = () => {
   const [dashboardData, setDashboardData] = useState({
@@ -9,7 +11,7 @@ const useDashboardData = () => {
     error: null
   });
 
-  const API_BASE = "http://localhost:4000/api";
+  const API_BASE = `${API}/api`;
 
   const fetchDashboardData = async () => {
     try {

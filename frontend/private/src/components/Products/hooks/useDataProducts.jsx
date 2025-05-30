@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import API from '../../../api/URL.js'
+
 
 const useDataProducts = () => {
   // Estados para productos y categorías
@@ -29,7 +31,7 @@ const useDataProducts = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:4000/api/products');
+      const response = await fetch(`${API}/api/products`);
       
       if (!response.ok) {
         throw new Error('Error al obtener los productos');
@@ -50,7 +52,7 @@ const useDataProducts = () => {
   // Función para obtener categorías
   const fetchCategories = async () => {
     try {
-      const response = await fetch("http://localhost:4000/api/categories");
+      const response = await fetch(`${API}/api/categories`);
       const data = await response.json();
       setCategories(data);
     } catch (error) {
@@ -63,8 +65,8 @@ const useDataProducts = () => {
     try {
       setLoading(true);
       const [productsResponse, categoriesResponse] = await Promise.all([
-        fetch("http://localhost:4000/api/products"),
-        fetch("http://localhost:4000/api/categories")
+        fetch(`${API}/api/products`),
+        fetch(`${API}/api/categories`)
       ]);
 
       const productsData = await productsResponse.json();
@@ -124,7 +126,7 @@ const useDataProducts = () => {
 
     try {
       // Enviamos el FormData al backend
-      const response = await fetch("http://localhost:4000/api/products", {
+      const response = await fetch(`${API}/api/products`, {
         method: 'POST',
         body: formDataToSend
       });
@@ -160,7 +162,7 @@ const useDataProducts = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:4000/api/products/${productId}`, {
+      const response = await fetch(`${API}/api/products/${productId}`, {
         method: 'PUT',
         body: formDataToSend
       });
@@ -183,7 +185,7 @@ const useDataProducts = () => {
   // Función para eliminar producto
   const deleteProduct = async (id) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/products/${id}`, {
+      const response = await fetch(`${API}/api/products/${id}`, {
         method: 'DELETE'
       });
 

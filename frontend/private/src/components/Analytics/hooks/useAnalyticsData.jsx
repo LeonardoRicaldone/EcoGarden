@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import API from '../../../api/URL.js'
 
 const useAnalyticsData = () => {
   const [analyticsData, setAnalyticsData] = useState({
@@ -13,7 +14,7 @@ const useAnalyticsData = () => {
     error: null
   });
 
-  const API_BASE = "http://localhost:4000/api";
+  const API_BASE = `${API}/api`;
 
   const fetchAnalyticsData = async () => {
     try {

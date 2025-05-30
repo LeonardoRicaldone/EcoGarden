@@ -1,4 +1,5 @@
 import { createContext, useState, useContext, useEffect } from "react";
+import API_BASE from '../api/URL.js'
 
 export const AuthContext = createContext();
 
@@ -9,7 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Nuevo estado para manejar la carga inicial
 
-  const API = "http://localhost:4000/api";
+  const API = `${API_BASE}/api`;
 
   // Verificar sesión al cargar la aplicación
   const checkAuthStatus = async () => {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
+import API_BASE from '../../../api/URL.js'
 
 const useDataSales = () => {
   const [sales, setSales] = useState([]);
@@ -7,7 +8,7 @@ const useDataSales = () => {
   const [filteredSales, setFilteredSales] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const API = "http://localhost:4000/api/sales";
+  const API = `${API_BASE}/api/sales`;
 
   const fetchSales = async () => {
     try {

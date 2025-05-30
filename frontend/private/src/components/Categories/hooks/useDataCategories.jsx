@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
+import API_BASE from '../../../api/URL.js'
+
 
 const useDataCategories = () => {
   // Estados para manejar los datos del formulario y la lista de categorías
@@ -9,7 +11,7 @@ const useDataCategories = () => {
   const [loading, setLoading] = useState(true);
 
   // URL de tu API para categorías
-  const API = "http://localhost:4000/api/categories";
+  const API = `${API_BASE}/api/categories`;
 
   const fetchCategories = async () => {
     try {

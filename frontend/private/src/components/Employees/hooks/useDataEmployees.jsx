@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
+import API_BASE from '../../../api/URL.js'
+
 
 const useDataEmployees = () => {
   // Estados para manejar los datos del formulario y la lista de empleados
@@ -13,7 +15,7 @@ const useDataEmployees = () => {
   const [loading, setLoading] = useState(true);
 
   // URL fija directamente en el código
-  const API = "http://localhost:4000/api/employees";
+  const API = `${API_BASE}/api/employees`;
 
   // Función para obtener empleados del backend
   // Esta función se ejecuta al cargar el componente
