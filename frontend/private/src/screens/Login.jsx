@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import "./Login.css";
+import sunflower from "../../public/sunflowers.png"
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -108,7 +109,7 @@ const Login = () => {
       <Toaster toastOptions={{ duration: 2000 }} />
 
       <div className="imagen-lateral">
-        <img src="public/sunflowers.png" alt="Fondo" />
+        <img src={sunflower} alt="Fondo" />
       </div>
     </div>
   );
