@@ -125,7 +125,8 @@ loginController.verify = async (req, res) => {
     return res.status(401).json({ ok: false, message: "No token provided" });
   }
 
-  jsonwebtoken.verify(token, config.JWT.secret, async (err, decoded) => {
+  jsonwebtoken.verify(token, config.JWT.secret, 
+    async (err, decoded) => {
     if (err) {
       return res.status(401).json({ ok: false, message: "Invalid token" });
     }
