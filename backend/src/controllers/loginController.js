@@ -94,19 +94,21 @@ loginController.login = async(req, res) => {
                 return res.status(500).json({ success: false, message: "Error en el servidor" });
             }
             
-            // ✅ MODIFICADO: Configurar cookie con opciones para cross-domain
+            // ✅ MODIFICADO: Configurar cookie con opciones mejoradas
             res.cookie("authToken", token, {
                 httpOnly: true,
-                secure: true, // HTTPS requerido
-                sameSite: 'none', // Permitir cross-domain
-                maxAge: 24 * 60 * 60 * 1000 // 24 horas
+                secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Cross-domain solo en prod
+                maxAge: 24 * 60 * 60 * 1000, // 24 horas
+                path: '/' // Asegurar que esté disponible en toda la app
             });
             
-            // ✅ MODIFICADO: Devolver éxito CON los datos del usuario
+            // ✅ MODIFICADO: Devolver éxito CON los datos del usuario Y el token
             res.json({ 
                 success: true, 
                 message: "Login exitoso",
-                user: userData // ✅ NUEVO: Incluir datos del usuario
+                user: userData, // ✅ Incluir datos del usuario
+                token: token    // ✅ NUEVO: Incluir token para localStorage
             });
             }
         )
@@ -117,10 +119,23 @@ loginController.login = async(req, res) => {
     }
 };
 
-// 🔐 VERIFY TOKEN
+// 🔐 VERIFY TOKEN - DUAL AUTH (Cookie + Header)
 loginController.verify = async (req, res) => {
-  const token = req.cookies.authToken;
+  // ✅ NUEVO: Intentar obtener token de ambas fuentes
+  let token = req.cookies.authToken; // Primero intentar cookie
+  
+  // Si no hay cookie, intentar header Authorization
+  if (!token) {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7); // Remover 'Bearer ' del inicio
+      console.log("Token obtenido desde header Authorization");
+    }
+  } else {
+    console.log("Token obtenido desde cookie");
+  }
 
+  // Si no hay token en ningún lado
   if (!token) {
     return res.status(401).json({ ok: false, message: "No token provided" });
   }
@@ -128,6 +143,7 @@ loginController.verify = async (req, res) => {
   jsonwebtoken.verify(token, config.JWT.secret, 
     async (err, decoded) => {
     if (err) {
+      console.log("Token inválido:", err.message);
       return res.status(401).json({ ok: false, message: "Invalid token" });
     }
 
@@ -144,6 +160,9 @@ loginController.verify = async (req, res) => {
         };
       } else if (decoded.userType === "employee") {
         const employee = await employeesModel.findById(decoded.id);
+        if (!employee) {
+          return res.status(401).json({ ok: false, message: "Employee not found" });
+        }
         userData = {
           id: employee._id,
           email: employee.email,
@@ -152,6 +171,9 @@ loginController.verify = async (req, res) => {
         };
       } else if (decoded.userType === "customer") {
         const customer = await customersModel.findById(decoded.id);
+        if (!customer) {
+          return res.status(401).json({ ok: false, message: "Customer not found" });
+        }
         userData = {
           id: customer._id,
           email: customer.email,
@@ -162,13 +184,39 @@ loginController.verify = async (req, res) => {
 
       res.json({
         ok: true,
-        user: userData
+        user: userData,
+        // ✅ OPCIONAL: Devolver token renovado si quieres renovar la sesión
+        token: token
       });
     } catch (error) {
       console.error("Error getting user data:", error);
       res.status(401).json({ ok: false, message: "Error getting user data" });
     }
   });
+};
+
+// ✅ NUEVO: Logout mejorado que limpia cookie
+loginController.logout = async (req, res) => {
+  try {
+    // Limpiar la cookie
+    res.clearCookie("authToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      path: '/'
+    });
+    
+    res.json({ 
+      success: true, 
+      message: "Logout exitoso" 
+    });
+  } catch (error) {
+    console.error("Error en logout:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Error en el servidor" 
+    });
+  }
 };
 
 export default loginController;
