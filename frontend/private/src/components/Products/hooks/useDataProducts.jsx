@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import API from '../../../api/URL.js'
+import API_BASE from '../../../api/URL.js'
 
 
 const useDataProducts = () => {
@@ -31,7 +31,7 @@ const useDataProducts = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API}/api/products`);
+      const response = await fetch(`${API_BASE}/api/products`);
       
       if (!response.ok) {
         throw new Error('Error al obtener los productos');
@@ -65,8 +65,8 @@ const useDataProducts = () => {
     try {
       setLoading(true);
       const [productsResponse, categoriesResponse] = await Promise.all([
-        fetch(`${API}/api/products`),
-        fetch(`${API}/api/categories`)
+        fetch(`${API_BASE}/api/products`),
+        fetch(`${API_BASE}/api/categories`)
       ]);
 
       const productsData = await productsResponse.json();
@@ -126,7 +126,7 @@ const useDataProducts = () => {
 
     try {
       // Enviamos el FormData al backend
-      const response = await fetch(`${API}/api/products`, {
+      const response = await fetch(`${API_BASE}/api/products`, {
         method: 'POST',
         body: formDataToSend
       });
@@ -162,7 +162,7 @@ const useDataProducts = () => {
     }
 
     try {
-      const response = await fetch(`${API}/api/products/${productId}`, {
+      const response = await fetch(`${API_BASE}/api/products/${productId}`, {
         method: 'PUT',
         body: formDataToSend
       });
@@ -185,7 +185,7 @@ const useDataProducts = () => {
   // Función para eliminar producto
   const deleteProduct = async (id) => {
     try {
-      const response = await fetch(`${API}/api/products/${id}`, {
+      const response = await fetch(`${API_BASE}/api/products/${id}`, {
         method: 'DELETE'
       });
 

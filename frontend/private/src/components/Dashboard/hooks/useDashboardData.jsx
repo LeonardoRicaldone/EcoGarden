@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import API from '../../../api/URL.js'
+import API_BASE from '../../../api/URL.js'
 
 
 const useDashboardData = () => {
@@ -11,7 +11,7 @@ const useDashboardData = () => {
     error: null
   });
 
-  const API_BASE = `${API}/api`;
+  const API = `${API_BASE}/api`;
 
   const fetchDashboardData = async () => {
     try {
@@ -19,8 +19,8 @@ const useDashboardData = () => {
 
       // Fetch paralelo de productos y ventas
       const [productsResponse, salesResponse] = await Promise.all([
-        fetch(`${API_BASE}/products`),
-        fetch(`${API_BASE}/sales`)
+        fetch(`${API}/products`),
+        fetch(`${API}/sales`)
       ]);
 
       // Verificar que ambas respuestas sean exitosas

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import API from '../../../api/URL.js'
+import API_BASE from '../../../api/URL.js';
 
 const useAnalyticsData = () => {
   const [analyticsData, setAnalyticsData] = useState({
@@ -14,16 +14,16 @@ const useAnalyticsData = () => {
     error: null
   });
 
-  const API_BASE = `${API}/api`;
+  const API = `${API_BASE}/api`;
 
   const fetchAnalyticsData = async () => {
     try {
       setAnalyticsData(prev => ({ ...prev, loading: true, error: null }));
 
       const [productsResult, salesResult, ratingsResult] = await Promise.allSettled([
-        fetch(`${API_BASE}/products`).then(res => res.ok ? res.json() : []),
-        fetch(`${API_BASE}/sales`).then(res => res.ok ? res.json() : []),
-        fetch(`${API_BASE}/ratings`).then(res => res.ok ? res.json() : [])
+        fetch(`${API}/products`).then(res => res.ok ? res.json() : []),
+        fetch(`${API}/sales`).then(res => res.ok ? res.json() : []),
+        fetch(`${API}/ratings`).then(res => res.ok ? res.json() : [])
       ]);
 
       const productsData = productsResult.status === 'fulfilled' ? productsResult.value : [];

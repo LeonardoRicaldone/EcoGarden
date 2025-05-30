@@ -1,3 +1,3 @@
-const api = "https://ecogarden.onrender.com"
+const API_BASE = "https://ecogarden.onrender.com"
 
-export default api;
+export default API_BASE;

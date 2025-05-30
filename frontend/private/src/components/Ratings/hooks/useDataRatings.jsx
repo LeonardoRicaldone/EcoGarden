@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "../../../api/URL.js";
+import API_BASE from "../../../api/URL.js";
 
 
 const useDataRatings = () => {
@@ -7,7 +7,7 @@ const useDataRatings = () => {
   const [loading, setLoading] = useState(true);
 
   // URL de tu API para ratings
-  const API = `${api}/api/ratings`;
+  const API = `${API_BASE}/api/ratings`;
 
   const fetchRatings = async () => {
     try {
