@@ -57,9 +57,9 @@ export const AuthProvider = ({ children }) => {
         throw new Error(data.message || "Error en la autenticación");
       }
 
-      const verifyRes = await fetch(`${API}/login/verify`, {
-        credentials: "include",
-      });
+      //const verifyRes = await fetch(`${API}/login/verify`, {
+    //    credentials: "include",
+     // });
 
       const verifyData = await verifyRes.json();
 
