@@ -108,7 +108,7 @@ const Login = () => {
       <Toaster toastOptions={{ duration: 2000 }} />
 
       <div className="imagen-lateral">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzN-aOhTOUknAEzKb5F5XPq1X40ahBpkZWCsrghZcLWQn4UAt7" alt="Fondo" />
+        <img src="https://s0.smartresize.com/wallpaper/281/482/HD-wallpaper-sunflower-field-flower-nature-sunflower-petal-field.jpg" alt="Fondo" />
       </div>
     </div>
   );
