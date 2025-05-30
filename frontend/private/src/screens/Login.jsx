@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import "./Login.css";
 import sunflower from "../../public/sunflowers.png"
+import logo from "../../public/logo.png"; 
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -54,7 +55,7 @@ const Login = () => {
     <div className="contenedor-principal-Login">
       <div id="DivPrincipal-Login">
         <div className="logo-contenedor">
-          <img src="src/img/logo.png" alt="Logo EcoGarden" />
+          <img src={logo} alt="Logo EcoGarden" />
           <h3>EcoGarden</h3>
           <br />
         </div>

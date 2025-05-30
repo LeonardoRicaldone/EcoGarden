@@ -1,6 +1,7 @@
 import Imput from "../components/Imput"
 import Button from "../components/Button"
 import './FirstUserForm.css';
+import forest from '../../public/forest.png';
 
 const FirstUserForm = () => {
 
@@ -45,7 +46,7 @@ const FirstUserForm = () => {
         </div>
 
         <div class="imagen-lateral">
-        <img src="src/img/forest.png" alt="Fondo" />
+        <img src={forest} alt="Fondo" />
         </div>
 
 

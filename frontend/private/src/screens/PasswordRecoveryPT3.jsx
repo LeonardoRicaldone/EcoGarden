@@ -1,6 +1,8 @@
 import Imput from "../components/Imput"
 import Button from "../components/Button"
 import './PasswordRecovery.css';
+import logo from "../../public/logo.png"; 
+
 
 const FirstUserForm = () => {
 
@@ -13,7 +15,7 @@ const FirstUserForm = () => {
         <div id="DivPrincipal-PassWordRecovery">
 
         <div className="logo-contenedor">
-        <img src="src/img/logo.png" alt="" />
+        <img src={logo} alt="" />
         <h3>EcoGarden</h3> <br />
         </div> <br />
 
