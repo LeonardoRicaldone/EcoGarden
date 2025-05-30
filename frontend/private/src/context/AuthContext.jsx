@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
   // Verificar sesión al cargar la aplicación
   const checkAuthStatus = async () => {
     try {
-      const verifyRes = await fetch(`${API}/login/verify`, {
+      const verifyRes = await fetch(`https://eco-garden.vercel.app/login/verify`, {
         credentials: "include",
       });
 
@@ -57,9 +57,9 @@ export const AuthProvider = ({ children }) => {
         throw new Error(data.message || "Error en la autenticación");
       }
 
-      //const verifyRes = await fetch(`${API}/login/verify`, {
-    //    credentials: "include",
-     // });
+      const verifyRes = await fetch(`https://eco-garden.vercel.app/login/verify`, {
+        credentials: "include",
+      });
 
       const verifyData = await verifyRes.json();
 
