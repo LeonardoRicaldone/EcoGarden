@@ -22,7 +22,7 @@ const app = express();
 
 app.use(
     cors({
-      origin: "http://eco-garden.vercel.app",
+      origin: "https://eco-garden.vercel.app",
       // Permitir envío de cookies y credenciales
       credentials: true
     })

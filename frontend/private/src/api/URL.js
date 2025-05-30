@@ -1,3 +1,3 @@
-const api = "https://ecogarden.onrender.com"
+const api = "https://eco-garden.vercel.app"
 
 export default api;
