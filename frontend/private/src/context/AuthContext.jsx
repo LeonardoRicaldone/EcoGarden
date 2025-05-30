@@ -8,7 +8,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Nuevo estado para manejar la carga inicial
+  const [isLoading, setIsLoading] = useState(true);
 
   const API = `${API_BASE}/api`;
 
@@ -57,22 +57,21 @@ export const AuthProvider = ({ children }) => {
         throw new Error(data.message || "Error en la autenticación");
       }
 
-      const verifyRes = await fetch(`${API}/login/verify`, {
-        credentials: "include",
-      });
-
-      const verifyData = await verifyRes.json();
-
-      if (verifyData.ok) {
+      // ✅ CAMBIO PRINCIPAL: Si el backend devuelve el usuario directamente
+      if (data.success && data.user) {
         setIsAuthenticated(true);
-        setUser(verifyData.user);
-      } else {
-        setIsAuthenticated(false);
-        setUser(null);
+        setUser(data.user);
+        console.log("Login exitoso, usuario autenticado:", data.user);
+        return { success: true, message: data.message };
       }
 
+      // ✅ Si llegamos aquí, el login fue exitoso pero sin usuario (no debería pasar)
+      console.log("Login exitoso pero sin datos de usuario, verificando...");
+      await checkAuthStatus();
+      
       return { success: data.success, message: data.message };
     } catch (error) {
+      console.error("Error en login:", error);
       return { success: false, message: error.message };
     }
   };
