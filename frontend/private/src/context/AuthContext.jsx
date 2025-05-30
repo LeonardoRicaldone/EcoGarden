@@ -15,16 +15,33 @@ export const AuthProvider = ({ children }) => {
   // Verificar sesión al cargar la aplicación
   const checkAuthStatus = async () => {
     try {
+      console.log("Verificando estado de autenticación...");
       const verifyRes = await fetch(`${API}/login/verify`, {
         credentials: "include",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
       });
 
-      const verifyData = await verifyRes.json();
+      // Verificar si la respuesta es OK antes de parsear
+      if (!verifyRes.ok) {
+        console.log("Token inválido o expirado, cerrando sesión");
+        setIsAuthenticated(false);
+        setUser(null);
+        setIsLoading(false);
+        return;
+      }
 
-      if (verifyData.ok) {
+      const verifyData = await verifyRes.json();
+      console.log("Respuesta de verificación:", verifyData);
+
+      if (verifyData.ok && verifyData.user) {
+        console.log("Usuario autenticado encontrado:", verifyData.user);
         setIsAuthenticated(true);
         setUser(verifyData.user);
       } else {
+        console.log("No hay usuario autenticado");
         setIsAuthenticated(false);
         setUser(null);
       }
