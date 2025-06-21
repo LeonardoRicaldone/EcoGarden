@@ -1,112 +1,142 @@
 import React, { useState } from 'react';
 import './Contact.css';
+import { toast, Toaster } from "react-hot-toast";
 
 const Contact = () => {
-  // Estado para almacenar y gestionar los datos del formulario
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
     mensaje: ''
   });
 
-  // Función para actualizar el estado cuando cambian los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
-      ...prev,      // Mantiene los valores anteriores del formulario
-      [name]: value // Actualiza solo el campo que cambió
+      ...prev,
+      [name]: value
     }));
   };
 
-  // Función para manejar el envío del formulario
-  const handleSubmit = (e) => {
-    e.preventDefault(); // Evita el comportamiento predeterminado de recarga de página
-    console.log('Formulario enviado:', formData); // Registra los datos en la consola
-    alert('Mensaje enviado con éxito!'); // Muestra confirmación al usuario
-    setFormData({ nombre: '', email: '', mensaje: '' }); // Reinicia el formulario
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await fetch('http://localhost:4000/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success("Mensaje enviado con éxito!");
+        setFormData({ nombre: '', email: '', mensaje: '' });
+      } else {
+        toast.error('Error al enviar el mensaje: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Error al enviar el mensaje: ' + error.message);
+    }
   };
 
   return (
     <div className="page-container">
-    <div className="contact-container">
-      
-      {/* Encabezado de la página de contacto */}
-      <div className="contact-header">
-        <h1>Contáctanos</h1>
-        <p>Esperamos tu mensaje, estamos listos para atenderte</p>
-      </div>
 
-      <div className="contact-content">
-        {/* Sección de información de contacto */}
-        <div className="contact-info">
-          {/* Método de contacto: teléfono */}
-          <div className="contact-method">
-            <i className="fas fa-phone"></i> {/* Ícono de teléfono */}
-            <div>
-              <h3>Teléfonos</h3>
-              <p>5555-5555</p>
-              <p>4444-4444</p>
-            </div>
-          </div>
-
-          {/* Método de contacto: correo electrónico */}
-          <div className="contact-method">
-            <i className="fas fa-envelope"></i> {/* Ícono de correo */}
-            <div>
-              <h3>Correos Electrónicos</h3>
-              <p>ventas@gmail.com</p>
-              <p>info@gmail.com</p>
-            </div>
-          </div>
+      <div className="contact-container">
+        
+<Toaster 
+                   position="top-center"
+                   toastOptions={{
+                     duration: 4000,
+                     style: {
+                       background: '#10B981',
+                       color: '#fff',
+                       fontSize: '16px',
+                       fontWeight: '500',
+                     },
+                     success: {
+                       iconTheme: {
+                         primary: '#fff',
+                         secondary: '#10B981',
+                       },
+                     },
+                   }} 
+                 />
+        <div className="contact-header">
+          
+          <h1>Contáctanos</h1>
+          <p>Esperamos tu mensaje, estamos listos para atenderte</p>
         </div>
 
-        {/* Formulario de contacto con manejador de envío */}
-        <form className="contact-form" onSubmit={handleSubmit}>
-          {/* Campo para el nombre */}
-          <div className="form-group">
-            <label htmlFor="nombre">Nombre</label>
-            <input
-              type="text"
-              id="nombre"
-              name="nombre"
-              value={formData.nombre}
-              onChange={handleChange} // Actualiza el estado cuando cambia el input
-              required // Campo obligatorio
-            />
+        <div className="contact-content">
+          
+          <div className="contact-info">
+            <div className="contact-method">
+              
+              <i className="fas fa-phone"></i>
+              <div>
+                <h3>Teléfonos</h3>
+                <p>5555-5555</p>
+                <p>4444-4444</p>
+              </div>
+            </div>
+
+            <div className="contact-method">
+              <i className="fas fa-envelope"></i>
+              <div>
+                <h3>Correos Electrónicos</h3>
+                <p>ventas@gmail.com</p>
+                <p>info@gmail.com</p>
+              </div>
+            </div>
           </div>
 
-          {/* Campo para el email */}
-          <div className="form-group">
-            <label htmlFor="email">Correo Electrónico</label>
-            <input
-              type="email" // Tipo email para validación básica
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required // Campo obligatorio
-            />
-          </div>
+          <form className="contact-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="nombre">Nombre</label>
+              <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                value={formData.nombre}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          {/* Campo para el mensaje */}
-          <div className="form-group">
-            <label htmlFor="mensaje">Mensaje</label>
-            <textarea
-              id="mensaje"
-              name="mensaje"
-              value={formData.mensaje}
-              onChange={handleChange}
-              required // Campo obligatorio
-            ></textarea>
-          </div>
+            <div className="form-group">
+              <label htmlFor="email">Correo Electrónico</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          {/* Botón de envío */}
-          <button type="submit" className="submit-btn">
-            Enviar → <i className="fas fa-arrow-right"></i> {/* Ícono de flecha derecha */}
-          </button>
-        </form>
+            <div className="form-group">
+              <label htmlFor="mensaje">Mensaje</label>
+              <textarea
+                id="mensaje"
+                name="mensaje"
+                value={formData.mensaje}
+                onChange={handleChange}
+                required
+              ></textarea>
+            </div>
+
+            <button type="submit" className="submit-btn">
+              Enviar → <i className="fas fa-arrow-right"></i>
+            </button>
+
+           
+          </form>
+        </div>
       </div>
-    </div>
     </div>
   );
 };

@@ -17,6 +17,8 @@ import logoutRoutes from "./src/routes/logout.js"
 import cookieParser from "cookie-parser";
 /*import { validateAuthToken } from "../src/middlewares/ValidateAuthToken.js";*/
 
+import contactRoutes from './src/routes/contactRoutes.js';
+
 //crear constante que es igual a la libreria que importe
 const app = express();
 
@@ -24,8 +26,8 @@ app.use(
   cors({
     origin: function (origin, callback) {
       const allowedOrigins = [
-        "https://eco-garden.vercel.app", // Producción
-        "http://localhost:5173"          // Desarrollo local con Vite
+        "https://eco-garden.vercel.app", 
+        "http://localhost:5173"          
       ];
 
       // Permitir solicitudes sin origin (como en Postman o curl)
@@ -59,6 +61,8 @@ app.use("/api/shoppingCart", shoppingCartRoutes);
 
 app.use("/api/login", loginRoutes)
 app.use("/api/logout", logoutRoutes)
+
+app.use('/api/contact', contactRoutes);
 
 //exporto la constante para poder usar express en otros archivos
 export default app;
