@@ -21,12 +21,24 @@ import cookieParser from "cookie-parser";
 const app = express();
 
 app.use(
-    cors({
-      origin: "https://eco-garden.vercel.app",
-      // Permitir envío de cookies y credenciales
-      credentials: true
-    })
+  cors({
+    origin: function (origin, callback) {
+      const allowedOrigins = [
+        "https://eco-garden.vercel.app", // Producción
+        "http://localhost:5173"          // Desarrollo local con Vite
+      ];
+
+      // Permitir solicitudes sin origin (como en Postman o curl)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Origen no permitido por CORS"));
+      }
+    },
+    credentials: true
+  })
 );
+
 
 //Que acepte datos de json
 app.use(express.json());

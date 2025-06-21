@@ -1,105 +1,122 @@
-import React, { useState } from "react";
+import React from "react";
 import "./Products.css";
 import { useNavigate } from 'react-router-dom';
 import ProductCard from "../components/ProductCard/ProductCard";
+import useProducts from "../components/Products/hooks/useProducts"; // Importar tu hook personalizado
 
 const Products = () => {
   // Hook para la navegación
   const navigate = useNavigate();
+  
+  // Hook personalizado para manejar productos y filtros
+  const {
+    products,
+    categories,
+    loading,
+    error,
+    priceRange,
+    selectedCategories,
+    searchTerm,
+    maxPrice,
+    handlePriceRangeChange,
+    handleCategoryChange,
+    handleSearchChange,
+    clearFilters,
+    toggleFavorite,
+    handleAddToCart,
+    resultsInfo,
+    isCategory,
+    isEmpty,
+    getCategoryName
+  } = useProducts();
       
   // Función para manejar el clic en un producto
-  const handleProductClick = () => {
-    navigate('/product'); 
+  const handleProductClick = (productId) => {
+    navigate(`/product/${productId}`); 
   };
 
-  // Estado para el valor del rango
-  const [rangeValue, setRangeValue] = useState(100);
-  
-  // Función para alternar el estado de favorito
-  const toggleFavorite = (id) => {
-    console.log(`Toggle favorito para producto ${id}`);
-    setProducts(prevProducts => 
-      prevProducts.map(product => 
-        product.id === id 
-        ? { ...product, isFavorite: !product.isFavorite } 
-        : product
-      )
-    );
-  };
-
-    const handleAddClick = (id) => {
-    console.log(`Añadir producto ${id} al carrito`);
-  };
-  
-  // Estado para los productos
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: 'bonete de obispo',
-      price: '10€',
-      rating: 4,
-      img: 'https://i.etsystatic.com/13841971/r/il/43b81c/1224996118/il_570xN.1224996118_fwnp.jpg',
-      isFavorite: false
-    },
-    {
-      id: 2,
-      name: 'cactus chin',
-      price: '5€',
-      rating: 2,
-      img: 'https://www.jardineriaon.com/wp-content/uploads/2018/12/Gymnocalyciums-baldianum-Gymnocalyciums-baldianum-en-maceta.jpg',
-      isFavorite: false
-    },
-    {
-      id: 3,
-      name: 'cactus columnar',
-      price: '15€',
-      rating: 3,
-      img: 'https://www.cactusoutlet.com/cdn/shop/products/CM-Blue-Flame-Myrtillo-Product-Main-V1.1.jpg?v=1636157923',
-      isFavorite: false
-    },
-    {
-      id: 4,
-      name: 'árbol candelabro',
-      price: '10€',
-      rating: 4,
-      img: 'https://image.made-in-china.com/365f3j00OwSaNzJdcKkG/Candelabro-de-cactus-artificial-de-aspecto-realista-de-Serene-Spaces-Living-Planta-artificial-de-cactus-con-brazos-de-cactus-realistas-perfecta-para-la-decoraci-n-del-hogar-interior.webp',
-      isFavorite: false
-    },
-    {
-      id: 5,
-      name: 'cactus de Navidad',
-      price: '20€',
-      rating: 3,
-      img: 'https://cloudfront-eu-central-1.images.arcpublishing.com/prisa/OAS32PERCNBB7GNDI7MIT4MLTQ.jpg',
-      isFavorite: false
-    },
-    {
-      id: 6,
-      name: 'cactus de ordenador',
-      price: '5€',
-      rating: 2,
-      img: 'https://kellogggarden.com/wp-content/uploads/2021/03/Tips-on-How-to-Grow-Rosemary.jpg',
-      isFavorite: false
-    }
-  ]);
-
-  const categories = [
-    { id: 'all', name: 'Todos las plantas'},
-    { id: 'tools', name: 'Herramientas'},
-    { id: 'trees', name: 'Árboles' },
-    { id: 'bulbs', name: 'Bulbos'},
-    { id: 'cactus', name: 'Cactus' },
-    { id: 'seeds', name: 'Semillas'},
-    { id: 'herbs', name: 'Hierbas' },
-    { id: 'ferns', name: 'Helechos' },
-    { id: 'sprinklers', name: 'Aspersores'},
-    { id: 'shovels', name: 'Palas'}
-  ];
-
-
+  // Función para manejar el cambio del input range
   const handleRangeChange = (e) => {
-    setRangeValue(e.target.value);  //cambia el rango de la barra
+    handlePriceRangeChange(e.target.value);
   };
+
+  // Función para manejar cambios en checkboxes de categorías
+  const handleCheckboxChange = (categoryId) => {
+    handleCategoryChange(categoryId);
+  };
+
+  // Función para manejar el click del botón añadir
+  const handleAddClick = (id) => {
+    handleAddToCart(id);
+  };
+
+  // Función para manejar búsqueda
+  const handleSearchInput = (e) => {
+    handleSearchChange(e.target.value);
+  };
+
+  // Mostrar loading
+  if (loading) {
+    return (
+      <div className="page-container">
+        <div className="products-page-container">
+          <div style={{ textAlign: 'center', padding: '50px' }}>
+            <div style={{ 
+              display: 'inline-block',
+              width: '40px',
+              height: '40px',
+              border: '4px solid #f3f3f3',
+              borderTop: '4px solid #93A267',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              marginBottom: '20px'
+            }}></div>
+            <p>Cargando productos...</p>
+            <style>
+              {`
+                @keyframes spin {
+                  0% { transform: rotate(0deg); }
+                  100% { transform: rotate(360deg); }
+                }
+              `}
+            </style>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Mostrar error
+  if (error) {
+    return (
+      <div className="page-container">
+        <div className="products-page-container">
+          <div style={{ textAlign: 'center', padding: '50px' }}>
+            <div style={{ 
+              color: '#e74c3c', 
+              fontSize: '48px', 
+              marginBottom: '20px' 
+            }}>⚠️</div>
+            <h3 style={{ color: '#e74c3c', marginBottom: '10px' }}>Error al cargar productos</h3>
+            <p style={{ color: '#666', marginBottom: '20px' }}>{error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: '#93A267',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer'
+              }}
+            >
+              Recargar página
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-container">
@@ -107,6 +124,25 @@ const Products = () => {
       <div className="products-page-container">
         <div className="products-container">
           <div className="sidebar">
+            {/* Barra de búsqueda */}
+            <div className="search-filter" style={{ marginBottom: '25px' }}>
+              <h3>Buscar</h3>
+              <input
+                type="text"
+                placeholder="Buscar productos..."
+                value={searchTerm}
+                onChange={handleSearchInput}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  fontSize: '14px'
+                }}
+              />
+            </div>
+
+            {/* Filtro de precio */}
             <div className="price-filter">
               <h3>Precio</h3>
               <div className="range-container">
@@ -114,22 +150,45 @@ const Products = () => {
                 <input 
                   type="range" 
                   min="0" 
-                  max="100" 
-                  value={rangeValue} 
+                  max={maxPrice} 
+                  value={priceRange} 
                   onChange={handleRangeChange} 
                 />
-                <span>100€</span>
+                <span>{maxPrice}€</span>
+              </div>
+              <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '14px', color: '#666' }}>
+                Hasta {priceRange}€
               </div>
             </div>
             
+            {/* Filtro de categorías */}
             <div className="category-filter">
-              <h3>Categoría</h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3>Categoría</h3>
+                {(selectedCategories.length > 0 || searchTerm) && (
+                  <button 
+                    onClick={clearFilters}
+                    style={{ 
+                      background: 'none', 
+                      border: 'none', 
+                      color: '#93A267', 
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      textDecoration: 'underline'
+                    }}
+                  >
+                    Limpiar
+                  </button>
+                )}
+              </div>
               <ul>
                 {categories.map(category => (
                   <li key={category.id}>
                     <label>
                       <input 
-                        type="checkbox" 
+                        type="checkbox"
+                        checked={category.id === 'all' ? selectedCategories.length === 0 : isCategory(category.id)}
+                        onChange={() => handleCheckboxChange(category.id)}
                       />
                       {category.name}
                     </label>
@@ -141,21 +200,62 @@ const Products = () => {
           
           <div className="products-area">
             <div className="results-info">
-              <span>3000 resultados</span>
+              <span>{resultsInfo.message}</span>
+              {resultsInfo.hasFilters && (
+                <span style={{ marginLeft: '10px', fontSize: '12px', color: '#93A267' }}>
+                  (filtros aplicados)
+                </span>
+              )}
             </div>
             
-            <div className="products-grid">
-              {/* Mapeo de productos para mostrar en la cuadrícula */}
-              {products.map((product) => (
-                <ProductCard 
-                  key={product.id}
-                  product={product}
-                  onProductClick={handleProductClick}
-                  onToggleFavorite={toggleFavorite}
-                  onAddClick={handleAddClick}
-                />
-              ))}
-            </div>
+            {isEmpty ? (
+              <div style={{ 
+                textAlign: 'center', 
+                padding: '50px', 
+                color: '#666' 
+              }}>
+                <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔍</div>
+                <h3>No se encontraron productos</h3>
+                <p>No hay productos que coincidan con los filtros aplicados</p>
+                <button 
+                  onClick={clearFilters}
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: '#93A267',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    marginTop: '15px'
+                  }}
+                >
+                  Ver todos los productos
+                </button>
+              </div>
+            ) : (
+              <div className="products-grid">
+                {/* Mapeo de productos filtrados para mostrar en la cuadrícula */}
+                {products.map((product) => (
+                  <ProductCard 
+                    key={product.id}
+                    product={{
+                      id: product.id,
+                      name: product.name,
+                      price: `${product.price}€`,
+                      rating: product.rating || 3,
+                      img: product.imgProduct,
+                      isFavorite: product.isFavorite,
+                      stock: product.stock,
+                      description: product.description,
+                      category: getCategoryName(product.idCategory)
+                    }}
+                    onProductClick={() => handleProductClick(product.id)}
+                    onToggleFavorite={toggleFavorite}
+                    onAddClick={handleAddClick}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
