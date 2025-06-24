@@ -1,12 +1,78 @@
+import React, { useState } from 'react';
 import './Register.css';
-import { FaGoogle } from 'react-icons/fa';
 import logo from '../assets/logo.png';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; 
 
 const Register = () => {
-  // Use useLocation para acceder y pasar a la pagina de Términos y condiciones
-  const location = useLocation(); 
-  const termsAccepted = location.state?.termsAccepted || false;
+  const [formData, setFormData] = useState({
+    name: '',
+    lastname: '',
+    telephone: '',
+    email: '',
+    password: ''
+  });
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { register, isLoading } = useAuth();
+
+  // Verificar si viene de términos y condiciones
+  const initialTermsAccepted = location.state?.termsAccepted || false;
+
+  React.useEffect(() => {
+    if (initialTermsAccepted) {
+      setTermsAccepted(true);
+    }
+  }, [initialTermsAccepted]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validación de términos y condiciones
+    if (!termsAccepted) {
+      toast.error("Debes aceptar los términos y condiciones");
+      return;
+    }
+
+    // Validación de campos vacíos
+    if (!formData.name || !formData.lastname || !formData.telephone || 
+        !formData.email || !formData.password) {
+      toast.error("Por favor, completa todos los campos");
+      return;
+    }
+
+    // Validación de contraseña
+    if (formData.password.length < 6) {
+      toast.error("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
+    // Llamar al registro del contexto
+    const result = await register(formData);
+    
+    if (result.success) {
+      // Registro exitoso - redirigir al login
+      navigate('/login', { 
+        state: { 
+          message: 'Registro exitoso. Ahora puedes iniciar sesión.',
+          email: formData.email 
+        }
+      });
+    }
+    // Los errores se manejan automáticamente en el contexto con toast
+  };
+
+
 
   return (
     <div className="page-container">
@@ -26,38 +92,85 @@ const Register = () => {
         <div className="register-right">
           <h1 className="register-title">¡Bienvenido!<br />Comencemos con tu registro.</h1>
 
-          <div className="input-row">
-            <input type="text" placeholder="Nombre" className="register-input half-width" />
-            <input type="text" placeholder="Apellido" className="register-input half-width" />
-          </div>
-          <input type="text" placeholder="Teléfono" className="register-input" />
-          <input type="email" placeholder="Correo electrónico" className="register-input" />
-          <input type="password" placeholder="Contraseña" className="register-input" />
-
-          <div className="checkbox-container">
-            <input
-              type="checkbox"
-              id="terms"
-              className="terms-checkbox"
-              defaultChecked={termsAccepted} 
+          <form onSubmit={handleSubmit}>
+            <div className="input-row">
+              <input 
+                type="text" 
+                name="name"
+                placeholder="Nombre" 
+                className="register-input half-width" 
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
+              <input 
+                type="text" 
+                name="lastname"
+                placeholder="Apellido" 
+                className="register-input half-width" 
+                value={formData.lastname}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <input 
+              type="tel" 
+              name="telephone"
+              placeholder="Teléfono" 
+              className="register-input" 
+              value={formData.telephone}
+              onChange={handleChange}
+              required
             />
-            <label htmlFor="terms" className="termsConditions">
-              Acepto <Link to="/TermsConditions">términos y condiciones</Link>
-            </label>
-          </div>
+            
+            <input 
+              type="email" 
+              name="email"
+              placeholder="Correo electrónico" 
+              className="register-input" 
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+            
+            <input 
+              type="password" 
+              name="password"
+              placeholder="Contraseña (mínimo 6 caracteres)" 
+              className="register-input" 
+              value={formData.password}
+              onChange={handleChange}
+              minLength="6"
+              required
+            />
 
-          <button className="register-button">Registrarse</button>
+            <div className="checkbox-container">
+              <input
+                type="checkbox"
+                id="terms"
+                className="terms-checkbox"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                required
+              />
+              <label htmlFor="terms" className="termsConditions">
+                Acepto <Link to="/TermsConditions" state={{ returnTo: '/register' }}>términos y condiciones</Link>
+              </label>
+            </div>
+
+            <button 
+              type="submit" 
+              className="register-button"
+              disabled={isLoading || !termsAccepted}
+            >
+              {isLoading ? 'Registrando...' : 'Registrarse'}
+            </button>
+          </form>
 
           <div className="already-account">
-            ¿Ya estás registrado? <a href="/login">Inicia sesión</a>
+            ¿Ya estás registrado? <Link to="/login">Inicia sesión</Link>
           </div>
-
-          <div className="google-divider">o</div>
-
-          <button className="google-register-button">
-            <FaGoogle className="google-icon" />
-            Google
-          </button>
         </div>
       </div>
     </div>

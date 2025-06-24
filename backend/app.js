@@ -12,7 +12,6 @@ import productsRoutes from "./src/routes/products.js"
 import salesRoutes from "./src/routes/sales.js"
 import shoppingCartRoutes from "./src/routes/shoppingCart.js"
 import loginRoutes from "./src/routes/login.js"
-import logoutRoutes from "./src/routes/logout.js"
 
 import cookieParser from "cookie-parser";
 /*import { validateAuthToken } from "../src/middlewares/ValidateAuthToken.js";*/
@@ -60,7 +59,6 @@ app.use("/api/sales", salesRoutes);
 app.use("/api/shoppingCart", shoppingCartRoutes);
 
 app.use("/api/login", loginRoutes)
-app.use("/api/logout", logoutRoutes)
 
 app.use('/api/contact', contactRoutes);
 

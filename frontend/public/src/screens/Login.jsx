@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './Login.css';
 import logo from '../assets/logo.png';
-import { FaGoogle, FaUserCircle, FaSignOutAlt } from "react-icons/fa";
-import { useNavigate } from 'react-router-dom';
+import { FaUserCircle, FaSignOutAlt } from "react-icons/fa";
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; 
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -10,32 +11,17 @@ const Login = () => {
     password: ''
   });
   const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
 
-  // Verificar si hay sesión al cargar el componente
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const response = await fetch('http://localhost:4000/api/check-session', {
-          credentials: 'include'
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          setIsLoggedIn(true);
-          setUserData(data.user);
-        }
-      } catch (err) {
-        console.error('Error checking session:', err);
-      }
-    };
-    
-    checkSession();
-  }, []);
+  // Usar el AuthContext
+  const { 
+    Login: loginUser, 
+    logOut, 
+    user, 
+    isLoggedIn, 
+    isLoading,
+    auth 
+  } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,68 +33,30 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
 
-    try {
-      const response = await fetch('http://localhost:4000/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        }),
-        credentials: 'include'
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Credenciales incorrectas');
-      }
-
-      // Guardar datos del usuario
-      setIsLoggedIn(true);
-      setUserData(data.user);
-      
+    const result = await loginUser(formData.email, formData.password);
+    
+    if (result.success) {
       if (rememberMe) {
-        localStorage.setItem('userData', JSON.stringify(data.user));
+        localStorage.setItem('rememberLogin', 'true');
       }
       
-      // Redirigir o recargar la página
-      window.location.reload();
-      
-    } catch (err) {
-      setError(err.message || 'Error al iniciar sesión. Verifica tus credenciales.');
-    } finally {
-      setLoading(false);
+      // Redirigir a home
+      navigate('/');
     }
+    // Los errores ya se manejan en el AuthContext con toast
   };
 
   const handleLogout = async () => {
-    try {
-      await fetch('http://localhost:4000/api/logout', {
-        method: 'POST',
-        credentials: 'include'
-      });
-      
-      setIsLoggedIn(false);
-      setUserData(null);
-      localStorage.removeItem('userData');
-      window.location.reload();
-      
-    } catch (err) {
-      console.error('Error al cerrar sesión:', err);
+    const success = await logOut();
+    if (success) {
+      localStorage.removeItem('rememberLogin');
+      navigate('/'); // Redirigir a home
     }
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:4000/api/auth/google';
-  };
-
-  if (isLoggedIn && userData) {
+  // Si el usuario está logueado, mostrar perfil
+  if (isLoggedIn && user) {
     return (
       <div className="page-container">
         <div className="login-page">
@@ -119,23 +67,24 @@ const Login = () => {
                   <img src={logo} alt="EcoGarden Logo" className="logoLogin-img" />
                   <h1>EcoGarden</h1>
                 </div>
-                <h2>Bienvenido de vuelta, {userData.name}</h2>
+                <h2>Bienvenido de vuelta, {user.name}</h2>
               </div>
 
               <div className="profile-section">
                 <FaUserCircle className="profile-icon" size={80} />
                 <div className="profile-info">
-                  <p><strong>Nombre:</strong> {userData.name}</p>
-                  <p><strong>Email:</strong> {userData.email}</p>
-                  {/* Agrega más campos según tu modelo de usuario */}
+                  <p><strong>Nombre:</strong> {auth.userFullName}</p>
+                  <p><strong>Email:</strong> {user.email}</p>
+                  <p><strong>Teléfono:</strong> {user.telephone}</p>
                 </div>
               </div>
 
               <button 
                 onClick={handleLogout} 
                 className="submit-button logout-button"
+                disabled={isLoading}
               >
-                <FaSignOutAlt /> Cerrar sesión
+                <FaSignOutAlt /> {isLoading ? 'Cerrando...' : 'Cerrar sesión'}
               </button>
             </div>
 
@@ -153,6 +102,7 @@ const Login = () => {
     );
   }
 
+  // Formulario de login
   return (
     <div className="page-container">
       <div className="login-page">
@@ -166,17 +116,6 @@ const Login = () => {
               <h2>Bienvenido de vuelta</h2>
               <p className="login-subtitle">Inicia sesión para acceder a tu cuenta</p>
             </div>
-
-            <button className="google-button" onClick={handleGoogleLogin}>
-              <FaGoogle className="google-icon" />
-              Continuar con Google
-            </button>
-
-            <div className="divider">
-              <span>o inicia con tu correo</span>
-            </div>
-
-            {error && <div className="error-message" style={{color: 'red', marginBottom: '15px', textAlign: 'center'}}>{error}</div>}
 
             <form className="login-form" onSubmit={handleSubmit}>
               <div className="input-group">
@@ -208,27 +147,19 @@ const Login = () => {
               </div>
 
               <div className="login-options">
-                <div className="remember-me">
-                  <input 
-                    type="checkbox" 
-                    id="remember" 
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                  />
-                  <label htmlFor="remember">Recordarme</label>
-                </div>
-                <a href="/forgot-password" className="forgot-password">
+              
+                <Link to="/forgot-password" className="forgot-password">
                   ¿Olvidaste tu contraseña?
-                </a>
+                </Link>
               </div>
 
-              <button type="submit" className="submit-button" disabled={loading}>
-                {loading ? 'Cargando...' : 'Iniciar sesión'}
+              <button type="submit" className="submit-button" disabled={isLoading}>
+                {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
               </button>
             </form>
 
             <div className="register-section">
-              <p>¿No tienes una cuenta? <a href="/register" className="register-link">Regístrate aquí</a></p>
+              <p>¿No tienes una cuenta? <Link to="/register" className="register-link">Regístrate aquí</Link></p>
             </div>
           </div>
 
