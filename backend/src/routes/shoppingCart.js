@@ -1,15 +1,30 @@
 import express from "express";
 import shoppingCartController from "../controllers/shoppingCartController.js";
 
-//Router nos ayuda a colocar los métodos que tendrá mi ruta
 const router = express.Router();
 
-router.route("/")
-.get(shoppingCartController.getShoppingCart)
-.post(shoppingCartController.createShoppingCart)
+// GET - Obtener todos los carritos (solo para admin)
+router.get("/", shoppingCartController.getShoppingCart);
 
-router.route("/:id")
-.put(shoppingCartController.updateShoppingCart)
-.delete(shoppingCartController.deleteShoppingCart);
+// GET - Obtener carrito PENDIENTE por cliente
+router.get("/client/:clientId", shoppingCartController.getCartByClient);
+
+// NUEVO - GET - Obtener historial de carritos pagados por cliente
+router.get("/client/:clientId/history", shoppingCartController.getCartHistoryByClient);
+
+// POST - Crear nuevo carrito (se asegura de no duplicar carritos pendientes)
+router.post("/", shoppingCartController.createShoppingCart);
+
+// PUT - Actualizar carrito (solo carritos pendientes)
+router.put("/:id", shoppingCartController.updateShoppingCart);
+
+// PATCH - Vaciar carrito (solo carritos pendientes)
+router.patch("/:id/clear", shoppingCartController.clearCart);
+
+// PATCH - Marcar como pagado (proceso de checkout)
+router.patch("/:id/paid", shoppingCartController.markAsPaid);
+
+// DELETE - Eliminar carrito (solo carritos pendientes)
+router.delete("/:id", shoppingCartController.deleteShoppingCart);
 
 export default router;

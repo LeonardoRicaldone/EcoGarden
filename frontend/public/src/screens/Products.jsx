@@ -2,13 +2,11 @@ import React from "react";
 import "./Products.css";
 import { useNavigate } from 'react-router-dom';
 import ProductCard from "../components/ProductCard/ProductCard";
-import useProducts from "../components/Products/hooks/useProducts"; // Importar tu hook personalizado
+import useProducts from "../components/Products/hooks/useProducts";
 
 const Products = () => {
-  // Hook para la navegación
   const navigate = useNavigate();
   
-  // Hook personalizado para manejar productos y filtros
   const {
     products,
     categories,
@@ -29,33 +27,42 @@ const Products = () => {
     isEmpty,
     getCategoryName
   } = useProducts();
+
+  // DEBUG: Verificar los productos
+  console.log('Products Component - Products data:', products.slice(0, 2));
       
-  // Función para manejar el clic en un producto
   const handleProductClick = (productId) => {
+    console.log('Products - Product clicked:', productId);
     navigate(`/product/${productId}`); 
   };
 
-  // Función para manejar el cambio del input range
   const handleRangeChange = (e) => {
     handlePriceRangeChange(e.target.value);
   };
 
-  // Función para manejar cambios en checkboxes de categorías
   const handleCheckboxChange = (categoryId) => {
     handleCategoryChange(categoryId);
   };
 
-  // Función para manejar el click del botón añadir
   const handleAddClick = (id) => {
+    console.log('Products - Add to cart:', id);
     handleAddToCart(id);
   };
 
-  // Función para manejar búsqueda
   const handleSearchInput = (e) => {
     handleSearchChange(e.target.value);
   };
 
-  // Mostrar loading
+  // DEBUG: Función para toggle de favoritos
+  const handleToggleFavorite = (id) => {
+    console.log('Products - Toggle favorite for ID:', id);
+    if (!id) {
+      console.error('Products - ERROR: No ID provided to toggleFavorite');
+      return;
+    }
+    toggleFavorite(id);
+  };
+
   if (loading) {
     return (
       <div className="page-container">
@@ -86,7 +93,6 @@ const Products = () => {
     );
   }
 
-  // Mostrar error
   if (error) {
     return (
       <div className="page-container">
@@ -234,26 +240,35 @@ const Products = () => {
               </div>
             ) : (
               <div className="products-grid">
-                {/* Mapeo de productos filtrados para mostrar en la cuadrícula */}
-                {products.map((product) => (
-                  <ProductCard 
-                    key={product.id}
-                    product={{
-                      id: product.id,
-                      name: product.name,
-                      price: `${product.price}€`,
-                      rating: product.rating || 3,
-                      img: product.imgProduct,
-                      isFavorite: product.isFavorite,
-                      stock: product.stock,
-                      description: product.description,
-                      category: getCategoryName(product.idCategory)
-                    }}
-                    onProductClick={() => handleProductClick(product.id)}
-                    onToggleFavorite={toggleFavorite}
-                    onAddClick={handleAddClick}
-                  />
-                ))}
+                {products.map((product) => {
+                  // DEBUG: Verificar cada producto individualmente
+                  console.log('Products - Rendering product:', {
+                    originalId: product.id,
+                    _id: product._id,
+                    name: product.name,
+                    hasId: !!product.id
+                  });
+
+                  return (
+                    <ProductCard 
+                      key={product.id || product._id}
+                      product={{
+                        id: product.id || product._id, // FALLBACK por si acaso
+                        name: product.name,
+                        price: `${product.price}€`,
+                        rating: product.rating || 3,
+                        img: product.imgProduct,
+                        isFavorite: product.isFavorite,
+                        stock: product.stock,
+                        description: product.description,
+                        category: getCategoryName(product.idCategory)
+                      }}
+                      onProductClick={handleProductClick}
+                      onToggleFavorite={handleToggleFavorite}
+                      onAddClick={handleAddClick}
+                    />
+                  );
+                })}
               </div>
             )}
           </div>

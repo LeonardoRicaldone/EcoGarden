@@ -1,225 +1,310 @@
-import React, { useState } from "react";
+import React from "react";
 import "./ShoppingCart.css";
 import { Link } from 'react-router-dom';
 import { FaTrashAlt, FaTruck, FaGift, FaCheck, FaDollarSign } from 'react-icons/fa';
+import { useAuth } from "../context/AuthContext";
+import useShoppingCart from "../hooks/useShoppingCart";
 
 const ShoppingCart = () => {
-    // Estado para los productos en el carrito
-    const [cartItems, setCartItems] = useState([
-        {
-            id: "abfse0294430bc",
-            name: "Echeveria elegans",
-            price: 10,
-            originalPrice: 14,
-            quantity: 1,
-            img: "https://coastalsucculentsandcacti.com/cdn/shop/products/20220815_175134_540x.jpg?v=1660601267"
-        },
-        {
-            id: "abfse0294430bd",
-            name: "Boca de dragon",
-            price: 8,
-            originalPrice: null,
-            quantity: 1,
-            img: "https://media.revistaad.es/photos/62cd549b7cfdd4662ecbbb95/master/w_1600%2Cc_limit/Flor%2520boca%2520de%2520dragon.jpg"
-        }
-    ]);
+    // Obtener información de autenticación
+    const { auth, user } = useAuth();
+    const { isAuthenticated } = auth;
+    const clientId = user?.id || null;
 
-    // Calcular subtotal
-    const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-    
+    // Usar el hook del carrito
+    const {
+        cartItems,
+        loading,
+        error,
+        updateQuantity,
+        removeFromCart,
+        clearCart,
+        getSubtotal,
+        getTotalAmount,
+        getTotalItems,
+        isEmpty
+    } = useShoppingCart(isAuthenticated ? clientId : null);
+
     // Gastos de envío
     const shippingCost = 4;
-    
-    // Total de la compra
-    const totalAmount = subtotal + shippingCost;
+    const subtotal = getSubtotal();
+    const totalAmount = getTotalAmount(shippingCost);
+    const totalItems = getTotalItems();
 
     // Función para incrementar la cantidad
     const incrementQuantity = (id) => {
-        setCartItems(prevItems =>
-            prevItems.map(item =>
-                item.id === id
-                    ? { ...item, quantity: item.quantity + 1 }
-                    : item
-            )
-        );
+        const currentItem = cartItems.find(item => item.id === id);
+        if (currentItem) {
+            updateQuantity(id, currentItem.quantity + 1);
+        }
     };
 
     // Función para decrementar la cantidad
     const decrementQuantity = (id) => {
-        setCartItems(prevItems =>
-            prevItems.map(item =>
-                item.id === id && item.quantity > 1
-                    ? { ...item, quantity: item.quantity - 1 }
-                    : item
-            )
-        );
+        const currentItem = cartItems.find(item => item.id === id);
+        if (currentItem && currentItem.quantity > 1) {
+            updateQuantity(id, currentItem.quantity - 1);
+        }
     };
 
     // Función para eliminar un item
     const removeItem = (id) => {
-        setCartItems(prevItems => prevItems.filter(item => item.id !== id));
+        removeFromCart(id);
     };
 
     // Función para vaciar el carrito
-    const clearCart = () => {
-        setCartItems([]);
+    const handleClearCart = () => {
+        clearCart();
     };
 
-    return (
-        <div className="page-container">
-        <div className="shopping-cart-container">
-            <div className="container mx-auto px-4 py-8">
-                <h1 className="text-2xl font-bold title-color mb-6">Mi carrito</h1>
-                
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Columna de productos */}
-                    <div className="lg:col-span-2">
-                        <div className="bg-white rounded-lg shadow-sm p-6">
-                            {/* Mapeo de los productos en el carrito */}
-                            {cartItems.map((item) => (
-                                <div key={item.id} className="cart-item">
-                                    <div className="flex flex-col md:flex-row items-start md:items-center mb-4 pb-4 border-b border-gray-200">
-                                        <div className="flex-shrink-0 w-24 h-24 rounded-md overflow-hidden mr-4 mb-4 md:mb-0">
-                                            <img 
-                                                src={item.img} 
-                                                alt={item.name} 
-                                                className="w-full h-full object-cover"
-                                                onError={(e) => {
-                                                    e.target.onerror = null;
-                                                    e.target.src = "https://via.placeholder.com/150";
-                                                }}
-                                            />
-                                        </div>
-                                        
-                                        <div className="flex-1">
-                                            <div className="flex flex-col md:flex-row justify-between mb-2">
-                                                <div>
-                                                    <h3 className="text-lg font-medium product-title-color mb-1">{item.name}</h3>
-                                                    <div className="flex items-center">
-                                                        <span className="font-bold price-color">{item.price}$</span>
-                                                        {item.originalPrice && (
-                                                            <span className="ml-2 text-sm text-gray-500 line-through">{item.originalPrice}$</span>
-                                                        )}
-                                                    </div>
-                                                    <p className="text-sm text-gray-500 mt-1">ID: {item.id}</p>
-                                                </div>
-                                                
-                                                <div className="flex items-center justify-between mt-3 md:mt-0">
-                                                    <div className="quantity-selector flex items-center bg-white border border-gray-300 rounded-full overflow-hidden mr-4">
-                                                        <button 
-                                                            className="px-3 py-1 text-gray-600 hover:bg-gray-100"
-                                                            onClick={() => decrementQuantity(item.id)}
-                                                        >
-                                                            −
-                                                        </button>
-                                                        <span className="px-3 py-1">{item.quantity}</span>
-                                                        <button 
-                                                            className="px-3 py-1 text-gray-600 hover:bg-gray-100"
-                                                            onClick={() => incrementQuantity(item.id)}
-                                                        >
-                                                            +
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div className="flex justify-between items-center">
-                                                <div className="flex items-center">
-                                                    <div className="text-right">
-                                                        <span className="font-medium">Total: </span>
-                                                        <span className="font-bold price-color">{item.price * item.quantity}$</span>
-                                                    </div>
-                                                    <button 
-                                                        className="ml-4 delete-icon-color hover:text-red-500"
-                                                        onClick={() => removeItem(item.id)}  // Función para eliminar el item
-                                                    >
-                                                        <FaTrashAlt />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                            
-                            {cartItems.length === 0 && (
-                                <div className="text-center py-8">
-                                    <p className="text-gray-500">Tu carrito está vacío</p>
-                                </div>
-                            )}
-
-                            <div className="flex justify-between mt-6">
-                                <button 
-                                    className="flex items-center px-6 py-2 border outline-button-border outline-button-text rounded-full hover:outline-button-hover"
-                                    onClick={clearCart} // Función para vaciar el carrito
-                                >
-                                    <FaTrashAlt className="mr-2" />
-                                    Vaciar carrito
-                                </button>
-                                <Link to="/Products"><button className="flex items-center px-6 py-2 border outline-button-border outline-button-text rounded-full hover:outline-button-hover">
-                                    Volver a la tienda
-                                </button></Link>
+    // Mostrar loading
+    if (loading) {
+        return (
+            <div className="page-container">
+                <div className="shopping-cart-container">
+                    <div className="container mx-auto px-4 py-8">
+                        <h1 className="text-2xl font-bold title-color mb-6">Mi carrito</h1>
+                        <div className="flex justify-center items-center h-64">
+                            <div className="flex flex-col items-center">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mb-4"></div>
+                                <div className="text-lg text-gray-600">Cargando carrito...</div>
                             </div>
-                        </div>
-                    </div>
-                    
-                    {/* Columna de resumen */}
-                    <div className="lg:col-span-1">
-                        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-                            <h2 className="text-lg font-medium title-color mb-4">Subtotal</h2>
-                            <div className="flex justify-between py-2 border-b border-gray-200">
-                                <span>Subtotal</span>
-                                <span className="font-bold">{subtotal}$</span>
-                            </div>
-                            <div className="flex justify-between py-2 border-b border-gray-200">
-                                <span>Gastos de envío</span>
-                                <span className="font-bold">{shippingCost}$</span>
-                            </div>
-                            <div className="flex justify-between py-4 mt-2">
-                                <span className="text-lg font-medium">Total compra</span>
-                                <span className="text-lg font-bold price-color">{totalAmount}$</span>
-                            </div>
-                            
-                            <button className="w-full py-3 primary-button-bg primary-button-text rounded-md hover:primary-button-hover mt-4 tramitarcompra">
-                                Tramitar compra
-                            </button>
-                        </div>
-                        
-                        <div className="bg-white rounded-lg shadow-sm p-4">
-                            <div className="flex items-center">
-                                <FaTruck className="icon-color mr-3" />
-                                <div>
-                                    <h3 className="font-medium">Entrega estimada</h3>
-                                    <p className="text-gray-600">Mañana</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                {/* Sección de beneficios */}
-                <div className="features-section-bg rounded-lg mt-8 p-6 cajaBeneficios">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
-                        <div className="flex flex-col items-center">
-                            <FaTruck className="feature-icon-color text-2xl mb-2" />
-                            <h3 className="font-medium">Entrega rápida</h3>
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <FaGift className="feature-icon-color text-2xl mb-2" />
-                            <h3 className="font-medium">Envío gratis a partir de un gasto de 70 dólares</h3>
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <FaCheck className="feature-icon-color text-2xl mb-2" />
-                            <h3 className="font-medium">Mejor calidad</h3>
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <FaDollarSign className="feature-icon-color text-2xl mb-2" />
-                            <h3 className="font-medium">Precios justos</h3>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        );
+    }
+
+    // Mostrar error
+    if (error) {
+        return (
+            <div className="page-container">
+                <div className="shopping-cart-container">
+                    <div className="container mx-auto px-4 py-8">
+                        <h1 className="text-2xl font-bold title-color mb-6">Mi carrito</h1>
+                        <div className="flex flex-col justify-center items-center h-64">
+                            <div className="text-6xl mb-4">⚠️</div>
+                            <div className="text-lg text-red-600 mb-4">{error}</div>
+                            <button 
+                                onClick={() => window.location.reload()}
+                                className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition-colors"
+                            >
+                                Recargar página
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="page-container">
+            <div className="shopping-cart-container">
+                <div className="container mx-auto px-4 py-8">
+                    <div className="flex justify-between items-center mb-6">
+                        <h1 className="text-2xl font-bold title-color">Mi carrito</h1>
+                        {totalItems > 0 && (
+                            <div className="text-sm text-gray-600">
+                                {totalItems} {totalItems === 1 ? 'producto' : 'productos'}
+                            </div>
+                        )}
+                    </div>
+                    
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Columna de productos */}
+                        <div className="lg:col-span-2">
+                            <div className="bg-white rounded-lg shadow-sm p-6">
+                                {/* Carrito vacío */}
+                                {isEmpty && (
+                                    <div className="text-center py-12">
+                                        <div className="text-6xl mb-4">🛒</div>
+                                        <h3 className="text-lg font-medium text-gray-600 mb-2">Tu carrito está vacío</h3>
+                                        <p className="text-gray-500 mb-6">Explora nuestros productos y agrega algunos a tu carrito</p>
+                                        <Link to="/Products">
+                                            <button className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition-colors">
+                                                Explorar productos
+                                            </button>
+                                        </Link>
+                                    </div>
+                                )}
+
+                                {/* Mapeo de los productos en el carrito */}
+                                {cartItems.map((item, index) => (
+                                    <div key={`${item.id}-${index}`} className="cart-item">
+                                        <div className="flex flex-col md:flex-row items-start md:items-center mb-4 pb-4 border-b border-gray-200">
+                                            <div className="flex-shrink-0 w-24 h-24 rounded-md overflow-hidden mr-4 mb-4 md:mb-0">
+                                                <img 
+                                                    src={item.img} 
+                                                    alt={item.name} 
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => {
+                                                        e.target.onerror = null;
+                                                        e.target.src = "https://via.placeholder.com/150";
+                                                    }}
+                                                />
+                                            </div>
+                                            
+                                            <div className="flex-1">
+                                                <div className="flex flex-col md:flex-row justify-between mb-2">
+                                                    <div>
+                                                        <h3 className="text-lg font-medium product-title-color mb-1">{item.name}</h3>
+                                                        <div className="flex items-center">
+                                                            <span className="font-bold price-color">${item.price}</span>
+                                                        </div>
+                                                        {item.stock && (
+                                                            <p className="text-xs text-gray-500">Stock: {item.stock}</p>
+                                                        )}
+                                                    </div>
+                                                    
+                                                    <div className="flex items-center justify-between mt-3 md:mt-0">
+                                                        <div className="quantity-selector flex items-center bg-white border border-gray-300 rounded-full overflow-hidden mr-4">
+                                                            <button 
+                                                                className="px-3 py-1 text-gray-600 hover:bg-gray-100"
+                                                                onClick={() => decrementQuantity(item.id)}
+                                                                disabled={item.quantity <= 1}
+                                                            >
+                                                                −
+                                                            </button>
+                                                            <span className="px-3 py-1">{item.quantity}</span>
+                                                            <button 
+                                                                className="px-3 py-1 text-gray-600 hover:bg-gray-100"
+                                                                onClick={() => incrementQuantity(item.id)}
+                                                                disabled={item.stock && item.quantity >= item.stock}
+                                                            >
+                                                                +
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="flex justify-between items-center">
+                                                    <div className="flex items-center">
+                                                        <div className="text-right">
+                                                            <span className="font-medium">Subtotal: </span>
+                                                            <span className="font-bold price-color">${item.subtotal || (item.price * item.quantity)}</span>
+                                                        </div>
+                                                        <button 
+                                                            className="ml-4 delete-icon-color hover:text-red-500 transition-colors"
+                                                            onClick={() => removeItem(item.id)}
+                                                            title="Eliminar producto"
+                                                        >
+                                                            <FaTrashAlt />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                                
+                                {/* Botones de acción */}
+                                {!isEmpty && (
+                                    <div className="flex justify-between mt-6">
+                                        <button 
+                                            className="flex items-center px-6 py-2 border outline-button-border outline-button-text rounded-full hover:outline-button-hover transition-colors"
+                                            onClick={handleClearCart}
+                                        >
+                                            <FaTrashAlt className="mr-2" />
+                                            Vaciar carrito
+                                        </button>
+                                        <Link to="/Products">
+                                            <button className="flex items-center px-6 py-2 border outline-button-border outline-button-text rounded-full hover:outline-button-hover transition-colors">
+                                                Volver a la tienda
+                                            </button>
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        
+                        {/* Columna de resumen */}
+                        <div className="lg:col-span-1">
+                            {!isEmpty && (
+                                <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                                    <h2 className="text-lg font-medium title-color mb-4">Resumen del pedido</h2>
+                                    <div className="flex justify-between py-2 border-b border-gray-200">
+                                        <span>Subtotal ({totalItems} {totalItems === 1 ? 'producto' : 'productos'})</span>
+                                        <span className="font-bold">${subtotal.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between py-2 border-b border-gray-200">
+                                        <span>Gastos de envío</span>
+                                        <span className="font-bold">
+                                            {subtotal >= 70 ? (
+                                                <span className="text-green-600">GRATIS</span>
+                                            ) : (
+                                                `$${shippingCost}`
+                                            )}
+                                        </span>
+                                    </div>
+                                    {subtotal > 0 && subtotal < 70 && (
+                                        <div className="text-xs text-gray-500 py-2">
+                                            Agrega ${(70 - subtotal).toFixed(2)} más para envío gratis
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between py-4 mt-2">
+                                        <span className="text-lg font-medium">Total</span>
+                                        <span className="text-lg font-bold price-color">
+                                            ${(subtotal >= 70 ? subtotal : totalAmount).toFixed(2)}
+                                        </span>
+                                    </div>
+                                    
+                                    <button 
+                                        className="w-full py-3 primary-button-bg primary-button-text rounded-md hover:primary-button-hover mt-4 tramitarcompra transition-colors"
+                                        disabled={isEmpty}
+                                    >
+                                        Tramitar compra
+                                    </button>
+
+                                    {!isAuthenticated && (
+                                        <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                                            <p className="text-sm text-yellow-700">
+                                                <Link to="/login" className="font-medium underline">Inicia sesión</Link> para guardar tu carrito
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                            
+                            <div className="bg-white rounded-lg shadow-sm p-4">
+                                <div className="flex items-center">
+                                    <FaTruck className="icon-color mr-3" />
+                                    <div>
+                                        <h3 className="font-medium">Entrega estimada</h3>
+                                        <p className="text-gray-600">
+                                            {subtotal >= 70 ? 'Mañana (Envío gratis)' : 'Mañana'}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Sección de beneficios */}
+                    <div className="features-section-bg rounded-lg mt-8 p-6 cajaBeneficios">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+                            <div className="flex flex-col items-center">
+                                <FaTruck className="feature-icon-color text-2xl mb-2" />
+                                <h3 className="font-medium">Entrega rápida</h3>
+                            </div>
+                            <div className="flex flex-col items-center">
+                                <FaGift className="feature-icon-color text-2xl mb-2" />
+                                <h3 className="font-medium">Envío gratis a partir de $70</h3>
+                            </div>
+                            <div className="flex flex-col items-center">
+                                <FaCheck className="feature-icon-color text-2xl mb-2" />
+                                <h3 className="font-medium">Mejor calidad</h3>
+                            </div>
+                            <div className="flex flex-col items-center">
+                                <FaDollarSign className="feature-icon-color text-2xl mb-2" />
+                                <h3 className="font-medium">Precios justos</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };

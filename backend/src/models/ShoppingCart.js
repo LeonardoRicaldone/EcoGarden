@@ -1,31 +1,23 @@
-/*
-   Campos:
-       idClient
-       products
-         idProduct
-         quantity
-         subtotal
-*/
-
 import { Schema, model } from "mongoose";
 
 const shoppingCartSchema = new Schema(
     {
         idClient: {
             type: Schema.Types.ObjectId,
-            ref: "Clients", //Referencia a la colección de clientes
-            require: true
+            ref: "Clients", // Referencia a la colección de clientes
+            required: true  // CORREGIDO: era "require"
         },
         products: [
             {
                 idProduct: {
                     type: Schema.Types.ObjectId,
-                    ref: "Products", //Referencia a la colección de prodructos
+                    ref: "Products", // Referencia a la colección de productos
                     required: true,
                 },
                 quantity: {
                     type: Number,
-                    min: 1, //Cantidad mínima
+                    required: true, // CORREGIDO: agregado required
+                    min: 1, // Cantidad mínima
                 },
                 subtotal: {
                     type: Number,
@@ -37,7 +29,8 @@ const shoppingCartSchema = new Schema(
         total: {
             type: Number,
             required: true,
-            min: 0
+            min: 0,
+            default: 0 // AGREGADO: valor por defecto
         },
         status: {
             type: String,
@@ -53,5 +46,14 @@ const shoppingCartSchema = new Schema(
         strict: false
     }
 );
+
+shoppingCartSchema.pre('save', function(next) {
+    if (this.products && this.products.length > 0) {
+        this.total = this.products.reduce((sum, product) => sum + product.subtotal, 0);
+    } else {
+        this.total = 0;
+    }
+    next();
+});
 
 export default model("ShoppingCart", shoppingCartSchema)

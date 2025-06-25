@@ -1,22 +1,16 @@
-/*
-    Campos:
-    idProduct
-        idClient
-*/
-
 import { Schema, model } from "mongoose";
 
 const favoritesSchema = new Schema(
     {
         idProduct: {
             type: Schema.Types.ObjectId,
-            ref: "Products",
-            require: true
+            ref: "Products", // IMPORTANTE: Debe coincidir EXACTAMENTE con el nombre del modelo
+            required: true  // CORREGIDO: era "require"
         },
         idClient: {
             type: Schema.Types.ObjectId,
-            ref: "Clients",
-            require: true
+            ref: "Clients",  // IMPORTANTE: Debe coincidir EXACTAMENTE con el nombre del modelo
+            required: true   // CORREGIDO: era "require"
         },
     },
     {

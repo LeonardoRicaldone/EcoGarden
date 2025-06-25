@@ -42,13 +42,53 @@ const uploadToCloudinary = async (fileBuffer, fileName) => {
     });
 };
 
-// SELECT
+// SELECT - Obtener todos los productos
 productsController.getProducts = async (req, res) => {
     try {
         const products = await productsModel.find().populate('idCategory')
         res.json(products)
     } catch (error) {
         res.status(500).json({ message: "Error al obtener productos", error });
+    }
+}
+
+// NUEVO - SELECT por ID - Obtener un producto específico
+productsController.getProductById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log('Getting product by ID:', id);
+
+        if (!id) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "ID del producto requerido" 
+            });
+        }
+
+        const product = await productsModel.findById(id).populate('idCategory');
+        
+        if (!product) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Producto no encontrado" 
+            });
+        }
+
+        console.log('Product found:', product.name);
+        res.json(product);
+    } catch (error) {
+        console.error('Error getting product by ID:', error);
+        if (error.name === 'CastError') {
+            return res.status(400).json({ 
+                success: false, 
+                message: "ID de producto inválido" 
+            });
+        }
+        res.status(500).json({ 
+            success: false, 
+            message: "Error al obtener producto", 
+            error: error.message 
+        });
     }
 }
 
@@ -155,6 +195,63 @@ productsController.updateProducts = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ message: "Error al actualizar producto", error: error.message });
+    }
+};
+
+// NUEVO - Actualizar solo el stock de un producto (para compras)
+productsController.updateStock = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { quantity, operation = 'subtract' } = req.body; // 'subtract' or 'add'
+
+        console.log('Updating stock for product:', id, 'quantity:', quantity, 'operation:', operation);
+
+        const product = await productsModel.findById(id);
+        if (!product) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Producto no encontrado" 
+            });
+        }
+
+        let newStock;
+        if (operation === 'subtract') {
+            newStock = product.stock - quantity;
+            if (newStock < 0) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: "Stock insuficiente" 
+                });
+            }
+        } else if (operation === 'add') {
+            newStock = product.stock + quantity;
+        } else {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Operación inválida. Use 'subtract' o 'add'" 
+            });
+        }
+
+        const updatedProduct = await productsModel.findByIdAndUpdate(
+            id,
+            { stock: newStock },
+            { new: true }
+        );
+
+        res.json({
+            success: true,
+            message: "Stock actualizado exitosamente",
+            product: updatedProduct,
+            previousStock: product.stock,
+            newStock: newStock
+        });
+    } catch (error) {
+        console.error('Error updating stock:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Error al actualizar stock", 
+            error: error.message 
+        });
     }
 };
 
