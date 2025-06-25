@@ -19,6 +19,22 @@ const useProducts = () => {
   const FAVORITES_API = "http://localhost:4000/api/favorites";
   const CART_API = "http://localhost:4000/api/shoppingCart";
 
+  // Función utilitaria para normalizar IDs (ObjectId a string)
+  const normalizeId = (id) => {
+    if (!id) return null;
+    // Si es un objeto con _id (ObjectId), extraer el string
+    if (typeof id === 'object' && id._id) return id._id.toString();
+    // Si ya es string, devolverlo
+    return id.toString();
+  };
+
+  // Función utilitaria para comparar IDs de manera segura
+  const compareIds = (id1, id2) => {
+    const normalizedId1 = normalizeId(id1);
+    const normalizedId2 = normalizeId(id2);
+    return normalizedId1 === normalizedId2;
+  };
+
   // Obtener token de autenticación (si lo tienes)
   const getAuthToken = () => {
     return localStorage.getItem('token') || localStorage.getItem('authToken');
@@ -42,10 +58,17 @@ const useProducts = () => {
       const data = await response.json();
       console.log('Categorías obtenidas:', data); // Debug
       
+      // Normalizar IDs de categorías
+      const normalizedCategories = data.map(category => ({
+        ...category,
+        id: normalizeId(category._id || category.id),
+        _id: normalizeId(category._id || category.id)
+      }));
+      
       // Agregar categoría "Todos" al inicio
       const categoriesWithAll = [
         { _id: 'all', id: 'all', name: 'Todas las plantas' },
-        ...data
+        ...normalizedCategories
       ];
       
       setCategories(categoriesWithAll);
@@ -80,20 +103,29 @@ const useProducts = () => {
         console.log('No se pudieron cargar favoritos:', favError);
       }
       
-      const favoriteIds = favorites.map(fav => fav.productId || fav._id || fav.id);
+      const favoriteIds = favorites.map(fav => normalizeId(fav.productId || fav._id || fav.id));
       
       // Transformar datos para incluir isFavorite y rating
-      const transformedProducts = data.map(product => ({
-        ...product,
-        // Usar _id como id principal si existe
-        id: product._id || product.id,
-        isFavorite: favoriteIds.includes(product._id || product.id),
-        rating: product.rating || Math.floor(Math.random() * 5) + 1,
-        // Asegurar que el precio sea numérico
-        price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
-        // Normalizar categoryId
-        categoryId: product.idCategory || product.categoryId || product.category
-      }));
+      const transformedProducts = data.map(product => {
+        const productId = normalizeId(product._id || product.id);
+        const categoryId = normalizeId(product.idCategory || product.categoryId || product.category);
+        
+        return {
+          ...product,
+          // Usar _id normalizado como id principal
+          id: productId,
+          _id: productId,
+          isFavorite: favoriteIds.includes(productId),
+          rating: product.rating || Math.floor(Math.random() * 5) + 1,
+          // Asegurar que el precio sea numérico
+          price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
+          // Normalizar categoryId
+          categoryId: categoryId,
+          idCategory: categoryId
+        };
+      });
+      
+      console.log('Productos transformados:', transformedProducts); // Debug para ver los categoryId
       
       setProducts(transformedProducts);
       setError(null);
@@ -117,9 +149,10 @@ const useProducts = () => {
   // Función para alternar favorito - CORREGIDA
   const toggleFavorite = async (productId) => {
     try {
-      console.log('Toggling favorite for product:', productId); // Debug
+      const normalizedProductId = normalizeId(productId);
+      console.log('Toggling favorite for product:', normalizedProductId); // Debug
       
-      const product = products.find(p => p.id === productId);
+      const product = products.find(p => compareIds(p.id, normalizedProductId));
       if (!product) {
         toast.error("Producto no encontrado");
         return;
@@ -128,7 +161,7 @@ const useProducts = () => {
       // Optimistic UI update
       setProducts(prevProducts => 
         prevProducts.map(p => 
-          p.id === productId 
+          compareIds(p.id, normalizedProductId)
             ? { ...p, isFavorite: !p.isFavorite } 
             : p
         )
@@ -136,14 +169,14 @@ const useProducts = () => {
 
       const method = product.isFavorite ? "DELETE" : "POST";
       const url = method === "DELETE" 
-        ? `${FAVORITES_API}/${productId}` 
+        ? `${FAVORITES_API}/${normalizedProductId}` 
         : FAVORITES_API;
       
       const response = await fetch(url, {
         method,
         headers: getAuthHeaders(),
         ...(method === "POST" && {
-          body: JSON.stringify({ productId })
+          body: JSON.stringify({ productId: normalizedProductId })
         })
       });
 
@@ -160,9 +193,10 @@ const useProducts = () => {
     } catch (error) {
       console.error("Error al actualizar favorito", error);
       // Revertir cambio en caso de error
+      const normalizedProductId = normalizeId(productId);
       setProducts(prevProducts => 
         prevProducts.map(p => 
-          p.id === productId 
+          compareIds(p.id, normalizedProductId)
             ? { ...p, isFavorite: !p.isFavorite } 
             : p
         )
@@ -174,9 +208,10 @@ const useProducts = () => {
   // Función para añadir al carrito - CORREGIDA
   const handleAddToCart = async (productId) => {
     try {
-      console.log('Adding to cart, product ID:', productId); // Debug
+      const normalizedProductId = normalizeId(productId);
+      console.log('Adding to cart, product ID:', normalizedProductId); // Debug
       
-      const product = products.find(p => p.id === productId);
+      const product = products.find(p => compareIds(p.id, normalizedProductId));
       
       if (!product) {
         toast.error("Producto no encontrado");
@@ -189,21 +224,20 @@ const useProducts = () => {
       }
 
       const response = await fetch(CART_API, {
-  method: "POST",
-  headers: getAuthHeaders(),
-  body: JSON.stringify({
-    idClient: userId, // Asegúrate de tener el ID del cliente autenticado
-    products: [
-      {
-        idProduct: productId,
-        quantity: 1,
-        subtotal: product.price * 1
-      }
-    ],
-    total: product.price * 1
-  })
-});
-
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          idClient: userId, // Asegúrate de tener el ID del cliente autenticado
+          products: [
+            {
+              idProduct: normalizedProductId,
+              quantity: 1,
+              subtotal: product.price * 1
+            }
+          ],
+          total: product.price * 1
+        })
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -214,9 +248,6 @@ const useProducts = () => {
       console.log('Cart response:', result); // Debug
       
       toast.success(`${product.name} añadido al carrito`);
-      
-      // NO redirigir automáticamente, solo mostrar el mensaje
-      // window.location.href = "/ShoppingCart";
       
     } catch (error) {
       console.error("Error al añadir al carrito:", error);
@@ -231,24 +262,24 @@ const useProducts = () => {
 
   // Función para manejar cambio de categorías - CORREGIDA
   const handleCategoryChange = (categoryId) => {
-    console.log('Category change:', categoryId, 'Current selected:', selectedCategories); // Debug
+    const normalizedCategoryId = normalizeId(categoryId);
+    console.log('Category change:', normalizedCategoryId, 'Current selected:', selectedCategories); // Debug
     
-    if (categoryId === 'all') {
+    if (normalizedCategoryId === 'all') {
       // Si selecciona "Todas las plantas", limpiar categorías seleccionadas
       setSelectedCategories([]);
       return;
     }
 
     setSelectedCategories(prev => {
-      const categoryIdStr = categoryId.toString();
-      const isSelected = prev.some(id => id.toString() === categoryIdStr);
+      const isSelected = prev.some(id => compareIds(id, normalizedCategoryId));
       
       if (isSelected) {
         // Si ya está seleccionada, quitarla
-        return prev.filter(id => id.toString() !== categoryIdStr);
+        return prev.filter(id => !compareIds(id, normalizedCategoryId));
       } else {
         // Si no está seleccionada, agregarla
-        return [...prev, categoryId];
+        return [...prev, normalizedCategoryId];
       }
     });
   };
@@ -297,15 +328,24 @@ const useProducts = () => {
     filtered = filtered.filter(product => product.price <= priceRange);
     console.log('After price filter:', filtered.length); // Debug
 
-    // Filtrar por categorías - LÓGICA CORREGIDA
+    // Filtrar por categorías - LÓGICA CORREGIDA PARA OBJECTID
     if (selectedCategories.length > 0) {
       filtered = filtered.filter(product => {
         const productCategoryId = product.categoryId || product.idCategory;
-        if (!productCategoryId) return false;
+        if (!productCategoryId) {
+          console.log('Producto sin categoryId:', product.name, product); // Debug
+          return false;
+        }
         
-        return selectedCategories.some(
-          catId => catId.toString() === productCategoryId.toString()
+        const hasMatchingCategory = selectedCategories.some(
+          catId => compareIds(catId, productCategoryId)
         );
+        
+        if (!hasMatchingCategory) {
+          console.log('Producto filtrado por categoría:', product.name, 'categoryId:', productCategoryId, 'selectedCategories:', selectedCategories); // Debug
+        }
+        
+        return hasMatchingCategory;
       });
       console.log('After category filter:', filtered.length); // Debug
     }
@@ -331,15 +371,25 @@ const useProducts = () => {
     };
   }, [filteredProducts, priceRange, maxPrice, selectedCategories, searchTerm]);
 
-  // Función para obtener nombre de categoría por ID
+  // Función para obtener nombre de categoría por ID - CORREGIDA PARA OBJECTID
   const getCategoryName = (categoryId) => {
-    if (!categoryId) return 'Sin categoría';
+    if (!categoryId) {
+      console.log('getCategoryName: categoryId es null/undefined'); // Debug
+      return 'Sin categoría';
+    }
+    
+    const normalizedCategoryId = normalizeId(categoryId);
+    console.log('getCategoryName: buscando categoría con ID:', normalizedCategoryId); // Debug
+    console.log('getCategoryName: categorías disponibles:', categories.map(c => ({ id: c.id, name: c.name }))); // Debug
     
     const category = categories.find(cat => 
-      (cat._id && cat._id.toString() === categoryId.toString()) ||
-      (cat.id && cat.id.toString() === categoryId.toString())
+      compareIds(cat._id, normalizedCategoryId) || compareIds(cat.id, normalizedCategoryId)
     );
-    return category ? category.name : 'Sin categoría';
+    
+    const result = category ? category.name : 'Sin categoría';
+    console.log('getCategoryName: resultado:', result); // Debug
+    
+    return result;
   };
 
   // Función para verificar si una categoría está seleccionada - CORREGIDA
@@ -347,7 +397,8 @@ const useProducts = () => {
     if (categoryId === 'all') {
       return selectedCategories.length === 0;
     }
-    return selectedCategories.some(catId => catId.toString() === categoryId.toString());
+    const normalizedCategoryId = normalizeId(categoryId);
+    return selectedCategories.some(catId => compareIds(catId, normalizedCategoryId));
   };
 
   return {
@@ -387,6 +438,10 @@ const useProducts = () => {
     // Estados de carga
     isLoading: loading,
     hasError: !!error,
+    
+    // Funciones utilitarias expuestas (por si las necesitas en otros componentes)
+    normalizeId,
+    compareIds
   };
 };
 

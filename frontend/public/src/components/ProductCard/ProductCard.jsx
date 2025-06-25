@@ -7,7 +7,7 @@ const ProductCard = ({
   onToggleFavorite,
   onAddClick 
 }) => {
-  const { id, name, price, rating, img, isFavorite, stock } = product;
+  const { id, name, price, rating, img, isFavorite, stock, category } = product;
 
   // Función para renderizar estrellas basadas en puntuación
   const renderStars = (rating) => {
@@ -82,6 +82,25 @@ const ProductCard = ({
     return `${numPrice.toFixed(2)}€`;
   };
 
+  // Función para obtener el nombre de la categoría de forma segura
+  const getCategoryDisplay = (category) => {
+    // Si category es undefined, null o vacío
+    if (!category || category === 'undefined' || category === 'null') {
+      return "Sin categoría";
+    }
+    
+    // Si category es un string vacío o solo espacios
+    if (typeof category === 'string') {
+      const trimmed = category.trim();
+      if (trimmed === '' || trimmed === 'undefined' || trimmed === 'null') {
+        return "Sin categoría";
+      }
+      return trimmed;
+    }
+    
+    return category;
+  };
+
   return (
     <div 
       className="simple-card bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"
@@ -138,6 +157,9 @@ const ProductCard = ({
         <h3 className="text-gray-700 font-medium mb-1 truncate" title={name}>
           {name || "Producto sin nombre"}
         </h3>
+        <p className="text-gray-600 text-sm mb-1 truncate">
+          Categoría: {getCategoryDisplay(category)}
+        </p>
         <p className="text-gray-800 font-bold mb-2">
           {formatPrice(price)}
         </p>
@@ -148,6 +170,8 @@ const ProductCard = ({
         <div className="mt-2 text-xs text-gray-500">
           Stock: {stock > 0 ? stock : 'Agotado'}
         </div>
+        
+
       </div>
     </div>
   );
