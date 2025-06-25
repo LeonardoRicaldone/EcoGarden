@@ -124,7 +124,7 @@ const Products = () => {
       <div className="products-page-container">
         <div className="products-container">
           <div className="sidebar">
-            {/* Barra de búsqueda */}
+            {/* Barra de búsqueda - MEJORADA */}
             <div className="search-filter" style={{ marginBottom: '25px' }}>
               <h3>Buscar</h3>
               <input
@@ -134,11 +134,20 @@ const Products = () => {
                 onChange={handleSearchInput}
                 style={{
                   width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '14px'
+                  minWidth: '280px', // Ancho mínimo más grande
+                  padding: '12px 16px', // Padding más grande
+                  border: '2px solid #ddd', // Borde más grueso
+                  borderRadius: '8px', // Bordes más redondeados
+                  fontSize: '16px', // Fuente más grande
+                  boxSizing: 'border-box',
+                  transition: 'border-color 0.3s ease',
+                  '&:focus': {
+                    borderColor: '#93A267',
+                    outline: 'none'
+                  }
                 }}
+                onFocus={(e) => e.target.style.borderColor = '#93A267'}
+                onBlur={(e) => e.target.style.borderColor = '#ddd'}
               />
             </div>
 
@@ -187,7 +196,7 @@ const Products = () => {
                     <label>
                       <input 
                         type="checkbox"
-                        checked={category.id === 'all' ? selectedCategories.length === 0 : isCategory(category.id)}
+                        checked={isCategory(category.id)}
                         onChange={() => handleCheckboxChange(category.id)}
                       />
                       {category.name}
@@ -235,25 +244,26 @@ const Products = () => {
             ) : (
               <div className="products-grid">
                 {/* Mapeo de productos filtrados para mostrar en la cuadrícula */}
-                {products.map((product) => (
-                  <ProductCard 
-                    key={product.id}
-                    product={{
-                      id: product.id,
-                      name: product.name,
-                      price: `${product.price}€`,
-                      rating: product.rating || 3,
-                      img: product.imgProduct,
-                      isFavorite: product.isFavorite,
-                      stock: product.stock,
-                      description: product.description,
-                      category: getCategoryName(product.idCategory)
-                    }}
-                    onProductClick={() => handleProductClick(product.id)}
-                    onToggleFavorite={toggleFavorite}
-                    onAddClick={handleAddClick}
-                  />
-                ))}
+               {products.map((product) => (
+  <ProductCard 
+    key={product._id}
+    product={{
+      id: product._id, 
+      name: product.name,
+      price: `${product.price}$`,
+      rating: product.rating || 3,
+      img: product.imgProduct,
+      isFavorite: product.isFavorite,
+      stock: product.stock,
+      description: product.description,
+      category: getCategoryName(product.idCategory)
+    }}
+    onProductClick={() => handleProductClick(product._id)} 
+    onToggleFavorite={toggleFavorite}
+    onAddClick={handleAddClick}
+  />
+))}
+
               </div>
             )}
           </div>

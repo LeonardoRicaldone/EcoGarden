@@ -16,6 +16,22 @@ const useProducts = () => {
   // URLs de tu API
   const PRODUCTS_API = "http://localhost:4000/api/products";
   const CATEGORIES_API = "http://localhost:4000/api/categories";
+  const FAVORITES_API = "http://localhost:4000/api/favorites";
+  const CART_API = "http://localhost:4000/api/shoppingCart";
+
+  // Obtener token de autenticación (si lo tienes)
+  const getAuthToken = () => {
+    return localStorage.getItem('token') || localStorage.getItem('authToken');
+  };
+
+  // Headers con autenticación
+  const getAuthHeaders = () => {
+    const token = getAuthToken();
+    return {
+      "Content-Type": "application/json",
+      ...(token && { "Authorization": `Bearer ${token}` })
+    };
+  };
 
   // Fetch categorías desde la API
   const fetchCategories = async () => {
@@ -24,10 +40,11 @@ const useProducts = () => {
       if (!response.ok) throw new Error('Error al obtener categorías');
       
       const data = await response.json();
+      console.log('Categorías obtenidas:', data); // Debug
       
       // Agregar categoría "Todos" al inicio
       const categoriesWithAll = [
-        { id: 'all', name: 'Todas las plantas' },
+        { _id: 'all', id: 'all', name: 'Todas las plantas' },
         ...data
       ];
       
@@ -48,14 +65,34 @@ const useProducts = () => {
       if (!response.ok) throw new Error('Error al obtener productos');
       
       const data = await response.json();
+      console.log('Productos obtenidos:', data); // Debug
+      
+      // Obtener favoritos del usuario
+      let favorites = [];
+      try {
+        const favoritesResponse = await fetch(FAVORITES_API, {
+          headers: getAuthHeaders()
+        });
+        if (favoritesResponse.ok) {
+          favorites = await favoritesResponse.json();
+        }
+      } catch (favError) {
+        console.log('No se pudieron cargar favoritos:', favError);
+      }
+      
+      const favoriteIds = favorites.map(fav => fav.productId || fav._id || fav.id);
       
       // Transformar datos para incluir isFavorite y rating
       const transformedProducts = data.map(product => ({
         ...product,
-        isFavorite: false, // Inicialmente ninguno es favorito
-        rating: Math.floor(Math.random() * 5) + 1, // Rating aleatorio (puedes quitarlo si tienes rating en BD)
+        // Usar _id como id principal si existe
+        id: product._id || product.id,
+        isFavorite: favoriteIds.includes(product._id || product.id),
+        rating: product.rating || Math.floor(Math.random() * 5) + 1,
         // Asegurar que el precio sea numérico
-        price: typeof product.price === 'string' ? parseFloat(product.price) : product.price
+        price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
+        // Normalizar categoryId
+        categoryId: product.idCategory || product.categoryId || product.category
       }));
       
       setProducts(transformedProducts);
@@ -77,49 +114,69 @@ const useProducts = () => {
     loadData();
   }, []);
 
-  // Función para alternar favorito
-  const toggleFavorite = async (id) => {
+  // Función para alternar favorito - CORREGIDA
+  const toggleFavorite = async (productId) => {
     try {
-      // Actualizar estado local inmediatamente
+      console.log('Toggling favorite for product:', productId); // Debug
+      
+      const product = products.find(p => p.id === productId);
+      if (!product) {
+        toast.error("Producto no encontrado");
+        return;
+      }
+
+      // Optimistic UI update
       setProducts(prevProducts => 
-        prevProducts.map(product => 
-          product.id === id 
-            ? { ...product, isFavorite: !product.isFavorite } 
-            : product
+        prevProducts.map(p => 
+          p.id === productId 
+            ? { ...p, isFavorite: !p.isFavorite } 
+            : p
         )
       );
 
-      // Si tienes un endpoint para favoritos, descomenta y ajusta esto:
-      /*
-      const product = products.find(p => p.id === id);
-      if (product) {
-        await fetch(`${PRODUCTS_API}/${id}/favorite`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ isFavorite: !product.isFavorite }),
-        });
-      }
-      */
+      const method = product.isFavorite ? "DELETE" : "POST";
+      const url = method === "DELETE" 
+        ? `${FAVORITES_API}/${productId}` 
+        : FAVORITES_API;
       
-      toast.success("Favorito actualizado");
+      const response = await fetch(url, {
+        method,
+        headers: getAuthHeaders(),
+        ...(method === "POST" && {
+          body: JSON.stringify({ productId })
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
+      toast.success(
+        product.isFavorite 
+          ? "Removido de favoritos" 
+          : "Agregado a favoritos"
+      );
+      
     } catch (error) {
       console.error("Error al actualizar favorito", error);
       // Revertir cambio en caso de error
       setProducts(prevProducts => 
-        prevProducts.map(product => 
-          product.id === id 
-            ? { ...product, isFavorite: !product.isFavorite } 
-            : product
+        prevProducts.map(p => 
+          p.id === productId 
+            ? { ...p, isFavorite: !p.isFavorite } 
+            : p
         )
       );
       toast.error("Error al actualizar favorito");
     }
   };
 
-  // Función para añadir al carrito
-  const handleAddToCart = async (id) => {
+  // Función para añadir al carrito - CORREGIDA
+  const handleAddToCart = async (productId) => {
     try {
-      const product = products.find(p => p.id === id);
+      console.log('Adding to cart, product ID:', productId); // Debug
+      
+      const product = products.find(p => p.id === productId);
       
       if (!product) {
         toast.error("Producto no encontrado");
@@ -131,24 +188,39 @@ const useProducts = () => {
         return;
       }
 
-      // Aquí puedes implementar la lógica para añadir al carrito
-      // Ejemplo de llamada a API de carrito:
-      /*
-      await fetch("http://localhost:4000/api/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          productId: id, 
-          quantity: 1 
-        }),
-      });
-      */
+      const response = await fetch(CART_API, {
+  method: "POST",
+  headers: getAuthHeaders(),
+  body: JSON.stringify({
+    idClient: userId, // Asegúrate de tener el ID del cliente autenticado
+    products: [
+      {
+        idProduct: productId,
+        quantity: 1,
+        subtotal: product.price * 1
+      }
+    ],
+    total: product.price * 1
+  })
+});
+
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('Cart response:', result); // Debug
       
-      console.log(`Añadir producto ${id} al carrito`, product);
       toast.success(`${product.name} añadido al carrito`);
+      
+      // NO redirigir automáticamente, solo mostrar el mensaje
+      // window.location.href = "/ShoppingCart";
+      
     } catch (error) {
-      console.error("Error al añadir al carrito", error);
-      toast.error("Error al añadir al carrito");
+      console.error("Error al añadir al carrito:", error);
+      toast.error(error.message || "Error al añadir al carrito");
     }
   };
 
@@ -157,18 +229,25 @@ const useProducts = () => {
     setPriceRange(parseInt(value));
   };
 
-  // Función para manejar cambio de categorías
+  // Función para manejar cambio de categorías - CORREGIDA
   const handleCategoryChange = (categoryId) => {
+    console.log('Category change:', categoryId, 'Current selected:', selectedCategories); // Debug
+    
     if (categoryId === 'all') {
+      // Si selecciona "Todas las plantas", limpiar categorías seleccionadas
       setSelectedCategories([]);
       return;
     }
 
     setSelectedCategories(prev => {
-      const isSelected = prev.includes(categoryId);
+      const categoryIdStr = categoryId.toString();
+      const isSelected = prev.some(id => id.toString() === categoryIdStr);
+      
       if (isSelected) {
-        return prev.filter(id => id !== categoryId);
+        // Si ya está seleccionada, quitarla
+        return prev.filter(id => id.toString() !== categoryIdStr);
       } else {
+        // Si no está seleccionada, agregarla
         return [...prev, categoryId];
       }
     });
@@ -189,11 +268,19 @@ const useProducts = () => {
   // Encontrar el precio máximo para el slider
   const maxPrice = useMemo(() => {
     if (products.length === 0) return 100;
-    return Math.max(...products.map(p => p.price));
+    const prices = products.map(p => p.price).filter(price => !isNaN(price));
+    return prices.length > 0 ? Math.max(...prices) : 100;
   }, [products]);
 
-  // Productos filtrados usando useMemo para optimización
+  // Productos filtrados usando useMemo para optimización - CORREGIDO
   const filteredProducts = useMemo(() => {
+    console.log('Filtering products...', {
+      totalProducts: products.length,
+      searchTerm,
+      selectedCategories,
+      priceRange
+    }); // Debug
+    
     let filtered = [...products];
 
     // Filtrar por término de búsqueda
@@ -203,21 +290,29 @@ const useProducts = () => {
         product.name.toLowerCase().includes(term) ||
         (product.description && product.description.toLowerCase().includes(term))
       );
+      console.log('After search filter:', filtered.length); // Debug
     }
 
     // Filtrar por precio
     filtered = filtered.filter(product => product.price <= priceRange);
+    console.log('After price filter:', filtered.length); // Debug
 
-    // Filtrar por categorías
+    // Filtrar por categorías - LÓGICA CORREGIDA
     if (selectedCategories.length > 0) {
-      filtered = filtered.filter(product => 
-        selectedCategories.includes(product.idCategory) ||
-        selectedCategories.includes(product.idCategory?.toString())
-      );
+      filtered = filtered.filter(product => {
+        const productCategoryId = product.categoryId || product.idCategory;
+        if (!productCategoryId) return false;
+        
+        return selectedCategories.some(
+          catId => catId.toString() === productCategoryId.toString()
+        );
+      });
+      console.log('After category filter:', filtered.length); // Debug
     }
 
     // Filtrar productos con stock disponible
     filtered = filtered.filter(product => product.stock > 0);
+    console.log('After stock filter:', filtered.length); // Debug
 
     return filtered;
   }, [products, priceRange, selectedCategories, searchTerm]);
@@ -238,8 +333,21 @@ const useProducts = () => {
 
   // Función para obtener nombre de categoría por ID
   const getCategoryName = (categoryId) => {
-    const category = categories.find(cat => cat.id === categoryId || cat.id === categoryId?.toString());
+    if (!categoryId) return 'Sin categoría';
+    
+    const category = categories.find(cat => 
+      (cat._id && cat._id.toString() === categoryId.toString()) ||
+      (cat.id && cat.id.toString() === categoryId.toString())
+    );
     return category ? category.name : 'Sin categoría';
+  };
+
+  // Función para verificar si una categoría está seleccionada - CORREGIDA
+  const isCategory = (categoryId) => {
+    if (categoryId === 'all') {
+      return selectedCategories.length === 0;
+    }
+    return selectedCategories.some(catId => catId.toString() === categoryId.toString());
   };
 
   return {
@@ -272,7 +380,7 @@ const useProducts = () => {
     resultsInfo,
     
     // Utilidades
-    isCategory: (categoryId) => selectedCategories.includes(categoryId) || selectedCategories.includes(categoryId?.toString()),
+    isCategory,
     isEmpty: filteredProducts.length === 0,
     getCategoryName,
     
