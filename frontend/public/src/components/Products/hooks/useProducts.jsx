@@ -104,16 +104,24 @@ const useProducts = () => {
       if (!response.ok) throw new Error('Error al obtener productos');
       
       const data = await response.json();
+      console.log('Raw products from API:', data.length);
       
-      // Transformar datos para incluir isFavorite y rating
+      // Transformar datos
       const transformedProducts = data.map(product => ({
         ...product,
-        isFavorite: false, // Inicialmente ninguno es favorito
-        rating: Math.floor(Math.random() * 5) + 1, // Rating aleatorio (puedes quitarlo si tienes rating en BD)
+        // Convertir _id a id como string
+        id: product._id ? product._id.toString() : product.id,
+        isFavorite: false, // Se actualizará con el estado de favoritos
+        rating: Math.floor(Math.random() * 5) + 1,
         // Asegurar que el precio sea numérico
-        price: typeof product.price === 'string' ? parseFloat(product.price) : product.price
+        price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
+        // Solo usar 'descripcion' como está en el esquema
+        description: product.descripcion || '',
+        // Convertir idCategory a string si es ObjectId
+        idCategory: product.idCategory ? product.idCategory.toString() : null
       }));
       
+      console.log('Transformed products:', transformedProducts.length);
       setProducts(transformedProducts);
       setError(null);
     } catch (error) {
@@ -159,45 +167,40 @@ const useProducts = () => {
 
   // Función para alternar favorito
   const toggleFavorite = async (id) => {
-    try {
-      // Actualizar estado local inmediatamente
-      setProducts(prevProducts => 
-        prevProducts.map(product => 
-          product.id === id 
-            ? { ...product, isFavorite: !product.isFavorite } 
-            : product
-        )
-      );
-
-      // Si tienes un endpoint para favoritos, descomenta y ajusta esto:
-      /*
-      const product = products.find(p => p.id === id);
-      if (product) {
-        await fetch(`${PRODUCTS_API}/${id}/favorite`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ isFavorite: !product.isFavorite }),
-        });
-      }
-      */
-      
-      toast.success("Favorito actualizado");
-    } catch (error) {
-      console.error("Error al actualizar favorito", error);
-      // Revertir cambio en caso de error
-      setProducts(prevProducts => 
-        prevProducts.map(product => 
-          product.id === id 
-            ? { ...product, isFavorite: !product.isFavorite } 
-            : product
-        )
-      );
-      toast.error("Error al actualizar favorito");
+    console.log('toggleFavorite called with id:', id, 'isAuthenticated:', isAuthenticated);
+    
+    if (!isAuthenticated) {
+      toast.error("Debes iniciar sesión para guardar favoritos", {
+        duration: 4000,
+        position: 'bottom-center',
+        style: {
+          background: '#f87171',
+          color: 'white',
+          fontSize: '14px',
+          padding: '12px 16px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+        },
+        icon: '💚'
+      });
+      return;
     }
+
+    if (!toggleFavoriteHook) {
+      console.error('toggleFavoriteHook is not available');
+      toast.error("Error: Función de favoritos no disponible");
+      return;
+    }
+
+    // Usar el hook de favoritos
+    const success = await toggleFavoriteHook(id);
+    console.log('toggleFavoriteHook result:', success);
   };
 
-  // Función para añadir al carrito
-  const handleAddToCart = async (id) => {
+  // NUEVA: Función para añadir al carrito usando el hook
+  const handleAddToCart = async (id, quantity = 1) => {
+    console.log('handleAddToCart called with:', { id, quantity });
+    
     try {
       const normalizedProductId = normalizeId(productId);
       console.log('Adding to cart, product ID:', normalizedProductId); // Debug
@@ -214,23 +217,19 @@ const useProducts = () => {
         return;
       }
 
-      // Aquí puedes implementar la lógica para añadir al carrito
-      // Ejemplo de llamada a API de carrito:
-      /*
-      await fetch("http://localhost:4000/api/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          productId: id, 
-          quantity: 1 
-        }),
-      });
-      */
+      if (quantity > product.stock) {
+        toast.error(`Solo hay ${product.stock} unidades disponibles`);
+        return;
+      }
+
+      // Usar el hook del carrito
+      const success = await addToCart(id, quantity);
       
-      console.log(`Añadir producto ${id} al carrito`, product);
-      toast.success(`${product.name} añadido al carrito`);
+      if (success) {
+        console.log(`Producto ${product.name} agregado al carrito exitosamente`);
+      }
     } catch (error) {
-      console.error("Error al añadir al carrito", error);
+      console.error("Error al añadir al carrito:", error);
       toast.error("Error al añadir al carrito");
     }
   };
@@ -423,6 +422,13 @@ const useProducts = () => {
     // Estados de carga
     isLoading: loading,
     hasError: !!error,
+    
+    // Estado de autenticación
+    isAuthenticated,
+    user,
+    
+    // Debug
+    favoriteIds
   };
 };
 
