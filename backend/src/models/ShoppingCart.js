@@ -4,8 +4,8 @@ const shoppingCartSchema = new Schema(
     {
         idClient: {
             type: Schema.Types.ObjectId,
-            ref: "Clients", // Referencia a la colección de clientes
-            required: true  // CORREGIDO: era "require"
+            ref: "Clients", //Referencia a la colección de clientes
+            require: true
         },
         products: [
             {

@@ -7,6 +7,7 @@ import useProducts from "../components/Products/hooks/useProducts";
 const Products = () => {
   const navigate = useNavigate();
   
+  // Hook personalizado para manejar productos y filtros
   const {
     products,
     categories,
@@ -27,12 +28,9 @@ const Products = () => {
     isEmpty,
     getCategoryName
   } = useProducts();
-
-  // DEBUG: Verificar los productos
-  console.log('Products Component - Products data:', products.slice(0, 2));
       
+  // Función para manejar el clic en un producto
   const handleProductClick = (productId) => {
-    console.log('Products - Product clicked:', productId);
     navigate(`/product/${productId}`); 
   };
 
@@ -53,22 +51,13 @@ const Products = () => {
     handleSearchChange(e.target.value);
   };
 
-  // DEBUG: Función para toggle de favoritos
-  const handleToggleFavorite = (id) => {
-    console.log('Products - Toggle favorite for ID:', id);
-    if (!id) {
-      console.error('Products - ERROR: No ID provided to toggleFavorite');
-      return;
-    }
-    toggleFavorite(id);
-  };
-
+  // Mostrar loading
   if (loading) {
     return (
       <div className="page-container">
         <div className="products-page-container">
           <div style={{ textAlign: 'center', padding: '50px' }}>
-            <div style={{ 
+            <div style={{
               display: 'inline-block',
               width: '40px',
               height: '40px',
@@ -98,14 +87,14 @@ const Products = () => {
       <div className="page-container">
         <div className="products-page-container">
           <div style={{ textAlign: 'center', padding: '50px' }}>
-            <div style={{ 
-              color: '#e74c3c', 
-              fontSize: '48px', 
-              marginBottom: '20px' 
+            <div style={{
+              color: '#e74c3c',
+              fontSize: '48px',
+              marginBottom: '20px'
             }}>⚠️</div>
             <h3 style={{ color: '#e74c3c', marginBottom: '10px' }}>Error al cargar productos</h3>
             <p style={{ color: '#666', marginBottom: '20px' }}>{error}</p>
-            <button 
+            <button
               onClick={() => window.location.reload()}
               style={{
                 padding: '10px 20px',
@@ -140,11 +129,16 @@ const Products = () => {
                 onChange={handleSearchInput}
                 style={{
                   width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '14px'
+                  minWidth: '280px',
+                  padding: '12px 16px',
+                  border: '2px solid #ddd',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  boxSizing: 'border-box',
+                  transition: 'border-color 0.3s ease'
                 }}
+                onFocus={(e) => e.target.style.borderColor = '#93A267'}
+                onBlur={(e) => e.target.style.borderColor = '#ddd'}
               />
             </div>
 
@@ -153,12 +147,12 @@ const Products = () => {
               <h3>Precio</h3>
               <div className="range-container">
                 <span>0€</span>
-                <input 
-                  type="range" 
-                  min="0" 
-                  max={maxPrice} 
-                  value={priceRange} 
-                  onChange={handleRangeChange} 
+                <input
+                  type="range"
+                  min="0"
+                  max={maxPrice}
+                  value={priceRange}
+                  onChange={handleRangeChange}
                 />
                 <span>{maxPrice}€</span>
               </div>
@@ -166,18 +160,18 @@ const Products = () => {
                 Hasta {priceRange}€
               </div>
             </div>
-            
+
             {/* Filtro de categorías */}
             <div className="category-filter">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3>Categoría</h3>
                 {(selectedCategories.length > 0 || searchTerm) && (
-                  <button 
+                  <button
                     onClick={clearFilters}
-                    style={{ 
-                      background: 'none', 
-                      border: 'none', 
-                      color: '#93A267', 
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#93A267',
                       cursor: 'pointer',
                       fontSize: '12px',
                       textDecoration: 'underline'
@@ -189,12 +183,12 @@ const Products = () => {
               </div>
               <ul>
                 {categories.map(category => (
-                  <li key={category.id}>
+                  <li key={category._id}>
                     <label>
-                      <input 
+                      <input
                         type="checkbox"
-                        checked={category.id === 'all' ? selectedCategories.length === 0 : isCategory(category.id)}
-                        onChange={() => handleCheckboxChange(category.id)}
+                        checked={isCategory(category._id)}
+                        onChange={() => handleCheckboxChange(category._id)}
                       />
                       {category.name}
                     </label>
@@ -203,7 +197,7 @@ const Products = () => {
               </ul>
             </div>
           </div>
-          
+
           <div className="products-area">
             <div className="results-info">
               <span>{resultsInfo.message}</span>
@@ -213,17 +207,17 @@ const Products = () => {
                 </span>
               )}
             </div>
-            
+
             {isEmpty ? (
-              <div style={{ 
-                textAlign: 'center', 
-                padding: '50px', 
-                color: '#666' 
+              <div style={{
+                textAlign: 'center',
+                padding: '50px',
+                color: '#666'
               }}>
                 <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔍</div>
                 <h3>No se encontraron productos</h3>
                 <p>No hay productos que coincidan con los filtros aplicados</p>
-                <button 
+                <button
                   onClick={clearFilters}
                   style={{
                     padding: '10px 20px',
@@ -240,35 +234,26 @@ const Products = () => {
               </div>
             ) : (
               <div className="products-grid">
-                {products.map((product) => {
-                  // DEBUG: Verificar cada producto individualmente
-                  console.log('Products - Rendering product:', {
-                    originalId: product.id,
-                    _id: product._id,
-                    name: product.name,
-                    hasId: !!product.id
-                  });
-
-                  return (
-                    <ProductCard 
-                      key={product.id || product._id}
-                      product={{
-                        id: product.id || product._id, // FALLBACK por si acaso
-                        name: product.name,
-                        price: `${product.price}€`,
-                        rating: product.rating || 3,
-                        img: product.imgProduct,
-                        isFavorite: product.isFavorite,
-                        stock: product.stock,
-                        description: product.description,
-                        category: getCategoryName(product.idCategory)
-                      }}
-                      onProductClick={handleProductClick}
-                      onToggleFavorite={handleToggleFavorite}
-                      onAddClick={handleAddClick}
-                    />
-                  );
-                })}
+                {/* Mapeo de productos filtrados para mostrar en la cuadrícula */}
+                {products.map((product) => (
+                  <ProductCard 
+                    key={product.id}
+                    product={{
+                      id: product.id,
+                      name: product.name,
+                      price: `${product.price}€`,
+                      rating: product.rating || 3,
+                      img: product.imgProduct,
+                      isFavorite: product.isFavorite,
+                      stock: product.stock,
+                      description: product.description,
+                      category: getCategoryName(product.idCategory)
+                    }}
+                    onProductClick={() => handleProductClick(product.id)}
+                    onToggleFavorite={toggleFavorite}
+                    onAddClick={handleAddClick}
+                  />
+                ))}
               </div>
             )}
           </div>
