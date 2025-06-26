@@ -65,7 +65,6 @@ ratingsController.getProductRatings = async (req, res) => {
     }
 }
 
-//INSERT - crear nuevo rating
 ratingsController.createRatings = async (req, res) => {
     try {
         const { comment, score, idProduct, idClient } = req.body;
@@ -87,18 +86,8 @@ ratingsController.createRatings = async (req, res) => {
                 message: "El puntaje debe estar entre 1 y 5" 
             });
         }
-        
-        // Verificar si el usuario ya calificó este producto
-        const existingRating = await Ratings.findOne({ 
-            idProduct, 
-            idClient 
-        });
-        
-        if (existingRating) {
-            return res.status(400).json({ 
-                message: "Ya has calificado este producto. Solo puedes calificar una vez por producto." 
-            });
-        }
+
+        // NO HAY VERIFICACIÓN DE RATING EXISTENTE - PERMITE MÚLTIPLES RATINGS
         
         const newRatings = new Ratings({ 
             comment: comment.trim(), 
