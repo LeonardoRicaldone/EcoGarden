@@ -72,17 +72,7 @@ const Nav = () => {
                 <a href="/about" className="nav-link">Sobre nosotros</a>
             </div>
 
-            {/* Barra de búsqueda para pantallas grandes */}
-            <div className="search-container">
-                <input
-                    type="text"
-                    placeholder="Buscar"
-                    className="search-input"
-                />
-                <button className="search-button">
-                    <FaSearch />
-                </button>
-            </div>
+            
 
             {/* Iconos para pantallas grandes */}
             <div className="nav-icons">
@@ -110,17 +100,7 @@ const Nav = () => {
                     <a href="/about" className="nav-link">Sobre nosotros</a>
                 </div>
 
-                {/* Barra de búsqueda móvil */}
-                <div className="search-container">
-                    <input
-                        type="text"
-                        placeholder="Buscar"
-                        className="search-input"
-                    />
-                    <button className="search-button">
-                        <FaSearch />
-                    </button>
-                </div>
+               
 
                 {/* Iconos móviles */}
                 <div className="nav-icons">

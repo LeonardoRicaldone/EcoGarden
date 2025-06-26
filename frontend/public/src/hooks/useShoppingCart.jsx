@@ -137,23 +137,10 @@ const useShoppingCart = (clientId) => {
 
         // Verificar si el usuario está autenticado
         if (!clientId) {
-            toast.error("Debes iniciar sesión para agregar productos al carrito", {
-                duration: 4000,
-                position: 'bottom-center',
-                style: {
-                    background: '#f87171',
-                    color: 'white',
-                    fontSize: '14px',
-                    padding: '12px 16px',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
-                },
-                icon: '🛒'
-            });
+            toast.error("Debes iniciar sesión para agregar productos al carrito");
             return false;
         }
 
-        // AGREGADO: Validar que clientId sea un ObjectId válido
         if (!isValidObjectId(clientId)) {
             toast.error("Error: ID de cliente inválido");
             return false;
@@ -295,7 +282,6 @@ const useShoppingCart = (clientId) => {
     const syncCartWithServerItems = async (items) => {
         if (!clientId) return;
 
-        // AGREGADO: Validar que clientId sea un ObjectId válido antes de sincronizar
         if (!isValidObjectId(clientId)) {
             console.error('Cannot sync cart: Invalid clientId format:', clientId);
             return;
@@ -305,7 +291,7 @@ const useShoppingCart = (clientId) => {
             console.log('Syncing cart with server using specific items...');
             
             const cartData = {
-                idClient: clientId, // El backend ahora maneja la conversión a ObjectId
+                idClient: clientId,
                 products: items.map(item => ({
                     idProduct: item.id,
                     quantity: item.quantity,

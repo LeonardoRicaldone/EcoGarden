@@ -1,74 +1,107 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Register.css';
 import logo from '../assets/logo.png';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 import { useAuth } from '../context/AuthContext';
-import { toast } from 'react-hot-toast';
 
 const Register = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    lastname: '',
-    telephone: '',
-    email: '',
-    password: ''
-  });
   const [termsAccepted, setTermsAccepted] = useState(false);
   
   const location = useLocation();
   const navigate = useNavigate();
-  const { register, isLoading } = useAuth();
+  const { register: registerUser, isLoading } = useAuth();
 
   // Verificar si viene de términos y condiciones
   const initialTermsAccepted = location.state?.termsAccepted || false;
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (initialTermsAccepted) {
       setTermsAccepted(true);
     }
   }, [initialTermsAccepted]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  // React Hook Form setup
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch
+  } = useForm({
+    defaultValues: {
+      name: '',
+      lastname: '',
+      telephone: '',
+      email: '',
+      password: ''
+    },
+    mode: 'onBlur'
+  });
+
+  // Validaciones
+  const validations = {
+    name: {
+      required: 'El nombre es requerido',
+      minLength: {
+        value: 2,
+        message: 'El nombre debe tener al menos 2 caracteres'
+      },
+      pattern: {
+        value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+        message: 'El nombre solo puede contener letras'
+      }
+    },
+    lastname: {
+      required: 'El apellido es requerido',
+      minLength: {
+        value: 2,
+        message: 'El apellido debe tener al menos 2 caracteres'
+      },
+      pattern: {
+        value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+        message: 'El apellido solo puede contener letras'
+      }
+    },
+    telephone: {
+      required: 'El teléfono es requerido',
+      pattern: {
+        value: /^[\+]?[(]?[\d\s\-\(\)]{8,}$/,
+        message: 'Formato de teléfono inválido'
+      }
+    },
+    email: {
+      required: 'El correo electrónico es requerido',
+      pattern: {
+        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+        message: 'Formato de correo electrónico inválido'
+      }
+    },
+    password: {
+      required: 'La contraseña es requerida',
+      minLength: {
+        value: 6,
+        message: 'La contraseña debe tener al menos 6 caracteres'
+      }
+    }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  // Manejar envío del formulario
+  const onSubmit = async (formData) => {
     // Validación de términos y condiciones
     if (!termsAccepted) {
-      toast.error("Debes aceptar los términos y condiciones");
-      return;
-    }
-
-    // Validación de campos vacíos
-    if (!formData.name || !formData.lastname || !formData.telephone || 
-        !formData.email || !formData.password) {
-      toast.error("Por favor, completa todos los campos");
-      return;
-    }
-
-    // Validación de contraseña
-    if (formData.password.length < 6) {
-      toast.error("La contraseña debe tener al menos 6 caracteres");
-      return;
-    }
-
-    // Validación de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error("Por favor ingresa un email válido");
+      // El error se manejará visualmente en el checkbox
       return;
     }
 
     // Llamar al registro del contexto
-    const result = await register(formData);
+    const result = await registerUser(formData);
     
     if (result.success) {
+      // Limpiar formulario
+      reset();
+      setTermsAccepted(false);
+      
       if (result.needsVerification) {
         // Redirigir a la página de verificación de email
         navigate('/verify-email', { 
@@ -108,83 +141,95 @@ const Register = () => {
         <div className="register-right">
           <h1 className="register-title">¡Bienvenido!<br />Comencemos con tu registro.</h1>
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div className="input-row">
-              <input 
-                type="text" 
-                name="name"
-                placeholder="Nombre" 
-                className="register-input half-width" 
-                value={formData.name}
-                onChange={handleChange}
-                required
-                disabled={isLoading}
-              />
-              <input 
-                type="text" 
-                name="lastname"
-                placeholder="Apellido" 
-                className="register-input half-width" 
-                value={formData.lastname}
-                onChange={handleChange}
-                required
-                disabled={isLoading}
-              />
+              <div className="input-container half-width">
+                <input 
+                  type="text" 
+                  {...register('name', validations.name)}
+                  placeholder="Nombre" 
+                  className={`register-input half-width ${errors.name ? 'error' : ''}`}
+                  disabled={isLoading}
+                />
+                {errors.name && (
+                  <span className="error-message">{errors.name.message}</span>
+                )}
+              </div>
+              
+              <div className="input-container half-width">
+                <input 
+                  type="text" 
+                  {...register('lastname', validations.lastname)}
+                  placeholder="Apellido" 
+                  className={`register-input half-width ${errors.lastname ? 'error' : ''}`}
+                  disabled={isLoading}
+                />
+                {errors.lastname && (
+                  <span className="error-message">{errors.lastname.message}</span>
+                )}
+              </div>
             </div>
             
-            <input 
-              type="tel" 
-              name="telephone"
-              placeholder="Teléfono" 
-              className="register-input" 
-              value={formData.telephone}
-              onChange={handleChange}
-              required
-              disabled={isLoading}
-            />
+            <div className="input-container">
+              <input 
+                type="tel" 
+                {...register('telephone', validations.telephone)}
+                placeholder="Teléfono" 
+                className={`register-input ${errors.telephone ? 'error' : ''}`}
+                disabled={isLoading}
+              />
+              {errors.telephone && (
+                <span className="error-message">{errors.telephone.message}</span>
+              )}
+            </div>
             
-            <input 
-              type="email" 
-              name="email"
-              placeholder="Correo electrónico" 
-              className="register-input" 
-              value={formData.email}
-              onChange={handleChange}
-              required
-              disabled={isLoading}
-            />
+            <div className="input-container">
+              <input 
+                type="email" 
+                {...register('email', validations.email)}
+                placeholder="Correo electrónico" 
+                className={`register-input ${errors.email ? 'error' : ''}`}
+                disabled={isLoading}
+              />
+              {errors.email && (
+                <span className="error-message">{errors.email.message}</span>
+              )}
+            </div>
             
-            <input 
-              type="password" 
-              name="password"
-              placeholder="Contraseña (mínimo 6 caracteres)" 
-              className="register-input" 
-              value={formData.password}
-              onChange={handleChange}
-              minLength="6"
-              required
-              disabled={isLoading}
-            />
+            <div className="input-container">
+              <input 
+                type="password" 
+                {...register('password', validations.password)}
+                placeholder="Contraseña (mínimo 6 caracteres)" 
+                className={`register-input ${errors.password ? 'error' : ''}`}
+                disabled={isLoading}
+              />
+              {errors.password && (
+                <span className="error-message">{errors.password.message}</span>
+              )}
+            </div>
 
-            <div className="checkbox-container">
+            <div className={`checkbox-container ${!termsAccepted && Object.keys(errors).length === 0 && watch('name') ? 'error' : ''}`}>
               <input
                 type="checkbox"
                 id="terms"
                 className="terms-checkbox"
                 checked={termsAccepted}
                 onChange={(e) => setTermsAccepted(e.target.checked)}
-                required
                 disabled={isLoading}
               />
               <label htmlFor="terms" className="termsConditions">
                 Acepto <Link to="/TermsConditions" state={{ returnTo: '/register' }}>términos y condiciones</Link>
               </label>
+              {!termsAccepted && Object.keys(errors).length === 0 && watch('name') && (
+                <span className="error-message">Debes aceptar los términos y condiciones</span>
+              )}
             </div>
 
             <button 
               type="submit" 
               className="register-button"
-              disabled={isLoading || !termsAccepted}
+              disabled={isLoading || !termsAccepted || Object.keys(errors).length > 0}
             >
               {isLoading ? 'Registrando...' : 'Registrarse'}
             </button>

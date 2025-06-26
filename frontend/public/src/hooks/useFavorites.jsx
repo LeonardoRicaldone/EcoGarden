@@ -69,19 +69,7 @@ const useFavorites = (clientId) => {
         
         if (!clientId) {
             console.log('No clientId, showing login toast');
-            toast.error("Debes iniciar sesión para guardar favoritos", {
-                duration: 4000,
-                position: 'bottom-center',
-                style: {
-                    background: '#f87171',
-                    color: 'white',
-                    fontSize: '14px',
-                    padding: '12px 16px',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
-                },
-                icon: '💚'
-            });
+            toast.error("Debes iniciar sesión para guardar favoritos");
             return false;
         }
 

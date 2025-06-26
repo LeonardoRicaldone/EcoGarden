@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 import { FaArrowLeft, FaEnvelope, FaLock, FaKey, FaCheckCircle, FaEye, FaEyeSlash } from 'react-icons/fa';
 import usePasswordRecovery from '../hooks/usePasswordRecovery';
 import './PasswordRecovery.css';
@@ -13,10 +14,6 @@ const PasswordRecovery = () => {
   const {
     currentStep,
     loading,
-    email,
-    code,
-    newPassword,
-    confirmPassword,
     maskedEmail,
     requestCode,
     verifyCode,
@@ -24,50 +21,71 @@ const PasswordRecovery = () => {
     resetProcess,
     goToPreviousStep,
     requestNewCode,
-    setEmail,
-    setCode,
-    setNewPassword,
-    setConfirmPassword,
   } = usePasswordRecovery();
 
-  // Formularios para cada paso
-  const [formData, setFormData] = useState({
-    email: '',
-    code: '',
-    newPassword: '',
-    confirmPassword: ''
+  // React Hook Form para Paso 1 (Email)
+  const emailForm = useForm({
+    defaultValues: { email: '' },
+    mode: 'onBlur'
   });
 
-  const handleInputChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  // React Hook Form para Paso 2 (Código)
+  const codeForm = useForm({
+    defaultValues: { code: '' },
+    mode: 'onChange'
+  });
+
+  // React Hook Form para Paso 3 (Contraseñas)
+  const passwordForm = useForm({
+    defaultValues: { 
+      newPassword: '', 
+      confirmPassword: '' 
+    },
+    mode: 'onBlur'
+  });
+
+  // Validaciones
+  const validations = {
+    email: {
+      required: 'El correo electrónico es requerido',
+      pattern: {
+        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+        message: 'Formato de correo electrónico inválido'
+      }
+    },
+    code: {
+      required: 'El código es requerido',
+      pattern: {
+        value: /^\d{5}$/,
+        message: 'El código debe tener exactamente 5 dígitos'
+      }
+    },
+    newPassword: {
+      required: 'La nueva contraseña es requerida',
+      minLength: {
+        value: 6,
+        message: 'La contraseña debe tener al menos 6 caracteres'
+      }
+    },
+    confirmPassword: {
+      required: 'Confirma tu contraseña',
+      validate: (value, formValues) => {
+        return value === formValues.newPassword || 'Las contraseñas no coinciden';
+      }
+    }
   };
 
   // Manejadores de cada paso
-  const handleEmailSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.email.trim()) {
-      return;
-    }
-    await requestCode(formData.email);
+  const handleEmailSubmit = async (data) => {
+    await requestCode(data.email);
   };
 
-  const handleCodeSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.code.trim()) {
-      return;
-    }
-    await verifyCode(formData.code);
+  const handleCodeSubmit = async (data) => {
+    await verifyCode(data.code);
   };
 
-  const handlePasswordSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.newPassword || !formData.confirmPassword) {
-      return;
-    }
-    const result = await setNewPasswordRequest(formData.newPassword, formData.confirmPassword);
+  const handlePasswordSubmit = async (data) => {
+    const result = await setNewPasswordRequest(data.newPassword, data.confirmPassword);
     if (result.success) {
       // Después de 3 segundos, redirigir al login
       setTimeout(() => {
@@ -108,18 +126,20 @@ const PasswordRecovery = () => {
       <h2>Recuperar Contraseña</h2>
       <p>Ingresa tu correo electrónico y te enviaremos un código de verificación.</p>
       
-      <form onSubmit={handleEmailSubmit} className="recovery-form">
+      <form onSubmit={emailForm.handleSubmit(handleEmailSubmit)} className="recovery-form">
         <div className="input-group">
           <label htmlFor="email">Correo Electrónico</label>
           <input
             type="email"
             id="email"
-            value={formData.email}
-            onChange={(e) => handleInputChange('email', e.target.value)}
+            {...emailForm.register('email', validations.email)}
             placeholder="tu-email@ejemplo.com"
-            required
+            className={emailForm.formState.errors.email ? 'error' : ''}
             disabled={loading}
           />
+          {emailForm.formState.errors.email && (
+            <span className="error-text">{emailForm.formState.errors.email.message}</span>
+          )}
         </div>
         
         <button type="submit" className="primary-btn" disabled={loading}>
@@ -139,23 +159,35 @@ const PasswordRecovery = () => {
         Hemos enviado un código de 5 dígitos a <strong>{maskedEmail}</strong>
       </p>
       
-      <form onSubmit={handleCodeSubmit} className="recovery-form">
+      <form onSubmit={codeForm.handleSubmit(handleCodeSubmit)} className="recovery-form">
         <div className="input-group">
           <label htmlFor="code">Código de Verificación</label>
           <input
             type="text"
             id="code"
-            value={formData.code}
-            onChange={(e) => handleInputChange('code', e.target.value.replace(/\D/g, '').slice(0, 5))}
+            {...codeForm.register('code', {
+              ...validations.code,
+              onChange: (e) => {
+                // Solo permitir números y limitar a 5 dígitos
+                const value = e.target.value.replace(/\D/g, '').slice(0, 5);
+                codeForm.setValue('code', value);
+              }
+            })}
             placeholder="12345"
             maxLength="5"
-            required
+            className={`code-input ${codeForm.formState.errors.code ? 'error' : ''}`}
             disabled={loading}
-            className="code-input"
           />
+          {codeForm.formState.errors.code && (
+            <span className="error-text">{codeForm.formState.errors.code.message}</span>
+          )}
         </div>
         
-        <button type="submit" className="primary-btn" disabled={loading || formData.code.length !== 5}>
+        <button 
+          type="submit" 
+          className="primary-btn" 
+          disabled={loading || codeForm.watch('code')?.length !== 5}
+        >
           {loading ? 'Verificando...' : 'Verificar Código'}
         </button>
         
@@ -180,19 +212,17 @@ const PasswordRecovery = () => {
       <h2>Nueva Contraseña</h2>
       <p>Crea una nueva contraseña segura para tu cuenta.</p>
       
-      <form onSubmit={handlePasswordSubmit} className="recovery-form">
+      <form onSubmit={passwordForm.handleSubmit(handlePasswordSubmit)} className="recovery-form">
         <div className="input-group">
           <label htmlFor="newPassword">Nueva Contraseña</label>
           <div className="password-input">
             <input
               type={showPassword ? 'text' : 'password'}
               id="newPassword"
-              value={formData.newPassword}
-              onChange={(e) => handleInputChange('newPassword', e.target.value)}
+              {...passwordForm.register('newPassword', validations.newPassword)}
               placeholder="Mínimo 6 caracteres"
-              required
+              className={passwordForm.formState.errors.newPassword ? 'error' : ''}
               disabled={loading}
-              minLength="6"
             />
             <button
               type="button"
@@ -202,6 +232,9 @@ const PasswordRecovery = () => {
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
           </div>
+          {passwordForm.formState.errors.newPassword && (
+            <span className="error-text">{passwordForm.formState.errors.newPassword.message}</span>
+          )}
         </div>
         
         <div className="input-group">
@@ -210,12 +243,10 @@ const PasswordRecovery = () => {
             <input
               type={showConfirmPassword ? 'text' : 'password'}
               id="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+              {...passwordForm.register('confirmPassword', validations.confirmPassword)}
               placeholder="Confirma tu nueva contraseña"
-              required
+              className={passwordForm.formState.errors.confirmPassword ? 'error' : ''}
               disabled={loading}
-              minLength="6"
             />
             <button
               type="button"
@@ -225,15 +256,15 @@ const PasswordRecovery = () => {
               {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
           </div>
-          {formData.newPassword && formData.confirmPassword && formData.newPassword !== formData.confirmPassword && (
-            <span className="error-text">Las contraseñas no coinciden</span>
+          {passwordForm.formState.errors.confirmPassword && (
+            <span className="error-text">{passwordForm.formState.errors.confirmPassword.message}</span>
           )}
         </div>
         
         <button 
           type="submit" 
           className="primary-btn" 
-          disabled={loading || formData.newPassword !== formData.confirmPassword || formData.newPassword.length < 6}
+          disabled={loading || !passwordForm.formState.isValid}
         >
           {loading ? 'Actualizando...' : 'Actualizar Contraseña'}
         </button>

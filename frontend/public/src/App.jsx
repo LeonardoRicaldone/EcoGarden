@@ -47,9 +47,7 @@ function App() {
               <Route 
                 path="/Favorites" 
                 element={
-                  <ProtectedRoute>
                     <Favorites />
-                  </ProtectedRoute>
                 } 
               />
               <Route 

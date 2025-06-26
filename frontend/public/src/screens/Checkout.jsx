@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 import { FaCreditCard, FaUser, FaMapMarkerAlt, FaPhone, FaLock, FaArrowLeft } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
@@ -25,34 +26,50 @@ const Checkout = () => {
         loading: cartLoading
     } = useShoppingCart(isAuthenticated ? clientId : null);
 
-    // NUEVO: Hook de ventas
+    // Hook de ventas
     const {
         loading: salesLoading,
-        processCompleteCheckout,
-        validateCheckoutData
+        processCompleteCheckout
     } = useSales();
 
-    // Estados para el formulario
-    const [formData, setFormData] = useState({
-        name: user?.name || '',
-        lastname: user?.lastname || '',
-        phone: user?.phone || '',
-        department: '',
-        city: '',
-        zipCode: '',
-        address: '',
-        creditCard: '',
-        expiryDate: '',
-        cvv: '',
-        cardName: ''
+    // React Hook Form setup
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        setValue,
+        watch,
+        reset
+    } = useForm({
+        defaultValues: {
+            name: user?.name || '',
+            lastname: user?.lastname || '',
+            phone: user?.phone || '',
+            department: '',
+            city: '',
+            zipCode: '',
+            address: '',
+            creditCard: '',
+            expiryDate: '',
+            cvv: '',
+            cardName: ''
+        },
+        mode: 'onBlur'
     });
-
-    const [errors, setErrors] = useState({});
 
     const shippingCost = 4;
     const subtotal = getSubtotal();
     const totalAmount = getTotalAmount(shippingCost);
     const totalItems = getTotalItems();
+
+    // Actualizar valores del usuario cuando cambien
+    useEffect(() => {
+        if (user) {
+            setValue('name', user.name || '');
+            setValue('lastname', user.lastname || '');
+            setValue('phone', user.phone || '');
+        }
+    }, [user, setValue]);
 
     // Verificar autenticación y carrito al cargar
     useEffect(() => {
@@ -100,48 +117,121 @@ const Checkout = () => {
         return cleanValue;
     };
 
-    // Manejar cambios en el formulario
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        let formattedValue = value;
-
-        if (name === 'creditCard') {
-            formattedValue = formatCardNumber(value);
-        } else if (name === 'expiryDate') {
-            formattedValue = formatExpiryDate(value);
-        }
-
-        setFormData(prev => ({
-            ...prev,
-            [name]: formattedValue
-        }));
-
-        // Limpiar error específico cuando el usuario empiece a escribir
-        if (errors[name]) {
-            setErrors(prev => ({
-                ...prev,
-                [name]: ''
-            }));
+    // Validaciones personalizadas
+    const validations = {
+        name: {
+            required: 'El nombre es requerido',
+            minLength: {
+                value: 2,
+                message: 'El nombre debe tener al menos 2 caracteres'
+            },
+            pattern: {
+                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+                message: 'Solo se permiten letras'
+            }
+        },
+        lastname: {
+            required: 'El apellido es requerido',
+            minLength: {
+                value: 2,
+                message: 'El apellido debe tener al menos 2 caracteres'
+            },
+            pattern: {
+                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+                message: 'Solo se permiten letras'
+            }
+        },
+        phone: {
+            required: 'El teléfono es requerido',
+            pattern: {
+                value: /^[\+]?[(]?[\d\s\-\(\)]{8,}$/,
+                message: 'Formato de teléfono inválido'
+            }
+        },
+        department: {
+            required: 'El departamento es requerido'
+        },
+        city: {
+            required: 'La ciudad es requerida',
+            minLength: {
+                value: 2,
+                message: 'La ciudad debe tener al menos 2 caracteres'
+            }
+        },
+        zipCode: {
+            required: 'El código postal es requerido',
+            pattern: {
+                value: /^\d{4,5}$/,
+                message: 'Código postal inválido (4-5 dígitos)'
+            }
+        },
+        address: {
+            required: 'La dirección es requerida',
+            minLength: {
+                value: 10,
+                message: 'La dirección debe ser más específica'
+            }
+        },
+        creditCard: {
+            required: 'El número de tarjeta es requerido',
+            validate: {
+                validLength: (value) => {
+                    const cleanValue = value.replace(/\s/g, '');
+                    return cleanValue.length === 16 || 'El número de tarjeta debe tener 16 dígitos';
+                },
+                validFormat: (value) => {
+                    const cleanValue = value.replace(/\s/g, '');
+                    return /^\d+$/.test(cleanValue) || 'Solo se permiten números';
+                }
+            }
+        },
+        expiryDate: {
+            required: 'La fecha de expiración es requerida',
+            pattern: {
+                value: /^(0[1-9]|1[0-2])\/\d{2}$/,
+                message: 'Formato inválido (MM/AA)'
+            },
+            validate: {
+                notExpired: (value) => {
+                    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(value)) return true;
+                    
+                    const [month, year] = value.split('/');
+                    const currentDate = new Date();
+                    const currentYear = currentDate.getFullYear() % 100;
+                    const currentMonth = currentDate.getMonth() + 1;
+                    
+                    const cardYear = parseInt(year);
+                    const cardMonth = parseInt(month);
+                    
+                    if (cardYear > currentYear) return true;
+                    if (cardYear === currentYear && cardMonth >= currentMonth) return true;
+                    
+                    return 'La tarjeta está vencida';
+                }
+            }
+        },
+        cvv: {
+            required: 'El CVV es requerido',
+            pattern: {
+                value: /^\d{3,4}$/,
+                message: 'CVV inválido (3-4 dígitos)'
+            }
+        },
+        cardName: {
+            required: 'El nombre en la tarjeta es requerido',
+            minLength: {
+                value: 3,
+                message: 'El nombre debe tener al menos 3 caracteres'
+            },
+            pattern: {
+                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+                message: 'Solo se permiten letras'
+            }
         }
     };
 
-    // MEJORADO: Manejar envío del formulario usando el hook de ventas
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        
-        console.log('=== FORM SUBMIT DEBUG ===');
-        console.log('cartId:', cartId);
-        console.log('cartItems:', cartItems);
-        console.log('totalAmount:', totalAmount);
-
-        // Validar formulario usando el hook
-        const validation = validateCheckoutData(formData, totalAmount);
-        
-        if (!validation.isValid) {
-            setErrors(validation.errors);
-            toast.error('Por favor corrige los errores en el formulario');
-            return;
-        }
+    // Manejar envío del formulario
+    const onSubmit = async (formData) => {
 
         if (!cartId) {
             toast.error('Error: No se encontró el carrito');
@@ -156,17 +246,20 @@ const Checkout = () => {
         try {
             console.log('Starting complete checkout process...');
             
-            // Usar el hook para procesar el checkout completo
+            // Procesar el checkout completo
             const result = await processCompleteCheckout(
                 {
                     ...formData,
                     total: totalAmount
                 },
                 cartId,
-                processCheckout // Pasar la función de checkout del carrito
+                processCheckout
             );
 
             if (result.success) {
+                // Limpiar formulario
+                reset();
+                
                 toast.success('¡Compra realizada exitosamente!', {
                     duration: 5000,
                     position: 'top-center',
@@ -243,7 +336,7 @@ const Checkout = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Formulario */}
                     <div className="lg:col-span-2">
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                             {/* Información personal */}
                             <div className="bg-white p-6 rounded-lg shadow-sm">
                                 <h2 className="text-xl font-semibold mb-4 flex items-center">
@@ -257,15 +350,13 @@ const Checkout = () => {
                                         </label>
                                         <input
                                             type="text"
-                                            name="name"
-                                            value={formData.name}
-                                            onChange={handleInputChange}
+                                            {...register('name', validations.name)}
                                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
                                                 errors.name ? 'border-red-500' : 'border-gray-300'
                                             }`}
                                         />
                                         {errors.name && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+                                            <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
                                         )}
                                     </div>
                                     <div>
@@ -274,15 +365,13 @@ const Checkout = () => {
                                         </label>
                                         <input
                                             type="text"
-                                            name="lastname"
-                                            value={formData.lastname}
-                                            onChange={handleInputChange}
+                                            {...register('lastname', validations.lastname)}
                                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
                                                 errors.lastname ? 'border-red-500' : 'border-gray-300'
                                             }`}
                                         />
                                         {errors.lastname && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.lastname}</p>
+                                            <p className="text-red-500 text-xs mt-1">{errors.lastname.message}</p>
                                         )}
                                     </div>
                                     <div className="md:col-span-2">
@@ -291,16 +380,14 @@ const Checkout = () => {
                                         </label>
                                         <input
                                             type="tel"
-                                            name="phone"
-                                            value={formData.phone}
-                                            onChange={handleInputChange}
+                                            {...register('phone', validations.phone)}
                                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
                                                 errors.phone ? 'border-red-500' : 'border-gray-300'
                                             }`}
                                             placeholder="+503 1234-5678"
                                         />
                                         {errors.phone && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+                                            <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>
                                         )}
                                     </div>
                                 </div>
@@ -318,9 +405,7 @@ const Checkout = () => {
                                             Departamento *
                                         </label>
                                         <select
-                                            name="department"
-                                            value={formData.department}
-                                            onChange={handleInputChange}
+                                            {...register('department', validations.department)}
                                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
                                                 errors.department ? 'border-red-500' : 'border-gray-300'
                                             }`}
@@ -331,7 +416,7 @@ const Checkout = () => {
                                             ))}
                                         </select>
                                         {errors.department && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.department}</p>
+                                            <p className="text-red-500 text-xs mt-1">{errors.department.message}</p>
                                         )}
                                     </div>
                                     <div>
@@ -340,15 +425,13 @@ const Checkout = () => {
                                         </label>
                                         <input
                                             type="text"
-                                            name="city"
-                                            value={formData.city}
-                                            onChange={handleInputChange}
+                                            {...register('city', validations.city)}
                                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
                                                 errors.city ? 'border-red-500' : 'border-gray-300'
                                             }`}
                                         />
                                         {errors.city && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.city}</p>
+                                            <p className="text-red-500 text-xs mt-1">{errors.city.message}</p>
                                         )}
                                     </div>
                                     <div>
@@ -357,16 +440,14 @@ const Checkout = () => {
                                         </label>
                                         <input
                                             type="text"
-                                            name="zipCode"
-                                            value={formData.zipCode}
-                                            onChange={handleInputChange}
+                                            {...register('zipCode', validations.zipCode)}
                                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
                                                 errors.zipCode ? 'border-red-500' : 'border-gray-300'
                                             }`}
                                             placeholder="1234"
                                         />
                                         {errors.zipCode && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.zipCode}</p>
+                                            <p className="text-red-500 text-xs mt-1">{errors.zipCode.message}</p>
                                         )}
                                     </div>
                                     <div className="md:col-span-2">
@@ -374,9 +455,7 @@ const Checkout = () => {
                                             Dirección completa *
                                         </label>
                                         <textarea
-                                            name="address"
-                                            value={formData.address}
-                                            onChange={handleInputChange}
+                                            {...register('address', validations.address)}
                                             rows={3}
                                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
                                                 errors.address ? 'border-red-500' : 'border-gray-300'
@@ -384,7 +463,7 @@ const Checkout = () => {
                                             placeholder="Calle, número de casa, referencias..."
                                         />
                                         {errors.address && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.address}</p>
+                                            <p className="text-red-500 text-xs mt-1">{errors.address.message}</p>
                                         )}
                                     </div>
                                 </div>
@@ -403,9 +482,13 @@ const Checkout = () => {
                                         </label>
                                         <input
                                             type="text"
-                                            name="creditCard"
-                                            value={formData.creditCard}
-                                            onChange={handleInputChange}
+                                            {...register('creditCard', {
+                                                ...validations.creditCard,
+                                                onChange: (e) => {
+                                                    const formatted = formatCardNumber(e.target.value);
+                                                    setValue('creditCard', formatted);
+                                                }
+                                            })}
                                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
                                                 errors.creditCard ? 'border-red-500' : 'border-gray-300'
                                             }`}
@@ -413,7 +496,7 @@ const Checkout = () => {
                                             maxLength={19}
                                         />
                                         {errors.creditCard && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.creditCard}</p>
+                                            <p className="text-red-500 text-xs mt-1">{errors.creditCard.message}</p>
                                         )}
                                     </div>
                                     <div>
@@ -422,9 +505,13 @@ const Checkout = () => {
                                         </label>
                                         <input
                                             type="text"
-                                            name="expiryDate"
-                                            value={formData.expiryDate}
-                                            onChange={handleInputChange}
+                                            {...register('expiryDate', {
+                                                ...validations.expiryDate,
+                                                onChange: (e) => {
+                                                    const formatted = formatExpiryDate(e.target.value);
+                                                    setValue('expiryDate', formatted);
+                                                }
+                                            })}
                                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
                                                 errors.expiryDate ? 'border-red-500' : 'border-gray-300'
                                             }`}
@@ -432,7 +519,7 @@ const Checkout = () => {
                                             maxLength={5}
                                         />
                                         {errors.expiryDate && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.expiryDate}</p>
+                                            <p className="text-red-500 text-xs mt-1">{errors.expiryDate.message}</p>
                                         )}
                                     </div>
                                     <div>
@@ -441,9 +528,7 @@ const Checkout = () => {
                                         </label>
                                         <input
                                             type="text"
-                                            name="cvv"
-                                            value={formData.cvv}
-                                            onChange={handleInputChange}
+                                            {...register('cvv', validations.cvv)}
                                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
                                                 errors.cvv ? 'border-red-500' : 'border-gray-300'
                                             }`}
@@ -451,7 +536,7 @@ const Checkout = () => {
                                             maxLength={4}
                                         />
                                         {errors.cvv && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.cvv}</p>
+                                            <p className="text-red-500 text-xs mt-1">{errors.cvv.message}</p>
                                         )}
                                     </div>
                                     <div className="md:col-span-2">
@@ -460,16 +545,14 @@ const Checkout = () => {
                                         </label>
                                         <input
                                             type="text"
-                                            name="cardName"
-                                            value={formData.cardName}
-                                            onChange={handleInputChange}
+                                            {...register('cardName', validations.cardName)}
                                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
                                                 errors.cardName ? 'border-red-500' : 'border-gray-300'
                                             }`}
                                             placeholder="Nombre completo como aparece en la tarjeta"
                                         />
                                         {errors.cardName && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.cardName}</p>
+                                            <p className="text-red-500 text-xs mt-1">{errors.cardName.message}</p>
                                         )}
                                     </div>
                                 </div>
@@ -546,7 +629,7 @@ const Checkout = () => {
                                         {subtotal >= 70 ? (
                                             <span className="text-green-600 font-medium">GRATIS</span>
                                         ) : (
-                                            `${shippingCost.toFixed(2)}`
+                                            `$${shippingCost.toFixed(2)}`
                                         )}
                                     </span>
                                 </div>

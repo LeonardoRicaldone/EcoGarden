@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import './EmailVerification.css';
 
 const EmailVerification = () => {
-  const [verificationCode, setVerificationCode] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [timeLeft, setTimeLeft] = useState(120); // 2 minutos para reenvío
   const [canResend, setCanResend] = useState(false);
@@ -16,6 +15,20 @@ const EmailVerification = () => {
   // Obtener email del estado de navegación
   const email = location.state?.email || '';
   const clientName = location.state?.clientName || '';
+
+  // React Hook Form setup
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+    watch
+  } = useForm({
+    defaultValues: {
+      verificationCode: ''
+    },
+    mode: 'onChange'
+  });
 
   // Contador regresivo para reenvío
   useEffect(() => {
@@ -34,36 +47,37 @@ const EmailVerification = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Validaciones
+  const validations = {
+    verificationCode: {
+      required: 'El código de verificación es requerido',
+      pattern: {
+        value: /^[A-Z0-9]{6}$/,
+        message: 'El código debe tener exactamente 6 caracteres alfanuméricos'
+      }
+    }
+  };
+
   // Manejar verificación del código
-  const handleVerifyCode = async (e) => {
-    e.preventDefault();
-
-    if (!verificationCode.trim()) {
-      toast.error('Por favor ingresa el código de verificación');
-      return;
-    }
-
-    if (verificationCode.length !== 6) {
-      toast.error('El código debe tener 6 caracteres');
-      return;
-    }
-
-    setIsLoading(true);
-
+  const onSubmit = async (data) => {
     try {
       const response = await fetch('http://localhost:4000/api/clients/verify-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ verificationCode: verificationCode.toUpperCase() }),
+        body: JSON.stringify({ verificationCode: data.verificationCode }),
         credentials: 'include'
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
-      if (data.success) {
-        toast.success(data.message);
+      if (result.success) {
+        toast.success(result.message);
+        
+        // Limpiar formulario
+        reset();
+        
         // Redirigir al login después de verificación exitosa
         navigate('/login', {
           state: {
@@ -72,14 +86,12 @@ const EmailVerification = () => {
           }
         });
       } else {
-        toast.error(data.message || 'Código de verificación inválido');
+        toast.error(result.message || 'Código de verificación inválido');
       }
 
     } catch (error) {
       console.error('Error verificando código:', error);
       toast.error('Error al verificar el código. Intenta de nuevo.');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -105,7 +117,7 @@ const EmailVerification = () => {
         toast.success(data.message);
         setTimeLeft(120); // Reiniciar contador
         setCanResend(false);
-        setVerificationCode(''); // Limpiar código anterior
+        reset(); // Limpiar código anterior
       } else {
         toast.error(data.message || 'Error reenviando código');
       }
@@ -116,6 +128,12 @@ const EmailVerification = () => {
     } finally {
       setIsResending(false);
     }
+  };
+
+  // Función para formatear el código mientras el usuario escribe
+  const formatVerificationCode = (value) => {
+    // Solo permitir letras y números, convertir a mayúsculas, máximo 6 caracteres
+    return value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
   };
 
   return (
@@ -148,33 +166,36 @@ const EmailVerification = () => {
               )}
             </div>
 
-            <form onSubmit={handleVerifyCode} className="verification-form">
+            <form onSubmit={handleSubmit(onSubmit)} className="verification-form">
               <div className="code-input-container">
                 <input
                   type="text"
-                  value={verificationCode}
-                  onChange={(e) => {
-                    const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                    if (value.length <= 6) {
-                      setVerificationCode(value);
+                  {...register('verificationCode', {
+                    ...validations.verificationCode,
+                    onChange: (e) => {
+                      const formattedValue = formatVerificationCode(e.target.value);
+                      e.target.value = formattedValue;
                     }
-                  }}
+                  })}
                   placeholder="Ingresa el código (6 caracteres)"
-                  className="verification-input"
+                  className={`verification-input ${errors.verificationCode ? 'error' : ''}`}
                   maxLength="6"
-                  required
+                  disabled={isSubmitting}
                 />
                 <small className="input-hint">
                   El código contiene letras y números
                 </small>
+                {errors.verificationCode && (
+                  <span className="error-message">{errors.verificationCode.message}</span>
+                )}
               </div>
 
               <button
                 type="submit"
-                disabled={isLoading || verificationCode.length !== 6}
+                disabled={isSubmitting || watch('verificationCode')?.length !== 6}
                 className="verify-button"
               >
-                {isLoading ? 'Verificando...' : 'Verificar Código'}
+                {isSubmitting ? 'Verificando...' : 'Verificar Código'}
               </button>
             </form>
 

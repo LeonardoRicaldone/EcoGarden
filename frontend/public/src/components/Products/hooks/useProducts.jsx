@@ -188,7 +188,7 @@ const useProducts = () => {
         return updatedProducts;
       });
     }
-  }, [ratings, products.length]); // Solo cuando cambien los ratings o se carguen los productos por primera vez
+  }, [ratings, products.length]);
 
   // Actualizar estado de favoritos en productos
   useEffect(() => {
@@ -214,24 +214,12 @@ const useProducts = () => {
     }
   }, [favoriteIds]);
 
-  // Función para alternar favorito
+  // Función para alternar favorito (SIN TOAST AQUÍ - lo maneja useFavorites)
   const toggleFavorite = async (id) => {
     console.log('toggleFavorite called with id:', id, 'isAuthenticated:', isAuthenticated);
     
     if (!isAuthenticated) {
-      toast.error("Debes iniciar sesión para guardar favoritos", {
-        duration: 4000,
-        position: 'bottom-center',
-        style: {
-          background: '#f87171',
-          color: 'white',
-          fontSize: '14px',
-          padding: '12px 16px',
-          borderRadius: '8px',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
-        },
-        icon: '💚'
-      });
+      toast.error("Debes iniciar sesión para guardar favoritos");
       return;
     }
 
@@ -241,12 +229,12 @@ const useProducts = () => {
       return;
     }
 
-    // Usar el hook de favoritos
+    // Usar el hook de favoritos (que ya maneja sus propios toasts)
     const success = await toggleFavoriteHook(id);
     console.log('toggleFavoriteHook result:', success);
   };
 
-  // Función para añadir al carrito usando el hook
+  // Función para añadir al carrito (SIN TOAST AQUÍ - lo maneja useShoppingCart)
   const handleAddToCart = async (id, quantity = 1) => {
     console.log('handleAddToCart called with:', { id, quantity });
     
@@ -271,11 +259,12 @@ const useProducts = () => {
         return;
       }
 
-      // Usar el hook del carrito
+      // Usar el hook del carrito (que ya maneja sus propios toasts)
       const success = await addToCart(id, quantity);
       
       if (success) {
         console.log(`Producto ${product.name} agregado al carrito exitosamente`);
+        // NO agregar toast aquí porque useShoppingCart ya lo hace
       }
     } catch (error) {
       console.error("Error al añadir al carrito:", error);
@@ -322,6 +311,7 @@ const useProducts = () => {
     setPriceRange(100);
     setSelectedCategories([]);
     setSearchTerm("");
+    toast.success("Filtros limpiados");
   };
 
   // Encontrar el precio máximo para el slider

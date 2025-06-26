@@ -296,7 +296,7 @@ const Home = () => {
                                 onToggleFavorite={() => handleToggleFavorite(product.id)}
                                 onAddClick={() => handleAddClick(product.id)}
                                 showBadge={true}
-                                badgeText={`🔥 ${product.salesCount} vendidos`}
+                                badgeText={`${product.salesCount} vendidos`}
                                 badgeColor="bg-red-500"
                             />
                         ))}
@@ -342,7 +342,7 @@ const Home = () => {
                                 onToggleFavorite={() => handleToggleFavorite(product.id)}
                                 onAddClick={() => handleAddClick(product.id)}
                                 showBadge={true}
-                                badgeText={`⭐ ${product.rating}/5`}
+                                badgeText={`${product.rating}/5`}
                                 badgeColor="bg-yellow-500"
                             />
                         ))}

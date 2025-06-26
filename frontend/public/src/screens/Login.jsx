@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import './Login.css';
 import logo from '../assets/logo.png';
 import { 
@@ -14,20 +15,29 @@ import {
 } from "react-icons/fa";
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import OrderDetailsModal from '../components/OrderDetailsModal'; // Importar el modal
+import OrderDetailsModal from '../components/OrderDetailsModal';
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
-  const [rememberMe, setRememberMe] = useState(false);
-  const [activeTab, setActiveTab] = useState('profile'); // 'profile' o 'orders'
+  const [activeTab, setActiveTab] = useState('profile');
   const [userSales, setUserSales] = useState([]);
   const [loadingSales, setLoadingSales] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+
+  // React Hook Form setup
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset
+  } = useForm({
+    defaultValues: {
+      email: '',
+      password: ''
+    },
+    mode: 'onBlur'
+  });
 
   // Usar el AuthContext
   const { 
@@ -50,7 +60,6 @@ const Login = () => {
     try {
       setLoadingSales(true);
       
-      // Obtener ventas filtradas por cliente
       const response = await fetch(`http://localhost:4000/api/sales?clientId=${user.id}`);
       
       if (response.ok) {
@@ -68,23 +77,31 @@ const Login = () => {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  // Validaciones para React Hook Form
+  const validations = {
+    email: {
+      required: 'El correo electrónico es requerido',
+      pattern: {
+        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+        message: 'Formato de correo electrónico inválido'
+      }
+    },
+    password: {
+      required: 'La contraseña es requerida',
+      minLength: {
+        value: 6,
+        message: 'La contraseña debe tener al menos 6 caracteres'
+      }
+    }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  // Manejar envío del formulario
+  const onSubmit = async (formData) => {
     const result = await loginUser(formData.email, formData.password);
     
     if (result.success) {
-      if (rememberMe) {
-        localStorage.setItem('rememberLogin', 'true');
-      }
+      // Limpiar formulario
+      reset();
       
       // Redirigir a home
       navigate('/');
@@ -95,9 +112,8 @@ const Login = () => {
   const handleLogout = async () => {
     const success = await logOut();
     if (success) {
-      localStorage.removeItem('rememberLogin');
-      setUserSales([]); // Limpiar datos de ventas
-      navigate('/'); // Redirigir a home
+      setUserSales([]);
+      navigate('/');
     }
   };
 
@@ -105,35 +121,35 @@ const Login = () => {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'Pending':
-        return <FaClock className="text-yellow-500" />;
+        return <FaClock className="status-icon status-pending" />;
       case 'Processing':
-        return <FaSpinner className="text-blue-500" />;
+        return <FaSpinner className="status-icon status-processing" />;
       case 'Shipped':
-        return <FaTruck className="text-purple-500" />;
+        return <FaTruck className="status-icon status-shipped" />;
       case 'Delivered':
-        return <FaCheckCircle className="text-green-500" />;
+        return <FaCheckCircle className="status-icon status-delivered" />;
       case 'Cancelled':
-        return <FaTimesCircle className="text-red-500" />;
+        return <FaTimesCircle className="status-icon status-cancelled" />;
       default:
-        return <FaClock className="text-gray-500" />;
+        return <FaClock className="status-icon status-default" />;
     }
   };
 
-  // Función para obtener el color del estado - ACTUALIZADA con verde EcoGarden
+  // Función para obtener el color del estado
   const getStatusColor = (status) => {
     switch (status) {
       case 'Pending':
-        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+        return 'status-pending';
       case 'Processing':
-        return 'text-blue-600 bg-blue-50 border-blue-200';
+        return 'status-processing';
       case 'Shipped':
-        return 'text-purple-600 bg-purple-50 border-purple-200';
+        return 'status-shipped';
       case 'Delivered':
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'status-delivered';
       case 'Cancelled':
-        return 'text-red-600 bg-red-50 border-red-200';
+        return 'status-cancelled';
       default:
-        return 'text-gray-600 bg-gray-50 border-gray-200';
+        return 'status-default';
     }
   };
 
@@ -154,7 +170,7 @@ const Login = () => {
       <div className="page-container">
         <div className="login-page">
           <div className="login-container">
-            <div className="login-left" style={{ minHeight: '600px' }}>
+            <div className="login-left profile-view">
               <div className="login-header">
                 <div className="logoLogin">
                   <img src={logo} alt="EcoGarden Logo" className="logoLogin-img" />
@@ -163,39 +179,20 @@ const Login = () => {
                 <h2>Bienvenido de vuelta, {user.name}</h2>
               </div>
 
-              {/* Navegación por pestañas - ACTUALIZADA */}
-              <div className="profile-tabs" style={{ marginBottom: '2rem' }}>
+              {/* Navegación por pestañas */}
+              <div className="profile-tabs">
                 <button 
                   onClick={() => setActiveTab('profile')}
                   className={`tab-button ${activeTab === 'profile' ? 'active' : ''}`}
-                  style={{
-                    padding: '0.75rem 1.5rem',
-                    marginRight: '0.5rem',
-                    border: 'none',
-                    borderRadius: '0.5rem',
-                    backgroundColor: activeTab === 'profile' ? '#93A267' : '#f3f4f6',
-                    color: activeTab === 'profile' ? 'white' : '#6b7280',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
                 >
-                  <FaUserCircle style={{ marginRight: '0.5rem' }} />
+                  <FaUserCircle className="tab-icon" />
                   Mi Perfil
                 </button>
                 <button 
                   onClick={() => setActiveTab('orders')}
                   className={`tab-button ${activeTab === 'orders' ? 'active' : ''}`}
-                  style={{
-                    padding: '0.75rem 1.5rem',
-                    border: 'none',
-                    borderRadius: '0.5rem',
-                    backgroundColor: activeTab === 'orders' ? '#93A267' : '#f3f4f6',
-                    color: activeTab === 'orders' ? 'white' : '#6b7280',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
                 >
-                  <FaShoppingBag style={{ marginRight: '0.5rem' }} />
+                  <FaShoppingBag className="tab-icon" />
                   Mis Órdenes
                 </button>
               </div>
@@ -213,64 +210,34 @@ const Login = () => {
               )}
 
               {activeTab === 'orders' && (
-                <div className="orders-section" style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                  <h3 style={{ marginBottom: '1rem', color: '#374151' }}>
+                <div className="orders-section">
+                  <h3 className="orders-title">
                     Historial de Órdenes ({userSales.length})
                   </h3>
                   
                   {loadingSales ? (
-                    <div style={{ textAlign: 'center', padding: '2rem' }}>
-                      <FaSpinner className="animate-spin" size={32} style={{ color: '#93A267' }} />
-                      <p style={{ marginTop: '1rem', color: '#6b7280' }}>Cargando órdenes...</p>
+                    <div className="loading-container">
+                      <FaSpinner className="loading-spinner" size={32} />
+                      <p className="loading-text">Cargando órdenes...</p>
                     </div>
                   ) : userSales.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '2rem' }}>
-                      <FaShoppingBag size={48} style={{ color: '#d1d5db', marginBottom: '1rem' }} />
-                      <p style={{ color: '#6b7280' }}>No tienes órdenes aún</p>
-                      <Link 
-                        to="/Products" 
-                        style={{ 
-                          color: '#93A267', 
-                          textDecoration: 'none',
-                          fontWeight: '500'
-                        }}
-                      >
+                    <div className="empty-orders">
+                      <FaShoppingBag size={48} className="empty-icon" />
+                      <p className="empty-text">No tienes órdenes aún</p>
+                      <Link to="/Products" className="explore-link">
                         ¡Explora nuestros productos!
                       </Link>
                     </div>
                   ) : (
                     <div className="orders-list">
                       {userSales.map((sale) => (
-                        <div 
-                          key={sale._id} 
-                          className="order-item"
-                          style={{
-                            border: '1px solid #e5e7eb',
-                            borderRadius: '0.5rem',
-                            padding: '1rem',
-                            marginBottom: '1rem',
-                            backgroundColor: 'white'
-                          }}
-                        >
-                          <div style={{ 
-                            display: 'flex', 
-                            justifyContent: 'space-between', 
-                            alignItems: 'flex-start',
-                            marginBottom: '0.75rem'
-                          }}>
-                            <div>
-                              <p style={{ 
-                                fontWeight: '600', 
-                                color: '#374151',
-                                marginBottom: '0.25rem'
-                              }}>
+                        <div key={sale._id} className="order-item">
+                          <div className="order-header">
+                            <div className="order-info">
+                              <p className="order-number">
                                 Orden #{sale._id.slice(-6).toUpperCase()}
                               </p>
-                              <p style={{ 
-                                fontSize: '0.875rem', 
-                                color: '#6b7280',
-                                marginBottom: '0.5rem'
-                              }}>
+                              <p className="order-date">
                                 {new Date(sale.createdAt).toLocaleDateString('es-ES', {
                                   year: 'numeric',
                                   month: 'long',
@@ -278,79 +245,31 @@ const Login = () => {
                                 })}
                               </p>
                             </div>
-                            <span 
-                              className={`status-badge ${getStatusColor(sale.status)}`}
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: '0.25rem 0.75rem',
-                                borderRadius: '9999px',
-                                fontSize: '0.75rem',
-                                fontWeight: '500',
-                                border: '1px solid'
-                              }}
-                            >
+                            <span className={`status-badge ${getStatusColor(sale.status)}`}>
                               {getStatusIcon(sale.status)}
-                              <span style={{ marginLeft: '0.5rem' }}>{sale.status}</span>
+                              <span className="status-text">{sale.status}</span>
                             </span>
                           </div>
 
-                          <div style={{ 
-                            display: 'flex', 
-                            justifyContent: 'space-between', 
-                            alignItems: 'center'
-                          }}>
-                            <div>
-                              <p style={{ 
-                                fontSize: '1.125rem', 
-                                fontWeight: '600', 
-                                color: '#93A267'
-                              }}>
-                                ${sale.total.toFixed(2)}
-                              </p>
-                              <p style={{ 
-                                fontSize: '0.875rem', 
-                                color: '#6b7280'
-                              }}>
+                          <div className="order-details">
+                            <div className="order-summary">
+                              <p className="order-total">${sale.total.toFixed(2)}</p>
+                              <p className="order-products">
                                 {sale.idShoppingCart?.products?.length || 0} productos
                               </p>
                             </div>
                             <button
                               onClick={() => viewOrderDetails(sale)}
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: '0.5rem 1rem',
-                                backgroundColor: '#f3f4f6',
-                                border: '1px solid #d1d5db',
-                                borderRadius: '0.375rem',
-                                color: '#374151',
-                                fontSize: '0.875rem',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s'
-                              }}
-                              onMouseOver={(e) => {
-                                e.target.style.backgroundColor = '#e5e7eb';
-                              }}
-                              onMouseOut={(e) => {
-                                e.target.style.backgroundColor = '#f3f4f6';
-                              }}
+                              className="view-details-btn"
                             >
-                              <FaEye style={{ marginRight: '0.5rem' }} />
+                              <FaEye className="btn-icon" />
                               Ver detalles
                             </button>
                           </div>
 
                           {/* Información de entrega */}
-                          <div style={{ 
-                            marginTop: '0.75rem', 
-                            paddingTop: '0.75rem', 
-                            borderTop: '1px solid #f3f4f6'
-                          }}>
-                            <p style={{ 
-                              fontSize: '0.875rem', 
-                              color: '#6b7280'
-                            }}>
+                          <div className="delivery-info">
+                            <p className="delivery-text">
                               <strong>Entrega:</strong> {sale.address}, {sale.city}, {sale.department}
                             </p>
                           </div>
@@ -365,7 +284,6 @@ const Login = () => {
                 onClick={handleLogout} 
                 className="submit-button logout-button"
                 disabled={isLoading}
-                style={{ marginTop: '2rem' }}
               >
                 <FaSignOutAlt /> {isLoading ? 'Cerrando...' : 'Cerrar sesión'}
               </button>
@@ -392,7 +310,7 @@ const Login = () => {
     );
   }
 
-  // Formulario de login
+  // Formulario de login con React Hook Form
   return (
     <div className="page-container">
       <div className="login-page">
@@ -407,19 +325,19 @@ const Login = () => {
               <p className="login-subtitle">Inicia sesión para acceder a tu cuenta</p>
             </div>
 
-            <form className="login-form" onSubmit={handleSubmit}>
+            <form className="login-form" onSubmit={handleSubmit(onSubmit)}>
               <div className="input-group">
                 <label htmlFor="email">Correo electrónico</label>
                 <input 
                   type="email" 
                   id="email"
-                  name="email"
+                  {...register('email', validations.email)}
                   placeholder="correo@gmail.com" 
-                  className="login-input"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
+                  className={`login-input ${errors.email ? 'input-error' : ''}`}
                 />
+                {errors.email && (
+                  <span className="error-message">{errors.email.message}</span>
+                )}
               </div>
 
               <div className="input-group">
@@ -427,35 +345,17 @@ const Login = () => {
                 <input 
                   type="password" 
                   id="password"
-                  name="password"
+                  {...register('password', validations.password)}
                   placeholder="••••••••" 
-                  className="login-input"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
+                  className={`login-input ${errors.password ? 'input-error' : ''}`}
                 />
+                {errors.password && (
+                  <span className="error-message">{errors.password.message}</span>
+                )}
               </div>
 
               <div className="login-options">
-                <Link 
-                  to="/PasswordRecovery" 
-                  className="forgot-password"
-                  style={{
-                    color: '#93A267',
-                    textDecoration: 'none',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    transition: 'color 0.2s ease'
-                  }}
-                  onMouseOver={(e) => {
-                    e.target.style.color = '#7a8a5c';
-                    e.target.style.textDecoration = 'underline';
-                  }}
-                  onMouseOut={(e) => {
-                    e.target.style.color = '#93A267';
-                    e.target.style.textDecoration = 'none';
-                  }}
-                >
+                <Link to="/PasswordRecovery" className="forgot-password">
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>
@@ -468,62 +368,19 @@ const Login = () => {
             <div className="register-section">
               <p>
                 ¿No tienes una cuenta? 
-                <Link 
-                  to="/register" 
-                  className="register-link"
-                  style={{
-                    color: '#93A267',
-                    textDecoration: 'none',
-                    fontWeight: '600',
-                    marginLeft: '5px'
-                  }}
-                >
+                <Link to="/register" className="register-link">
                   Regístrate aquí
                 </Link>
               </p>
             </div>
 
             {/* Sección adicional para recuperación de contraseña */}
-            <div className="password-recovery-section" style={{
-              marginTop: '20px',
-              padding: '15px',
-              backgroundColor: '#f0f9ff',
-              border: '1px solid #93A267',
-              borderRadius: '8px',
-              textAlign: 'center'
-            }}>
-              <p style={{ 
-                fontSize: '14px', 
-                color: '#374151',
-                marginBottom: '10px',
-                margin: '0 0 10px 0'
-              }}>
-                🔐 ¿Problemas para acceder?
+            <div className="password-recovery-section">
+              <p className="recovery-text">
+                ¿Problemas para acceder?
               </p>
-              <Link 
-                to="/PasswordRecovery"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  padding: '8px 16px',
-                  backgroundColor: '#93A267',
-                  color: 'white',
-                  textDecoration: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseOver={(e) => {
-                  e.target.style.backgroundColor = '#7a8a5c';
-                  e.target.style.transform = 'translateY(-1px)';
-                }}
-                onMouseOut={(e) => {
-                  e.target.style.backgroundColor = '#93A267';
-                  e.target.style.transform = 'translateY(0)';
-                }}
-              >
-                🌱 Recuperar mi cuenta
+              <Link to="/PasswordRecovery" className="recovery-button">
+                Recuperar mi cuenta
               </Link>
             </div>
           </div>
