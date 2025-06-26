@@ -27,4 +27,6 @@ router.patch("/:id/paid", shoppingCartController.markAsPaid);
 // DELETE - Eliminar carrito (solo carritos pendientes)
 router.delete("/:id", shoppingCartController.deleteShoppingCart);
 
+router.get('/:id', shoppingCartController.getCartById);
+
 export default router;

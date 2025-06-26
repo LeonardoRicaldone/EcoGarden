@@ -514,4 +514,52 @@ shoppingCartController.getCartHistoryByClient = async (req, res) => {
     }
 };
 
+// Agregar esta función a tu shoppingCartController.js
+
+// SELECT por ID - Obtener carrito específico por ID
+shoppingCartController.getCartById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log('Getting cart by ID:', id);
+
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: "ID del carrito requerido"
+            });
+        }
+
+        // Validar que el ID sea un ObjectId válido
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "ID del carrito inválido"
+            });
+        }
+
+        const cart = await shoppingCartModel.findById(id)
+            .populate('idClient')
+            .populate('products.idProduct');
+
+        if (!cart) {
+            console.log('Cart not found:', id);
+            return res.status(404).json({
+                success: false,
+                message: "Carrito no encontrado"
+            });
+        }
+
+        console.log('Cart found:', cart._id, 'Total:', cart.total);
+        res.json(cart);
+    } catch (error) {
+        console.error("Error al obtener carrito por ID:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error al obtener carrito",
+            error: error.message
+        });
+    }
+};
+
+
 export default shoppingCartController;

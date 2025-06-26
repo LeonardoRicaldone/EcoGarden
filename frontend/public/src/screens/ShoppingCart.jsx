@@ -35,8 +35,14 @@ const ShoppingCart = () => {
     const totalAmount = getTotalAmount(shippingCost);
     const totalItems = getTotalItems();
 
-    // FUNCIÓN PARA MANEJAR EL CHECKOUT
+    // FUNCIÓN PARA MANEJAR EL CHECKOUT - CORREGIDA
     const handleCheckout = () => {
+        console.log('CheckOut button clicked');
+        console.log('isAuthenticated:', isAuthenticated);
+        console.log('isEmpty:', isEmpty);
+        console.log('cartId:', cartId);
+        console.log('cartItems:', cartItems);
+        console.log('loading:', loading);
 
         // Verificar autenticación
         if (!isAuthenticated) {
@@ -56,8 +62,17 @@ const ShoppingCart = () => {
             return;
         }
 
+        // Verificar que no esté cargando
+        if (loading) {
+            toast.error('Espera a que termine de cargar el carrito', {
+                duration: 3000,
+                position: 'bottom-center'
+            });
+            return;
+        }
+
         // Verificar carrito vacío
-        if (isEmpty) {
+        if (isEmpty || !cartItems || cartItems.length === 0) {
             toast.error('Tu carrito está vacío', {
                 duration: 3000,
                 position: 'bottom-center'
@@ -65,31 +80,15 @@ const ShoppingCart = () => {
             return;
         }
 
-        // Verificar que hay cartId
+        // Verificar que hay cartId - pero permitir navegación aunque no haya cartId aún
         if (!cartId) {
-            toast.error('Error: No se encontró el carrito. Intenta refrescar la página.', {
-                duration: 4000,
-                position: 'bottom-center'
-            });
-            console.error('CartId missing:', cartId);
-            return;
-        }
-
-        // Verificar que hay productos
-        if (!cartItems || cartItems.length === 0) {
-            toast.error('No hay productos en el carrito', {
-                duration: 3000,
-                position: 'bottom-center'
-            });
-            return;
+            console.warn('CartId missing, but allowing navigation to checkout');
+            // No return aquí, permitir que navegue
         }
 
         // Todo está bien, navegar al checkout
-        console.log('Navigating to checkout with cartId:', cartId);
-        console.log('Cart items:', cartItems);
-
+        console.log('Navigating to checkout...');
         navigate('/checkout');
-        console.log('Navigate called');
     };
 
     // Función para incrementar la cantidad
@@ -191,7 +190,7 @@ const ShoppingCart = () => {
                                         <h3 className="text-lg font-medium text-gray-600 mb-2">Tu carrito está vacío</h3>
                                         <p className="text-gray-500 mb-6">Explora nuestros productos y agrega algunos a tu carrito</p>
                                         <Link to="/Products">
-                                            <button className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition-colors">
+                                            <button className="explore-products-button px-6 py-2 rounded hover:explore-products-button transition-colors">
                                                 Explorar productos
                                             </button>
                                         </Link>
@@ -321,13 +320,13 @@ const ShoppingCart = () => {
                                         </span>
                                     </div>
 
-                                    {/* BOTÓN DE CHECKOUT*/}
+                                    {/* BOTÓN DE CHECKOUT - CORREGIDO */}
                                     <button
                                         onClick={handleCheckout}
                                         className="w-full py-3 primary-button-bg primary-button-text rounded-md hover:primary-button-hover mt-4 tramitarcompra transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                        disabled={isEmpty || !cartId}
+                                        disabled={isEmpty || loading}
                                     >
-                                        Tramitar compra
+                                        {loading ? 'Cargando...' : 'Tramitar compra'}
                                     </button>
 
                                     {/* Mensajes de estado */}
@@ -339,10 +338,10 @@ const ShoppingCart = () => {
                                         </div>
                                     )}
 
-                                    {isAuthenticated && !cartId && (
-                                        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded">
-                                            <p className="text-sm text-red-700">
-                                                Error: No se encontró el carrito. Intenta refrescar la página.
+                                    {isAuthenticated && !cartId && !loading && (
+                                        <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded">
+                                            <p className="text-sm text-orange-700">
+                                                Sincronizando carrito... Puedes continuar al checkout.
                                             </p>
                                         </div>
                                     )}

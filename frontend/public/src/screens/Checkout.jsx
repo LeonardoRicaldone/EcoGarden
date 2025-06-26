@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { FaCreditCard, FaUser, FaMapMarkerAlt, FaPhone, FaLock, FaArrowLeft } from 'react-icons/fa';
@@ -6,9 +6,11 @@ import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import useShoppingCart from '../hooks/useShoppingCart';
 import useSales from '../hooks/useSales';
+import './Checkout.css';
 
 const Checkout = () => {
     const navigate = useNavigate();
+    const [isSubmitting, setIsSubmitting] = useState(false);
     
     // Hooks de autenticación y carrito
     const { auth, user } = useAuth();
@@ -23,13 +25,15 @@ const Checkout = () => {
         getTotalItems,
         isEmpty,
         processCheckout,
-        loading: cartLoading
+        loading: cartLoading,
+        error: cartError
     } = useShoppingCart(isAuthenticated ? clientId : null);
 
     // Hook de ventas
     const {
         loading: salesLoading,
-        processCompleteCheckout
+        processCompleteCheckout,
+        error: salesError
     } = useSales();
 
     // React Hook Form setup
@@ -71,32 +75,30 @@ const Checkout = () => {
         }
     }, [user, setValue]);
 
-    // Verificar autenticación y carrito al cargar
+    // Verificar autenticación y carrito al cargar - SIN TOAST DUPLICADOS
     useEffect(() => {
+        // Dar tiempo para que el carrito se cargue completamente
         const timer = setTimeout(() => {
+            if (cartLoading) return; // Aún está cargando
+
             if (!isAuthenticated) {
                 console.log('User not authenticated, redirecting to login');
-                toast.error('Debes iniciar sesión para continuar');
                 navigate('/Login');
                 return;
             }
 
-            if (!cartLoading) {
-                if (isEmpty) {
-                    console.log('Cart is empty, redirecting to cart');
-                    toast.error('Tu carrito está vacío');
-                    navigate('/ShoppingCart');
-                    return;
-                }
-
-                if (!cartId) {
-                    console.log('CartId missing, redirecting to cart');
-                    toast.error('Error: No se encontró el carrito');
-                    navigate('/ShoppingCart');
-                    return;
-                }
+            if (isEmpty) {
+                console.log('Cart is empty, redirecting to cart');
+                navigate('/ShoppingCart');
+                return;
             }
-        }, 2000);
+
+            if (!cartId) {
+                console.log('CartId missing, redirecting to cart');
+                navigate('/ShoppingCart');
+                return;
+            }
+        }, 1000); // Dar 1 segundo para que cargue
 
         return () => clearTimeout(timer);
     }, [isAuthenticated, isEmpty, cartId, navigate, cartLoading]);
@@ -213,8 +215,8 @@ const Checkout = () => {
         cvv: {
             required: 'El CVV es requerido',
             pattern: {
-                value: /^\d{3,4}$/,
-                message: 'CVV inválido (3-4 dígitos)'
+                value: /^\d{3}$/,
+                message: 'CVV inválido (3 dígitos)'
             }
         },
         cardName: {
@@ -230,27 +232,46 @@ const Checkout = () => {
         }
     };
 
-    // Manejar envío del formulario
+    // Manejar envío del formulario - CORREGIDO
     const onSubmit = async (formData) => {
-
-        if (!cartId) {
-            toast.error('Error: No se encontró el carrito');
-            return;
-        }
-
-        if (isEmpty) {
-            toast.error('Tu carrito está vacío');
-            return;
-        }
+        // Prevenir múltiples envíos
+        if (isSubmitting) return;
+        
+        setIsSubmitting(true);
 
         try {
+            // Validaciones básicas sin toast
+            if (!cartId) {
+                console.error('Error: No cartId available');
+                toast.error('Error: No se encontró el carrito. Recarga la página.');
+                return;
+            }
+
+            if (isEmpty || !cartItems || cartItems.length === 0) {
+                console.error('Error: Cart is empty');
+                toast.error('Tu carrito está vacío');
+                return;
+            }
+
+            // Calcular el total correctamente - CON MAYOR PRECISIÓN
+            const currentSubtotal = parseFloat(getSubtotal().toFixed(2));
+            const currentShippingCost = currentSubtotal >= 70 ? 0 : parseFloat(shippingCost.toFixed(2));
+            const calculatedTotal = parseFloat((currentSubtotal + currentShippingCost).toFixed(2));
+            
+            
+            if (!calculatedTotal || calculatedTotal <= 0) {
+                console.error('Error: Invalid total amount:', calculatedTotal);
+                toast.error('Error en el cálculo del total');
+                return;
+            }
+
             console.log('Starting complete checkout process...');
             
             // Procesar el checkout completo
             const result = await processCompleteCheckout(
                 {
                     ...formData,
-                    total: totalAmount
+                    total: calculatedTotal // Usar el total calculado con precisión
                 },
                 cartId,
                 processCheckout
@@ -260,18 +281,6 @@ const Checkout = () => {
                 // Limpiar formulario
                 reset();
                 
-                toast.success('¡Compra realizada exitosamente!', {
-                    duration: 5000,
-                    position: 'top-center',
-                    style: {
-                        background: '#10b981',
-                        color: 'white',
-                        fontSize: '16px',
-                        padding: '16px',
-                        borderRadius: '8px'
-                    },
-                    icon: '🎉'
-                });
                 
                 // Redirigir a página de confirmación
                 setTimeout(() => {
@@ -288,7 +297,12 @@ const Checkout = () => {
 
         } catch (error) {
             console.error('Error en checkout:', error);
-            toast.error('Error al procesar la compra: ' + error.message);
+            toast.error('Error al procesar la compra. Intenta nuevamente.', {
+                duration: 4000,
+                position: 'top-center'
+            });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -298,36 +312,44 @@ const Checkout = () => {
         'Usulután', 'San Miguel', 'Morazán', 'La Unión'
     ];
 
-    // Mostrar loading
-    if (cartLoading || (!cartItems || !Array.isArray(cartItems))) {
+    // Mostrar loading solo si realmente está cargando
+    if (cartLoading) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mb-4 mx-auto"></div>
                     <p className="text-lg">Preparando checkout...</p>
-                    <p className="text-sm text-gray-500 mt-2">
-                        ClientId: {clientId || 'No ID'} | 
-                        Authenticated: {isAuthenticated ? 'Sí' : 'No'} | 
-                        Loading: {cartLoading ? 'Sí' : 'No'}
-                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    // Solo mostrar redirigiendo si hay problemas después de cargar
+    if (!cartLoading && (!isAuthenticated || isEmpty || !cartId)) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mb-4 mx-auto"></div>
+                    <p className="text-lg">Redirigiendo...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
+        <div className="checkout-container min-h-screen py-8">
             <div className="max-w-7xl mx-auto px-4">
                 {/* Header */}
+                <br /><br />
                 <div className="mb-8">
                     <button
                         onClick={() => navigate('/ShoppingCart')}
-                        className="flex items-center text-green-600 hover:text-green-700 mb-4 transition-colors"
+                        className="back-button flex items-center mb-4 transition-colors"
                     >
                         <FaArrowLeft className="mr-2" />
                         Volver al carrito
                     </button>
-                    <h1 className="text-3xl font-bold text-gray-900">Finalizar compra</h1>
+                    <h1 className="title-color text-3xl font-bold">Finalizar compra</h1>
                     <p className="text-gray-600 mt-2">
                         Completa tu información para procesar el pedido
                     </p>
@@ -338,76 +360,76 @@ const Checkout = () => {
                     <div className="lg:col-span-2">
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                             {/* Información personal */}
-                            <div className="bg-white p-6 rounded-lg shadow-sm">
-                                <h2 className="text-xl font-semibold mb-4 flex items-center">
-                                    <FaUser className="mr-2 text-green-600" />
+                            <div className="form-section">
+                                <h2 className="section-title">
+                                    <FaUser className="icon" />
                                     Información personal
                                 </h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="form-row form-row-2">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="form-label block text-sm mb-1">
                                             Nombre *
                                         </label>
                                         <input
                                             type="text"
                                             {...register('name', validations.name)}
-                                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                                                errors.name ? 'border-red-500' : 'border-gray-300'
+                                            className={`form-input w-full px-3 py-2 ${
+                                                errors.name ? 'error' : ''
                                             }`}
                                         />
                                         {errors.name && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+                                            <p className="error-message">{errors.name.message}</p>
                                         )}
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="form-label block text-sm mb-1">
                                             Apellido *
                                         </label>
                                         <input
                                             type="text"
                                             {...register('lastname', validations.lastname)}
-                                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                                                errors.lastname ? 'border-red-500' : 'border-gray-300'
+                                            className={`form-input w-full px-3 py-2 ${
+                                                errors.lastname ? 'error' : ''
                                             }`}
                                         />
                                         {errors.lastname && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.lastname.message}</p>
+                                            <p className="error-message">{errors.lastname.message}</p>
                                         )}
                                     </div>
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <div className="form-row-full">
+                                        <label className="form-label block text-sm mb-1">
                                             Teléfono *
                                         </label>
                                         <input
                                             type="tel"
                                             {...register('phone', validations.phone)}
-                                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                                                errors.phone ? 'border-red-500' : 'border-gray-300'
+                                            className={`form-input w-full px-3 py-2 ${
+                                                errors.phone ? 'error' : ''
                                             }`}
                                             placeholder="+503 1234-5678"
                                         />
                                         {errors.phone && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>
+                                            <p className="error-message">{errors.phone.message}</p>
                                         )}
                                     </div>
                                 </div>
                             </div>
 
                             {/* Dirección de envío */}
-                            <div className="bg-white p-6 rounded-lg shadow-sm">
-                                <h2 className="text-xl font-semibold mb-4 flex items-center">
-                                    <FaMapMarkerAlt className="mr-2 text-green-600" />
+                            <div className="form-section">
+                                <h2 className="section-title">
+                                    <FaMapMarkerAlt className="icon" />
                                     Dirección de envío
                                 </h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="form-row form-row-2">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="form-label block text-sm mb-1">
                                             Departamento *
                                         </label>
                                         <select
                                             {...register('department', validations.department)}
-                                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                                                errors.department ? 'border-red-500' : 'border-gray-300'
+                                            className={`form-select w-full px-3 py-2 ${
+                                                errors.department ? 'error' : ''
                                             }`}
                                         >
                                             <option value="">Seleccionar...</option>
@@ -416,68 +438,68 @@ const Checkout = () => {
                                             ))}
                                         </select>
                                         {errors.department && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.department.message}</p>
+                                            <p className="error-message">{errors.department.message}</p>
                                         )}
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="form-label block text-sm mb-1">
                                             Ciudad *
                                         </label>
                                         <input
                                             type="text"
                                             {...register('city', validations.city)}
-                                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                                                errors.city ? 'border-red-500' : 'border-gray-300'
+                                            className={`form-input w-full px-3 py-2 ${
+                                                errors.city ? 'error' : ''
                                             }`}
                                         />
                                         {errors.city && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.city.message}</p>
+                                            <p className="error-message">{errors.city.message}</p>
                                         )}
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="form-label block text-sm mb-1">
                                             Código postal *
                                         </label>
                                         <input
                                             type="text"
                                             {...register('zipCode', validations.zipCode)}
-                                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                                                errors.zipCode ? 'border-red-500' : 'border-gray-300'
+                                            className={`form-input w-full px-3 py-2 ${
+                                                errors.zipCode ? 'error' : ''
                                             }`}
                                             placeholder="1234"
                                         />
                                         {errors.zipCode && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.zipCode.message}</p>
+                                            <p className="error-message">{errors.zipCode.message}</p>
                                         )}
                                     </div>
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <div className="form-row-full">
+                                        <label className="form-label block text-sm mb-1">
                                             Dirección completa *
                                         </label>
                                         <textarea
                                             {...register('address', validations.address)}
                                             rows={3}
-                                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                                                errors.address ? 'border-red-500' : 'border-gray-300'
+                                            className={`form-textarea w-full px-3 py-2 ${
+                                                errors.address ? 'error' : ''
                                             }`}
                                             placeholder="Calle, número de casa, referencias..."
                                         />
                                         {errors.address && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.address.message}</p>
+                                            <p className="error-message">{errors.address.message}</p>
                                         )}
                                     </div>
                                 </div>
                             </div>
 
                             {/* Información de pago */}
-                            <div className="bg-white p-6 rounded-lg shadow-sm">
-                                <h2 className="text-xl font-semibold mb-4 flex items-center">
-                                    <FaCreditCard className="mr-2 text-green-600" />
+                            <div className="form-section">
+                                <h2 className="section-title">
+                                    <FaCreditCard className="icon" />
                                     Información de pago
                                 </h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <div className="form-row form-row-2">
+                                    <div className="form-row-full">
+                                        <label className="form-label block text-sm mb-1">
                                             Número de tarjeta *
                                         </label>
                                         <input
@@ -489,18 +511,18 @@ const Checkout = () => {
                                                     setValue('creditCard', formatted);
                                                 }
                                             })}
-                                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                                                errors.creditCard ? 'border-red-500' : 'border-gray-300'
+                                            className={`form-input w-full px-3 py-2 ${
+                                                errors.creditCard ? 'error' : ''
                                             }`}
                                             placeholder="1234 5678 9012 3456"
                                             maxLength={19}
                                         />
                                         {errors.creditCard && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.creditCard.message}</p>
+                                            <p className="error-message">{errors.creditCard.message}</p>
                                         )}
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="form-label block text-sm mb-1">
                                             Fecha de expiración *
                                         </label>
                                         <input
@@ -512,62 +534,62 @@ const Checkout = () => {
                                                     setValue('expiryDate', formatted);
                                                 }
                                             })}
-                                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                                                errors.expiryDate ? 'border-red-500' : 'border-gray-300'
+                                            className={`form-input w-full px-3 py-2 ${
+                                                errors.expiryDate ? 'error' : ''
                                             }`}
                                             placeholder="MM/AA"
                                             maxLength={5}
                                         />
                                         {errors.expiryDate && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.expiryDate.message}</p>
+                                            <p className="error-message">{errors.expiryDate.message}</p>
                                         )}
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="form-label block text-sm mb-1">
                                             CVV *
                                         </label>
                                         <input
                                             type="text"
                                             {...register('cvv', validations.cvv)}
-                                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                                                errors.cvv ? 'border-red-500' : 'border-gray-300'
+                                            className={`form-input w-full px-3 py-2 ${
+                                                errors.cvv ? 'error' : ''
                                             }`}
                                             placeholder="123"
-                                            maxLength={4}
+                                            maxLength={3}
                                         />
                                         {errors.cvv && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.cvv.message}</p>
+                                            <p className="error-message">{errors.cvv.message}</p>
                                         )}
                                     </div>
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <div className="form-row-full">
+                                        <label className="form-label block text-sm mb-1">
                                             Nombre en la tarjeta *
                                         </label>
                                         <input
                                             type="text"
                                             {...register('cardName', validations.cardName)}
-                                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                                                errors.cardName ? 'border-red-500' : 'border-gray-300'
+                                            className={`form-input w-full px-3 py-2 ${
+                                                errors.cardName ? 'error' : ''
                                             }`}
                                             placeholder="Nombre completo como aparece en la tarjeta"
                                         />
                                         {errors.cardName && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.cardName.message}</p>
+                                            <p className="error-message">{errors.cardName.message}</p>
                                         )}
                                     </div>
                                 </div>
                             </div>
 
                             {/* Botón de envío */}
-                            <div className="bg-white p-6 rounded-lg shadow-sm">
+                            <div className="form-section">
                                 <button
                                     type="submit"
-                                    disabled={salesLoading || cartLoading || !cartId}
-                                    className="w-full bg-green-600 text-white py-3 px-6 rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                                    disabled={isSubmitting || salesLoading || cartLoading || !cartId}
+                                    className="primary-button w-full py-3 px-6 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                                 >
-                                    {salesLoading ? (
+                                    {isSubmitting || salesLoading ? (
                                         <>
-                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                            <div className="loading-spinner"></div>
                                             Procesando...
                                         </>
                                     ) : (
@@ -577,8 +599,8 @@ const Checkout = () => {
                                         </>
                                     )}
                                 </button>
-                                <p className="text-xs text-gray-500 text-center mt-2">
-                                    <FaLock className="inline mr-1" />
+                                <p className="security-message">
+                                    <FaLock className="security-icon" />
                                     Tu información está protegida y segura
                                 </p>
                             </div>
@@ -587,28 +609,28 @@ const Checkout = () => {
 
                     {/* Resumen del pedido */}
                     <div className="lg:col-span-1">
-                        <div className="bg-white p-6 rounded-lg shadow-sm sticky top-8">
-                            <h2 className="text-xl font-semibold mb-4">Resumen del pedido</h2>
+                        <div className="order-summary">
+                            <h2 className="order-summary-title">Resumen del pedido</h2>
                             
                             {/* Productos */}
                             <div className="space-y-3 mb-4">
                                 {cartItems && cartItems.length > 0 ? cartItems.map((item) => (
-                                    <div key={item.id} className="flex items-center space-x-3">
+                                    <div key={item.id} className="product-item">
                                         <img
                                             src={item.img}
                                             alt={item.name}
-                                            className="w-12 h-12 object-cover rounded"
+                                            className="product-image"
                                             onError={(e) => {
                                                 e.target.style.display = 'none';
                                                 const parent = e.target.parentElement;
                                                 parent.innerHTML = '<div class="w-12 h-12 bg-gray-200 flex items-center justify-center text-gray-500 text-xs rounded">Sin imagen</div>';
                                             }}
                                         />
-                                        <div className="flex-1">
-                                            <p className="text-sm font-medium">{item.name}</p>
-                                            <p className="text-xs text-gray-500">Cantidad: {item.quantity}</p>
+                                        <div className="product-info">
+                                            <p className="product-name">{item.name}</p>
+                                            <p className="product-quantity">Cantidad: {item.quantity}</p>
                                         </div>
-                                        <p className="text-sm font-medium">${item.subtotal?.toFixed(2) || '0.00'}</p>
+                                        <p className="product-price">${item.subtotal?.toFixed(2) || (item.price * item.quantity).toFixed(2)}</p>
                                     </div>
                                 )) : (
                                     <p className="text-center text-gray-500">No hay productos en el carrito</p>
@@ -619,30 +641,31 @@ const Checkout = () => {
                             
                             {/* Totales */}
                             <div className="space-y-2">
-                                <div className="flex justify-between text-sm">
+                                <div className="summary-row">
                                     <span>Subtotal ({totalItems || 0} productos)</span>
                                     <span>${subtotal?.toFixed(2) || '0.00'}</span>
                                 </div>
-                                <div className="flex justify-between text-sm">
+                                <div className="summary-row">
                                     <span>Envío</span>
                                     <span>
                                         {subtotal >= 70 ? (
-                                            <span className="text-green-600 font-medium">GRATIS</span>
+                                            <span className="free-shipping">GRATIS</span>
                                         ) : (
                                             `$${shippingCost.toFixed(2)}`
                                         )}
                                     </span>
                                 </div>
                                 <hr className="my-2" />
-                                <div className="flex justify-between text-lg font-bold">
+                                <div className="summary-total">
                                     <span>Total</span>
                                     <span>${totalAmount?.toFixed(2) || '0.00'}</span>
                                 </div>
+                                
                             </div>
                             
                             {subtotal > 0 && subtotal < 70 && (
-                                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded text-sm">
-                                    <p className="text-green-700">
+                                <div className="shipping-message">
+                                    <p className="shipping-message-text">
                                         Agrega ${(70 - subtotal).toFixed(2)} más para envío gratis
                                     </p>
                                 </div>
