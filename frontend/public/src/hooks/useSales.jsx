@@ -8,6 +8,81 @@ const useSales = () => {
 
     const SALES_API = "http://localhost:4000/api/sales";
 
+    // Función para obtener todas las ventas - CORREGIDA
+    const getSales = useCallback(async (clientId = null) => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            // Construir URL con filtro opcional de cliente
+            const url = clientId ? `${SALES_API}?clientId=${clientId}` : SALES_API;
+            console.log('Fetching sales from:', url);
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include' // Para incluir cookies si es necesario
+            });
+            
+            if (!response.ok) {
+                if (response.status === 404) {
+                    console.log('No sales found');
+                    setSales([]);
+                    return {
+                        success: true,
+                        sales: []
+                    };
+                }
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+
+            const salesData = await response.json();
+            console.log('Sales response structure:', salesData);
+            
+            // El backend devuelve { success: true, sales: [...] }
+            // Extraer el array de sales de la respuesta
+            let salesArray = [];
+            
+            if (salesData.success && salesData.sales) {
+                salesArray = Array.isArray(salesData.sales) ? salesData.sales : [];
+            } else if (Array.isArray(salesData)) {
+                // Por si el backend devuelve directamente el array
+                salesArray = salesData;
+            }
+            
+            console.log('Sales array extracted:', salesArray.length, 'sales');
+            setSales(salesArray);
+            
+            return {
+                success: true,
+                sales: salesArray
+            };
+
+        } catch (error) {
+            console.error('Error fetching sales:', error);
+            setError(error.message);
+            setSales([]); // Limpiar sales en caso de error
+            
+            // Solo mostrar toast si no es un error de CORS o conexión
+            if (!error.message.includes('CORS') && !error.message.includes('fetch')) {
+                toast.error(`Error al cargar ventas: ${error.message}`, {
+                    duration: 4000,
+                    position: 'top-center'
+                });
+            }
+            
+            return {
+                success: false,
+                error: error.message,
+                sales: []
+            };
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     // Función para crear una nueva venta
     const createSale = useCallback(async (saleData) => {
         try {
@@ -39,6 +114,7 @@ const useSales = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                credentials: 'include',
                 body: JSON.stringify({
                     ...saleData,
                     status: saleData.status || 'Pending'
@@ -57,7 +133,7 @@ const useSales = () => {
                 duration: 3000,
                 position: 'top-center',
                 style: {
-                    background: '#10b981',
+                    background: '#93A267',
                     color: 'white',
                     fontSize: '16px',
                     padding: '16px',
@@ -97,46 +173,15 @@ const useSales = () => {
         }
     }, []);
 
-    // Función para obtener todas las ventas
-    const getSales = useCallback(async () => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            const response = await fetch(SALES_API);
-            
-            if (!response.ok) {
-                throw new Error(`Error ${response.status}: ${response.statusText}`);
-            }
-
-            const salesData = await response.json();
-            setSales(salesData);
-            
-            return {
-                success: true,
-                sales: salesData
-            };
-
-        } catch (error) {
-            console.error('Error fetching sales:', error);
-            setError(error.message);
-            
-            return {
-                success: false,
-                error: error.message
-            };
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
     // Función para obtener una venta por ID
     const getSaleById = useCallback(async (saleId) => {
         try {
             setLoading(true);
             setError(null);
 
-            const response = await fetch(`${SALES_API}/${saleId}`);
+            const response = await fetch(`${SALES_API}/${saleId}`, {
+                credentials: 'include'
+            });
             
             if (!response.ok) {
                 if (response.status === 404) {
@@ -181,6 +226,7 @@ const useSales = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                credentials: 'include',
                 body: JSON.stringify({ status: newStatus })
             });
 
@@ -219,133 +265,6 @@ const useSales = () => {
         }
     }, []);
 
-    // Función para procesar el checkout completo (crear venta + marcar carrito como pagado)
-    const processCompleteCheckout = useCallback(async (checkoutData, cartId, processCartCheckout) => {
-        try {
-            setLoading(true);
-            console.log('Processing complete checkout...');
-
-            // 1. Crear la venta
-            const saleResult = await createSale({
-                idShoppingCart: cartId,
-                name: checkoutData.name,
-                lastname: checkoutData.lastname,
-                phone: checkoutData.phone,
-                department: checkoutData.department,
-                city: checkoutData.city,
-                zipCode: checkoutData.zipCode,
-                address: checkoutData.address,
-                creditCard: checkoutData.creditCard.replace(/\s/g, ''), // Limpiar espacios
-                total: checkoutData.total,
-                status: 'Pending'
-            });
-
-            if (!saleResult.success) {
-                throw new Error(`Error al crear venta: ${saleResult.error}`);
-            }
-
-            // 2. Marcar el carrito como pagado
-            const cartResult = await processCartCheckout();
-            
-            if (!cartResult) {
-                // Si falla el carrito, intentar rollback de la venta (opcional)
-                console.error('Cart checkout failed, but sale was created:', saleResult.saleId);
-                throw new Error('Error al procesar el carrito');
-            }
-
-            console.log('Complete checkout successful:', {
-                saleId: saleResult.saleId,
-                cartProcessed: cartResult
-            });
-
-            return {
-                success: true,
-                saleId: saleResult.saleId,
-                sale: saleResult.sale
-            };
-
-        } catch (error) {
-            console.error('Error in complete checkout:', error);
-            
-            return {
-                success: false,
-                error: error.message
-            };
-        } finally {
-            setLoading(false);
-        }
-    }, [createSale]);
-
-    // Función para validar datos de checkout antes de enviar
-    const validateCheckoutData = useCallback((formData, totalAmount) => {
-        const errors = {};
-
-        // Validar campos personales
-        if (!formData.name || formData.name.length < 2) {
-            errors.name = 'Nombre debe tener al menos 2 caracteres';
-        }
-        if (!formData.lastname || formData.lastname.length < 2) {
-            errors.lastname = 'Apellido debe tener al menos 2 caracteres';
-        }
-        if (!formData.phone || !/^[\d\-\+\(\)\s]+$/.test(formData.phone)) {
-            errors.phone = 'Formato de teléfono inválido';
-        }
-
-        // Validar dirección
-        if (!formData.department) {
-            errors.department = 'Selecciona un departamento';
-        }
-        if (!formData.city) {
-            errors.city = 'La ciudad es requerida';
-        }
-        if (!formData.zipCode || !/^\d{4,5}$/.test(formData.zipCode)) {
-            errors.zipCode = 'Código postal inválido';
-        }
-        if (!formData.address || formData.address.length < 10) {
-            errors.address = 'La dirección debe tener al menos 10 caracteres';
-        }
-
-        // Validar tarjeta de crédito
-        const cleanCard = formData.creditCard.replace(/\s/g, '');
-        if (!cleanCard || cleanCard.length !== 16 || !/^\d+$/.test(cleanCard)) {
-            errors.creditCard = 'La tarjeta debe tener 16 dígitos';
-        }
-
-        if (!formData.expiryDate || !/^\d{2}\/\d{2}$/.test(formData.expiryDate)) {
-            errors.expiryDate = 'Formato de fecha inválido (MM/AA)';
-        } else {
-            const [month, year] = formData.expiryDate.split('/');
-            const currentDate = new Date();
-            const currentYear = currentDate.getFullYear() % 100;
-            const currentMonth = currentDate.getMonth() + 1;
-            
-            if (parseInt(month) < 1 || parseInt(month) > 12) {
-                errors.expiryDate = 'Mes inválido';
-            } else if (parseInt(year) < currentYear || 
-                      (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
-                errors.expiryDate = 'Tarjeta vencida';
-            }
-        }
-
-        if (!formData.cvv || !/^\d{3,4}$/.test(formData.cvv)) {
-            errors.cvv = 'CVV debe tener 3 o 4 dígitos';
-        }
-
-        if (!formData.cardName || formData.cardName.length < 3) {
-            errors.cardName = 'Nombre en tarjeta muy corto';
-        }
-
-        // Validar total
-        if (!totalAmount || totalAmount <= 0) {
-            errors.total = 'Total inválido';
-        }
-
-        return {
-            isValid: Object.keys(errors).length === 0,
-            errors
-        };
-    }, []);
-
     return {
         // Estado
         loading,
@@ -357,10 +276,6 @@ const useSales = () => {
         getSales,
         getSaleById,
         updateSaleStatus,
-        processCompleteCheckout,
-
-        // Utilidades
-        validateCheckoutData,
 
         // Limpiar estado
         clearError: () => setError(null)

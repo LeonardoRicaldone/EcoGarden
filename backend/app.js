@@ -12,6 +12,7 @@ import productsRoutes from "./src/routes/products.js"
 import salesRoutes from "./src/routes/sales.js"
 import shoppingCartRoutes from "./src/routes/shoppingCart.js"
 import loginRoutes from "./src/routes/login.js"
+import passwordRecoveryRoutes from "./src/routes/passwordRecovery.js"
 
 import cookieParser from "cookie-parser";
 /*import { validateAuthToken } from "../src/middlewares/ValidateAuthToken.js";*/
@@ -40,13 +41,11 @@ app.use(
   })
 );
 
-
 //Que acepte datos de json
 app.use(express.json());
 
 //Que postman acepte guardar cookies
 app.use(cookieParser());
-
 
 //Definir las rutas de las funciones que tendra la pagina web
 app.use("/api/categories", categoriesRoutes);
@@ -57,11 +56,9 @@ app.use("/api/favorites", favoritesRoutes);
 app.use("/api/products", productsRoutes);
 app.use("/api/sales", salesRoutes);
 app.use("/api/shoppingCart", shoppingCartRoutes);
-
-app.use("/api/login", loginRoutes)
-
+app.use("/api/login", loginRoutes);
+app.use("/api/passwordRecovery", passwordRecoveryRoutes);
 app.use('/api/contact', contactRoutes);
 
 //exporto la constante para poder usar express en otros archivos
 export default app;
-//ESCRIBIR UNA LINEA ADICIONAL EN EL package.json hasta arriba   [  "type": "module",  ] es la linea y tambien en scripts "dev": "nodemon index.js"

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import './Register.css';
 import logo from '../assets/logo.png';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; 
+import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-hot-toast';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -57,22 +58,37 @@ const Register = () => {
       return;
     }
 
+    // Validación de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Por favor ingresa un email válido");
+      return;
+    }
+
     // Llamar al registro del contexto
     const result = await register(formData);
     
     if (result.success) {
-      // Registro exitoso - redirigir al login
-      navigate('/login', { 
-        state: { 
-          message: 'Registro exitoso. Ahora puedes iniciar sesión.',
-          email: formData.email 
-        }
-      });
+      if (result.needsVerification) {
+        // Redirigir a la página de verificación de email
+        navigate('/verify-email', { 
+          state: { 
+            email: formData.email,
+            clientName: formData.name
+          }
+        });
+      } else {
+        // Registro exitoso sin verificación - redirigir al login
+        navigate('/login', { 
+          state: { 
+            message: 'Registro exitoso. Ahora puedes iniciar sesión.',
+            email: formData.email 
+          }
+        });
+      }
     }
     // Los errores se manejan automáticamente en el contexto con toast
   };
-
-
 
   return (
     <div className="page-container">
@@ -102,6 +118,7 @@ const Register = () => {
                 value={formData.name}
                 onChange={handleChange}
                 required
+                disabled={isLoading}
               />
               <input 
                 type="text" 
@@ -111,6 +128,7 @@ const Register = () => {
                 value={formData.lastname}
                 onChange={handleChange}
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -122,6 +140,7 @@ const Register = () => {
               value={formData.telephone}
               onChange={handleChange}
               required
+              disabled={isLoading}
             />
             
             <input 
@@ -132,6 +151,7 @@ const Register = () => {
               value={formData.email}
               onChange={handleChange}
               required
+              disabled={isLoading}
             />
             
             <input 
@@ -143,6 +163,7 @@ const Register = () => {
               onChange={handleChange}
               minLength="6"
               required
+              disabled={isLoading}
             />
 
             <div className="checkbox-container">
@@ -153,6 +174,7 @@ const Register = () => {
                 checked={termsAccepted}
                 onChange={(e) => setTermsAccepted(e.target.checked)}
                 required
+                disabled={isLoading}
               />
               <label htmlFor="terms" className="termsConditions">
                 Acepto <Link to="/TermsConditions" state={{ returnTo: '/register' }}>términos y condiciones</Link>
@@ -170,6 +192,12 @@ const Register = () => {
 
           <div className="already-account">
             ¿Ya estás registrado? <Link to="/login">Inicia sesión</Link>
+          </div>
+
+          <div className="verification-info">
+            <p className="verification-note">
+              📧 Después del registro, recibirás un correo para verificar tu cuenta.
+            </p>
           </div>
         </div>
       </div>

@@ -12,10 +12,13 @@ import Products from './screens/Products';
 import Profile from './screens/Profile';
 import ShoppingCart from './screens/ShoppingCart';
 import TermsConditions from './screens/TermsConditions';
+import PasswordRecovery from './screens/PasswordRecovery';
+import EmailVerification from './components/EmailVerification/EmailVerification'; // Nueva pantalla
 import Nav from './components/Nav/Nav';
 import Layout from './components/Layaout';
 import Product from './screens/Product';
 import Checkout from './screens/CheckOut';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -35,12 +38,46 @@ function App() {
               <Route path="/Contact" element={<Contact />} />
               <Route path="/Register" element={<Register />} />
               <Route path="/Login" element={<Login />} />
-              <Route path="/Favorites" element={<Favorites />} />
-              <Route path="/Profile" element={<Profile />} />
-              <Route path="/ShoppingCart" element={<ShoppingCart />} />
-              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/PasswordRecovery" element={<PasswordRecovery />} />
               <Route path="/TermsConditions" element={<TermsConditions />} />
               
+              {/* Nueva ruta para verificación de email */}
+              <Route path="/verify-email" element={<EmailVerification />} />
+              
+              <Route 
+                path="/Favorites" 
+                element={
+                  <ProtectedRoute>
+                    <Favorites />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/Profile" 
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/ShoppingCart" 
+                element={
+                  <ProtectedRoute>
+                    <ShoppingCart />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/checkout" 
+                element={
+                  <ProtectedRoute>
+                    <Checkout />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Página 404 */}
               <Route path="*" element={
                 <div style={{ 
                   textAlign: 'center', 

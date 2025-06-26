@@ -15,9 +15,13 @@ export const config = {
         secret: process.env.JWT_SECRET,
         expiresIn: process.env.JWT_EXPIRES,
     },
-    ADMIN:{
+    ADMIN: {
         emailAdmin: process.env.ADMIN_EMAIL,
         password: process.env.ADMIN_PASSWORD
+    },
+    email: {
+        email_user: process.env.EMAIL_USER,
+        email_pass: process.env.EMAIL_PASS,
     },
     cloudinary: {
         cloudinary_name: process.env.CLOUDINARY_NAME,

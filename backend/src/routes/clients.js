@@ -2,7 +2,6 @@ import express from "express";
 import clientsController from "../controllers/clientsController.js";
 import registerClientsController from "../controllers/registerClientsController.js";
 
-//Router nos ayuda a colocar los métodos que tendrá mi ruta
 const router = express.Router();
 
 router.route("/")
@@ -13,6 +12,13 @@ router.route("/:id")
 .put(clientsController.updateClients)
 .delete(clientsController.deleteClients);
 
+// Ruta para registro de cliente
 router.post("/register", registerClientsController.register);
+
+// Ruta para verificar código de email
+router.post("/verify-email", registerClientsController.verifyCodeEmail);
+
+// Ruta para reenviar código de verificación
+router.post("/resend-verification", registerClientsController.resendVerificationCode);
 
 export default router;

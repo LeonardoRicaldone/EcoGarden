@@ -16,3 +16,179 @@
 .simple-card button:hover {
     transform: scale(1.05);
 }
+
+/* ProductCard.css */
+
+.product-card {
+  transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Limitar líneas de texto */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+  max-height: 2.8em;
+}
+
+/* Animaciones para las imágenes */
+.product-card img {
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover img {
+  transform: scale(1.05);
+}
+
+/* Estados del botón */
+.product-card button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.product-card button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.product-card button:not(:disabled):active {
+  transform: translateY(0);
+}
+
+/* Badge styles */
+.product-card .badge {
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Skeleton loading */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .product-card {
+    margin-bottom: 1rem;
+  }
+  
+  .product-card .p-4 {
+    padding: 0.75rem;
+  }
+  
+  .product-card h3 {
+    font-size: 0.9rem;
+  }
+  
+  .product-card button {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* Estados de hover para favoritos */
+.product-card .favorite-btn {
+  transition: all 0.2s ease;
+}
+
+.product-card .favorite-btn:hover {
+  transform: scale(1.1);
+  background-color: rgba(255, 255, 255, 1);
+}
+
+/* Indicadores de stock */
+.stock-indicator {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.stock-low {
+  color: #f59e0b;
+}
+
+.stock-out {
+  color: #ef4444;
+}
+
+.stock-available {
+  color: #10b981;
+}
+
+/* Efectos de carga para placeholder */
+.image-placeholder {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.image-placeholder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Mejoras de accesibilidad */
+.product-card:focus-within {
+  outline: 2px solid #93A267;
+  outline-offset: 2px;
+}
+
+.product-card button:focus {
+  outline: 2px solid #93A267;
+  outline-offset: 2px;
+}
+
+/* Colores personalizados para EcoGarden */
+.product-card .text-green-600 {
+  color: #93A267;
+}
+
+.product-card .bg-green-600 {
+  background-color: #93A267;
+}
+
+.product-card .hover\:bg-green-700:hover {
+  background-color: #7a8a5c;
+}
+
+.product-card .hover\:text-green-600:hover {
+  color: #93A267;
+}

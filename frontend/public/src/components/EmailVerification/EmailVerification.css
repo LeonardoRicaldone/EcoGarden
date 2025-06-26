@@ -1,0 +1,326 @@
+/* EmailVerification.css */
+
+.verification-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.verification-left {
+    flex: 1;
+    position: relative;
+    height: 100vh;
+}
+
+.verification-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.logo-overlay {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-weight: bold;
+    color: white;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+}
+
+.logo-image {
+    height: 120px;
+}
+
+.verification-right {
+    flex: 1;
+    background-color: white;
+    padding: 2rem 4rem;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 30px 0 0 30px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    margin-left: -30px;
+    position: relative;
+    z-index: 2;
+    width: 500px;
+}
+
+.verification-content {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.verification-title {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #485935;
+    line-height: 1.2;
+}
+
+.verification-info {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.verification-description {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.email-display {
+    font-size: 18px;
+    font-weight: 600;
+    color: #93A267;
+    margin-bottom: 0.5rem;
+    word-break: break-all;
+}
+
+.welcome-text {
+    font-size: 16px;
+    color: #485935;
+    font-weight: 500;
+    margin-top: 0.5rem;
+}
+
+.verification-form {
+    margin-bottom: 2rem;
+}
+
+.code-input-container {
+    margin-bottom: 1.5rem;
+}
+
+.verification-input {
+    width: 100%;
+    padding: 16px 20px;
+    border: 2px solid #bfcabe;
+    border-radius: 20px;
+    font-size: 18px;
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    outline: none;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    font-family: monospace;
+}
+
+.verification-input:focus {
+    border-color: #93A267;
+    box-shadow: 0 0 0 3px rgba(147, 162, 103, 0.1);
+}
+
+.verification-input::placeholder {
+    letter-spacing: normal;
+    text-transform: none;
+    font-family: inherit;
+    font-weight: normal;
+}
+
+.input-hint {
+    display: block;
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+    margin-top: 8px;
+}
+
+.verify-button {
+    background-color: #93A267;
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.verify-button:hover:not(:disabled) {
+    background-color: #7a8a5c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(147, 162, 103, 0.3);
+}
+
+.verify-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none;
+}
+
+.resend-section {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.resend-text {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.resend-button {
+    background: none;
+    border: 2px solid #93A267;
+    color: #93A267;
+    padding: 10px 20px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.resend-button:hover:not(:disabled) {
+    background-color: #93A267;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.resend-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.countdown-text {
+    font-size: 14px;
+    color: #93A267;
+    font-weight: 500;
+    background-color: #f8f9fa;
+    padding: 8px 16px;
+    border-radius: 15px;
+    display: inline-block;
+}
+
+.verification-footer {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.back-link,
+.login-link {
+    color: #93A267;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.back-link:hover,
+.login-link:hover {
+    color: #7a8a5c;
+    text-decoration: underline;
+}
+
+.divider {
+    color: #ccc;
+    font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .verification-container {
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .verification-left {
+        height: 200px;
+        flex: none;
+    }
+
+    .verification-right {
+        height: auto;
+        margin-left: 0;
+        border-radius: 20px;
+        margin-top: -20px;
+        padding: 2rem;
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .verification-title {
+        font-size: 28px;
+    }
+
+    .verification-footer {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .divider {
+        display: none;
+    }
+}
+
+/* Animaciones */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.verification-content {
+    animation: slideInUp 0.6s ease-out;
+}
+
+/* Estados de validación */
+.verification-input.valid {
+    border-color: #28a745;
+    background-color: #f8fff8;
+}
+
+.verification-input.invalid {
+    border-color: #dc3545;
+    background-color: #fff8f8;
+}
+
+/* Efectos de carga */
+.verify-button.loading {
+    position: relative;
+    color: transparent;
+}
+
+.verify-button.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ffffff;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}

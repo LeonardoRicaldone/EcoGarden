@@ -5,6 +5,7 @@
        telephone
        email
        password
+       isVerified (nuevo campo para verificación)
 */
 
 import { Schema, model } from "mongoose";
@@ -12,28 +13,46 @@ import { Schema, model } from "mongoose";
 const clientsSchema = new Schema({
     name: {
         type: String,
-        require: true
+        required: true,
+        trim: true
     },
     lastname: {
         type: String,
-        require: true
+        required: true,
+        trim: true
     },
     telephone: {
         type: String,
-        require: true
+        required: true, 
+        trim: true
     },
     email: {
         type: String,
-        require: true
+        required: true, 
+        unique: true, 
+        trim: true,
+        // Validación básica de email
+        match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Email inválido']
     },
     password: {
         type: String,
-        require: true
+        required: true, 
+        minlength: [6, 'La contraseña debe tener al menos 6 caracteres']
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
     }
 }, 
 {
     timestamps: true,
-    strict: false
+    strict: false // Mantiene tu configuración actual
 });
 
-export default model("Clients", clientsSchema)
+clientsSchema.methods.toJSON = function() {
+    const client = this.toObject();
+    delete client.password;
+    return client;
+};
+
+export default model("Clients", clientsSchema);

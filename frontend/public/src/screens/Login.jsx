@@ -39,9 +39,6 @@ const Login = () => {
     auth 
   } = useAuth();
 
-  // Hook de ventas - removido ya que usamos fetch directo
-  // const { getSales } = useSales();
-
   // Cargar historial de ventas cuando el usuario esté logueado
   useEffect(() => {
     if (isLoggedIn && user?.id && activeTab === 'orders') {
@@ -122,7 +119,7 @@ const Login = () => {
     }
   };
 
-  // Función para obtener el color del estado
+  // Función para obtener el color del estado - ACTUALIZADA con verde EcoGarden
   const getStatusColor = (status) => {
     switch (status) {
       case 'Pending':
@@ -166,7 +163,7 @@ const Login = () => {
                 <h2>Bienvenido de vuelta, {user.name}</h2>
               </div>
 
-              {/* Navegación por pestañas */}
+              {/* Navegación por pestañas - ACTUALIZADA */}
               <div className="profile-tabs" style={{ marginBottom: '2rem' }}>
                 <button 
                   onClick={() => setActiveTab('profile')}
@@ -176,7 +173,7 @@ const Login = () => {
                     marginRight: '0.5rem',
                     border: 'none',
                     borderRadius: '0.5rem',
-                    backgroundColor: activeTab === 'profile' ? '#22c55e' : '#f3f4f6',
+                    backgroundColor: activeTab === 'profile' ? '#93A267' : '#f3f4f6',
                     color: activeTab === 'profile' ? 'white' : '#6b7280',
                     cursor: 'pointer',
                     transition: 'all 0.2s'
@@ -192,7 +189,7 @@ const Login = () => {
                     padding: '0.75rem 1.5rem',
                     border: 'none',
                     borderRadius: '0.5rem',
-                    backgroundColor: activeTab === 'orders' ? '#22c55e' : '#f3f4f6',
+                    backgroundColor: activeTab === 'orders' ? '#93A267' : '#f3f4f6',
                     color: activeTab === 'orders' ? 'white' : '#6b7280',
                     cursor: 'pointer',
                     transition: 'all 0.2s'
@@ -223,7 +220,7 @@ const Login = () => {
                   
                   {loadingSales ? (
                     <div style={{ textAlign: 'center', padding: '2rem' }}>
-                      <FaSpinner className="animate-spin" size={32} style={{ color: '#22c55e' }} />
+                      <FaSpinner className="animate-spin" size={32} style={{ color: '#93A267' }} />
                       <p style={{ marginTop: '1rem', color: '#6b7280' }}>Cargando órdenes...</p>
                     </div>
                   ) : userSales.length === 0 ? (
@@ -233,7 +230,7 @@ const Login = () => {
                       <Link 
                         to="/Products" 
                         style={{ 
-                          color: '#22c55e', 
+                          color: '#93A267', 
                           textDecoration: 'none',
                           fontWeight: '500'
                         }}
@@ -307,7 +304,7 @@ const Login = () => {
                               <p style={{ 
                                 fontSize: '1.125rem', 
                                 fontWeight: '600', 
-                                color: '#22c55e'
+                                color: '#93A267'
                               }}>
                                 ${sale.total.toFixed(2)}
                               </p>
@@ -395,7 +392,7 @@ const Login = () => {
     );
   }
 
-  // Formulario de login (sin cambios)
+  // Formulario de login
   return (
     <div className="page-container">
       <div className="login-page">
@@ -440,7 +437,25 @@ const Login = () => {
               </div>
 
               <div className="login-options">
-                <Link to="/forgot-password" className="forgot-password">
+                <Link 
+                  to="/PasswordRecovery" 
+                  className="forgot-password"
+                  style={{
+                    color: '#93A267',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    transition: 'color 0.2s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.color = '#7a8a5c';
+                    e.target.style.textDecoration = 'underline';
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.color = '#93A267';
+                    e.target.style.textDecoration = 'none';
+                  }}
+                >
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>
@@ -451,7 +466,65 @@ const Login = () => {
             </form>
 
             <div className="register-section">
-              <p>¿No tienes una cuenta? <Link to="/register" className="register-link">Regístrate aquí</Link></p>
+              <p>
+                ¿No tienes una cuenta? 
+                <Link 
+                  to="/register" 
+                  className="register-link"
+                  style={{
+                    color: '#93A267',
+                    textDecoration: 'none',
+                    fontWeight: '600',
+                    marginLeft: '5px'
+                  }}
+                >
+                  Regístrate aquí
+                </Link>
+              </p>
+            </div>
+
+            {/* Sección adicional para recuperación de contraseña */}
+            <div className="password-recovery-section" style={{
+              marginTop: '20px',
+              padding: '15px',
+              backgroundColor: '#f0f9ff',
+              border: '1px solid #93A267',
+              borderRadius: '8px',
+              textAlign: 'center'
+            }}>
+              <p style={{ 
+                fontSize: '14px', 
+                color: '#374151',
+                marginBottom: '10px',
+                margin: '0 0 10px 0'
+              }}>
+                🔐 ¿Problemas para acceder?
+              </p>
+              <Link 
+                to="/PasswordRecovery"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '8px 16px',
+                  backgroundColor: '#93A267',
+                  color: 'white',
+                  textDecoration: 'none',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = '#7a8a5c';
+                  e.target.style.transform = 'translateY(-1px)';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = '#93A267';
+                  e.target.style.transform = 'translateY(0)';
+                }}
+              >
+                🌱 Recuperar mi cuenta
+              </Link>
             </div>
           </div>
 

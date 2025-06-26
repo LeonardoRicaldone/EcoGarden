@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { FaHeart, FaArrowLeft, FaShoppingCart, FaStar, FaRegStar, FaRegHeart } from 'react-icons/fa';
+import { FaHeart, FaArrowLeft, FaShoppingCart, FaStar, FaRegStar, FaRegHeart, FaUser } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import './Product.css';
 import { useAuth } from '../context/AuthContext';
@@ -8,14 +8,21 @@ import useShoppingCart from '../hooks/useShoppingCart';
 import useFavorites from '../hooks/useFavorites';
 
 const Product = () => {
-  const { id } = useParams(); // Obtener ID del producto desde la URL
+  const { id } = useParams();
   const navigate = useNavigate();
   
   // Estados del componente
   const [product, setProduct] = useState(null);
+  const [ratings, setRatings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingRatings, setLoadingRatings] = useState(false);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  
+  // Estados para nuevo comentario
+  const [newComment, setNewComment] = useState('');
+  const [newScore, setNewScore] = useState(0);
+  const [submittingComment, setSubmittingComment] = useState(false);
 
   // Hooks de autenticación y funcionalidades
   const { auth, user } = useAuth();
@@ -26,8 +33,72 @@ const Product = () => {
   const { addToCart, isInCart, getProductQuantity } = useShoppingCart(isAuthenticated ? clientId : null);
   const { toggleFavorite, isFavorite } = useFavorites(isAuthenticated ? clientId : null);
 
-  // URL de tu API (ajustada para tu backend)
+  // URLs de tu API
   const PRODUCTS_API = "http://localhost:4000/api/products";
+  const RATINGS_API = "http://localhost:4000/api/ratings";
+
+  // Función para calcular el rating promedio
+  const calculateAverageRating = (ratingsArray) => {
+    if (!ratingsArray || ratingsArray.length === 0) return 0;
+    const sum = ratingsArray.reduce((acc, rating) => acc + rating.score, 0);
+    return (sum / ratingsArray.length).toFixed(1);
+  };
+
+  // Función para obtener token de autenticación
+  const getAuthToken = () => {
+    return localStorage.getItem('token') || localStorage.getItem('authToken');
+  };
+
+  // Headers con autenticación
+  const getAuthHeaders = () => {
+    const token = getAuthToken();
+    return {
+      "Content-Type": "application/json",
+      ...(token && { "Authorization": `Bearer ${token}` })
+    };
+  };
+
+  // Cargar ratings del producto
+  const fetchRatings = async (productId) => {
+    try {
+      setLoadingRatings(true);
+      console.log('Fetching ratings for product ID:', productId);
+      
+      const response = await fetch(`${RATINGS_API}?productId=${productId}`);
+      
+      if (response.ok) {
+        const allRatings = await response.json();
+        console.log('All ratings received:', allRatings);
+        
+        // Filtrar ratings solo para este producto (doble verificación)
+        const productRatings = allRatings.filter(rating => {
+          const ratingProductId = rating.idProduct?._id || rating.idProduct;
+          const matches = ratingProductId === productId;
+          
+          if (!matches && ratingProductId) {
+            console.log('Rating filtered out - Product ID mismatch:', {
+              ratingProductId,
+              expectedProductId: productId,
+              rating
+            });
+          }
+          
+          return matches;
+        });
+        
+        console.log(`Filtered to ${productRatings.length} ratings for this product`);
+        setRatings(productRatings);
+      } else {
+        console.error('Error fetching ratings:', response.status);
+        setRatings([]);
+      }
+    } catch (error) {
+      console.error('Error fetching ratings:', error);
+      setRatings([]);
+    } finally {
+      setLoadingRatings(false);
+    }
+  };
 
   // Cargar datos del producto
   useEffect(() => {
@@ -38,7 +109,7 @@ const Product = () => {
 
         console.log('Fetching product with ID:', id);
 
-        // Obtener producto (tu endpoint ya incluye populate de la categoría)
+        // Obtener producto
         const response = await fetch(`${PRODUCTS_API}/${id}`);
         
         if (!response.ok) {
@@ -54,8 +125,10 @@ const Product = () => {
         const productData = await response.json();
         console.log('Product data received:', productData);
 
-        // Tu backend devuelve el producto directamente
         setProduct(productData);
+
+        // Cargar ratings del producto
+        await fetchRatings(id);
 
       } catch (error) {
         console.error('Error fetching product:', error);
@@ -70,6 +143,68 @@ const Product = () => {
       fetchProductData();
     }
   }, [id]);
+
+  // Función para enviar nuevo comentario
+  const handleSubmitComment = async (e) => {
+    e.preventDefault();
+    
+    if (!isAuthenticated) {
+      toast.error("Debes iniciar sesión para calificar productos");
+      return;
+    }
+
+    if (newScore === 0) {
+      toast.error("Por favor selecciona una calificación");
+      return;
+    }
+
+    if (newScore < 1 || newScore > 5) {
+      toast.error("La calificación debe estar entre 1 y 5");
+      return;
+    }
+
+    if (!newComment.trim()) {
+      toast.error("Por favor escribe un comentario");
+      return;
+    }
+
+    try {
+      setSubmittingComment(true);
+
+      console.log('Submitting comment with data:', {
+        comment: newComment.trim(),
+        score: newScore,
+        idProduct: id,
+        idClient: clientId
+      });
+
+      const response = await fetch(RATINGS_API, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          comment: newComment.trim(),
+          score: newScore,
+          idProduct: id,
+          idClient: clientId
+        })
+      });
+
+      if (response.ok) {
+        toast.success("Comentario agregado exitosamente");
+        setNewComment('');
+        setNewScore(0);
+        // Recargar ratings
+        await fetchRatings(id);
+      } else {
+        throw new Error('Error al enviar comentario');
+      }
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+      toast.error("Error al enviar comentario");
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
 
   // Funciones para manejar cantidad
   const decreaseQuantity = () => {
@@ -136,7 +271,6 @@ const Product = () => {
 
     const success = await addToCart(product._id, quantity);
     if (success) {
-      // Resetear cantidad después de agregar
       setQuantity(1);
     }
   };
@@ -146,58 +280,59 @@ const Product = () => {
     navigate('/ShoppingCart');
   };
 
-  // Función para renderizar estrellas
-  const renderStars = (rating) => {
+  // Función para renderizar estrellas (para mostrar rating)
+  const renderStars = (rating, interactive = false, onStarClick = null) => {
     const stars = [];
-    const numRating = rating || Math.floor(Math.random() * 5) + 1; // Rating aleatorio si no existe
+    const numRating = parseFloat(rating) || 0;
     
     for (let i = 1; i <= 5; i++) {
+      const isFilled = i <= numRating;
       stars.push(
-        i <= numRating 
-          ? <FaStar key={i} className="text-yellow-500" /> 
-          : <FaRegStar key={i} className="text-gray-300" />
+        <span
+          key={i}
+          onClick={interactive ? () => onStarClick(i) : undefined}
+          className={`product-detail-star ${interactive ? 'product-detail-star-interactive' : ''} ${isFilled ? 'product-detail-star-filled' : ''}`}
+        >
+          {isFilled 
+            ? <FaStar className="product-detail-star-icon filled" /> 
+            : <FaRegStar className="product-detail-star-icon empty" />
+          }
+        </span>
       );
     }
-    return <div className="flex items-center">{stars}</div>;
+    return <div className="product-detail-stars-container">{stars}</div>;
   };
 
   // Función para obtener nombre de categoría
   const getCategoryName = () => {
     if (product?.idCategory) {
-      // Si está populado, tendrá la propiedad name
       if (typeof product.idCategory === 'object' && product.idCategory.name) {
         return product.idCategory.name;
       }
-      // Si solo es el ID
       return 'Categoría';
     }
     return 'Sin categoría';
+  };
+
+  // Función para formatear fecha
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
   // Estados de carga y error
   if (loading) {
     return (
       <div className="page-container">
-        <div className="product-container" style={{ textAlign: 'center', padding: '50px' }}>
-          <div style={{
-            display: 'inline-block',
-            width: '40px',
-            height: '40px',
-            border: '4px solid #f3f3f3',
-            borderTop: '4px solid #93A267',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            marginBottom: '20px'
-          }}></div>
-          <p>Cargando producto...</p>
-          <style>
-            {`
-              @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-              }
-            `}
-          </style>
+        <div className="product-detail-container">
+          <div className="product-detail-loading">
+            <div className="product-detail-spinner"></div>
+            <p>Cargando producto...</p>
+          </div>
         </div>
       </div>
     );
@@ -206,51 +341,42 @@ const Product = () => {
   if (error || !product) {
     return (
       <div className="page-container">
-        <div className="product-container" style={{ textAlign: 'center', padding: '50px' }}>
-          <div style={{ color: '#e74c3c', fontSize: '48px', marginBottom: '20px' }}>⚠️</div>
-          <h3 style={{ color: '#e74c3c', marginBottom: '10px' }}>
-            {error || 'Producto no encontrado'}
-          </h3>
-          <p style={{ color: '#666', marginBottom: '20px' }}>
-            {error === 'Producto no encontrado' 
-              ? 'El producto que buscas no existe o ha sido eliminado.'
-              : 'Hubo un problema al cargar la información del producto.'
-            }
-          </p>
-          <div style={{ marginTop: '20px' }}>
-            <Link to="/Products">
-              <button style={{
-                padding: '10px 20px',
-                backgroundColor: '#93A267',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                marginRight: '10px'
-              }}>
-                Ver todos los productos
+        <div className="product-detail-container">
+          <div className="product-detail-error">
+            <div className="product-detail-error-icon">⚠️</div>
+            <h3 className="product-detail-error-title">
+              {error || 'Producto no encontrado'}
+            </h3>
+            <p className="product-detail-error-message">
+              {error === 'Producto no encontrado' 
+                ? 'El producto que buscas no existe o ha sido eliminado.'
+                : 'Hubo un problema al cargar la información del producto.'
+              }
+            </p>
+            <div className="product-detail-error-actions">
+              <Link to="/Products">
+                <button className="product-detail-btn-primary">
+                  Ver todos los productos
+                </button>
+              </Link>
+              <button
+                onClick={() => window.location.reload()}
+                className="product-detail-btn-secondary"
+              >
+                Reintentar
               </button>
-            </Link>
-            <button
-              onClick={() => window.location.reload()}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#6b7280',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer'
-              }}
-            >
-              Reintentar
-            </button>
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  // Preparar imagen del producto (solo usar la del backend)
+  // Calcular rating promedio
+  const averageRating = calculateAverageRating(ratings);
+  const totalRatings = ratings.length;
+
+  // Preparar imagen del producto
   const productImage = product.imgProduct;
 
   // Verificar si el producto está en favoritos
@@ -262,31 +388,30 @@ const Product = () => {
 
   return (
     <div className="page-container">
-      <div className="product-container">
+      <div className="product-detail-container">
         {/* Navegación de regreso */}
-        <div className="back-navigation">
-          <Link to="/Products" className="back-link">
-            <FaArrowLeft className="back-icon" /> 
-            <span>volver a todos los productos</span>
+        <div className="product-detail-back-navigation">
+          <Link to="/Products" className="product-detail-back-link">
+            <FaArrowLeft className="product-detail-back-icon" /> 
+            <span>Volver a todos los productos</span>
           </Link>
         </div>
 
-        <div className="product-layout">
+        <div className="product-detail-layout">
           {/* Columna izquierda: Imagen */}
-          <div className="product-images">
-            <div className="image-gallery">
-              {/* Imagen principal */}
-              <div className="main-image-container">
+          <div className="product-detail-images">
+            <div className="product-detail-image-gallery">
+              <div className="product-detail-main-image-container">
                 <img 
                   src={productImage || "https://via.placeholder.com/500x500/93A267/FFFFFF?text=Sin+Imagen"} 
                   alt={product.name} 
-                  className="main-image"
+                  className="product-detail-main-image"
                   onError={(e) => {
                     e.target.src = "https://via.placeholder.com/500x500/93A267/FFFFFF?text=Sin+Imagen";
                   }}
                 />
                 {productImage && (
-                  <button className="zoom-button" title="Ampliar imagen">
+                  <button className="product-detail-zoom-button" title="Ampliar imagen">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="11" cy="11" r="8"></circle>
                       <path d="m21 21-4.35-4.35"></path>
@@ -300,62 +425,44 @@ const Product = () => {
           </div>
 
           {/* Columna derecha: Información del producto */}
-          <div className="product-info">
+          <div className="product-detail-info">
             {/* Etiquetas */}
-            <div className="product-tags">
-              <span className="tag">{getCategoryName()}</span>
-              <span className="tag" style={{
-                backgroundColor: product.stock > 0 ? '#dcfce7' : '#fee2e2',
-                color: product.stock > 0 ? '#166534' : '#dc2626'
-              }}>
+            <div className="product-detail-tags">
+              <span className="product-detail-tag">{getCategoryName()}</span>
+              <span className={`product-detail-tag ${product.stock > 0 ? 'product-detail-tag-success' : 'product-detail-tag-danger'}`}>
                 Stock: {product.stock}
               </span>
             </div>
             
             {/* Encabezado del producto */}
-            <div className="product-header">
-              <h1 className="product-title">{product.name}</h1>
+            <div className="product-detail-header">
+              <h1 className="product-detail-title">{product.name}</h1>
               <button 
                 onClick={handleToggleFavorite}
-                className={`favorite-button ${isProductFavorite ? 'favorite-active' : ''}`}
+                className={`product-detail-favorite-button ${isProductFavorite ? 'product-detail-favorite-active' : ''}`}
                 disabled={!isAuthenticated}
                 title={!isAuthenticated ? "Inicia sesión para guardar favoritos" : 
                        isProductFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
-                style={{
-                  opacity: !isAuthenticated ? 0.5 : 1,
-                  cursor: !isAuthenticated ? 'not-allowed' : 'pointer'
-                }}
               >
                 {isProductFavorite ? <FaHeart /> : <FaRegHeart />}
               </button>
             </div>
             
             {/* Precio */}
-            <p className="product-price">${product.price}</p>
+            <p className="product-detail-price">${product.price}</p>
             
-            {/* Calificación */}
-            <div className="product-rating">
-              {renderStars(product.rating)}
-              <span className="rating-count">(Calificación: {product.rating || 'N/A'})</span>
+            {/* Calificación dinámica */}
+            <div className="product-detail-rating">
+              {renderStars(averageRating)}
+              <span className="product-detail-rating-count">
+                ({averageRating}/5.0 - {totalRatings} {totalRatings === 1 ? 'calificación' : 'calificaciones'})
+              </span>
             </div>
 
             {/* Stock disponible */}
-            <div className="stock-info" style={{ 
-              margin: '1rem 0', 
-              padding: '0.75rem', 
-              borderRadius: '0.5rem',
-              backgroundColor: product.stock > 0 ? '#f0f9ff' : '#fef2f2',
-              border: `1px solid ${product.stock > 0 ? '#bae6fd' : '#fecaca'}`
-            }}>
-              <p style={{ 
-                margin: 0, 
-                color: product.stock > 0 ? '#0369a1' : '#dc2626',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                display: 'flex',
-                alignItems: 'center'
-              }}>
-                <span style={{ marginRight: '0.5rem' }}>
+            <div className={`product-detail-stock-info ${product.stock > 0 ? 'product-detail-stock-available' : 'product-detail-stock-unavailable'}`}>
+              <p className="product-detail-stock-message">
+                <span className="product-detail-stock-icon">
                   {product.stock > 0 ? '✅' : '❌'}
                 </span>
                 {product.stock > 0 
@@ -364,40 +471,36 @@ const Product = () => {
                 }
               </p>
               {product.stock > 0 && product.stock <= 10 && (
-                <p style={{ 
-                  margin: '0.25rem 0 0 0', 
-                  color: '#f59e0b',
-                  fontSize: '0.75rem'
-                }}>
+                <p className="product-detail-stock-warning">
                   ⚠️ Pocas unidades disponibles
                 </p>
               )}
             </div>
             
             {/* Descripción */}
-            <div className="product-description">
-              <h2 className="description-title">Descripción</h2>
-              <p className="description-text">
+            <div className="product-detail-description">
+              <h2 className="product-detail-description-title">Descripción</h2>
+              <p className="product-detail-description-text">
                 {product.descripcion || 
                  "Este producto no tiene descripción disponible. Contacta con nosotros para más información sobre sus características y beneficios."}
               </p>
             </div>
             
             {/* Control de cantidad y botones de acción */}
-            <div className="purchase-controls">
+            <div className="product-detail-purchase-controls">
               {product.stock > 0 && (
-                <div className="quantity-control">
+                <div className="product-detail-quantity-control">
                   <button 
                     onClick={decreaseQuantity}
-                    className="quantity-button"
+                    className="product-detail-quantity-button"
                     disabled={quantity <= 1}
                   >
                     −
                   </button>
-                  <span className="quantity-display">{quantity}</span>
+                  <span className="product-detail-quantity-display">{quantity}</span>
                   <button 
                     onClick={increaseQuantity}
-                    className="quantity-button"
+                    className="product-detail-quantity-button"
                     disabled={quantity >= product.stock}
                   >
                     +
@@ -406,48 +509,22 @@ const Product = () => {
               )}
 
               {/* Botones de acción */}
-              <div className="action-buttons" style={{ 
-                display: 'flex', 
-                gap: '0.5rem', 
-                flexWrap: 'wrap',
-                marginTop: '1rem'
-              }}>
+              <div className="product-detail-action-buttons">
                 {product.stock > 0 ? (
                   <>
                     <button 
                       onClick={handleAddToCart}
-                      className="buy-button"
+                      className="product-detail-buy-button"
                       disabled={!isAuthenticated}
-                      style={{ 
-                        opacity: !isAuthenticated ? 0.6 : 1,
-                        cursor: !isAuthenticated ? 'not-allowed' : 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        minWidth: '160px',
-                        justifyContent: 'center'
-                      }}
                     >
-                      <FaShoppingCart style={{ marginRight: '0.5rem' }} />
+                      <FaShoppingCart className="product-detail-button-icon" />
                       {!isAuthenticated ? 'Inicia sesión' : 'Agregar al carrito'}
                     </button>
                     
                     {productInCart && cartQuantity > 0 && (
                       <button 
                         onClick={handleGoToCart}
-                        style={{
-                          padding: '12px 24px',
-                          backgroundColor: '#22c55e',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '8px',
-                          cursor: 'pointer',
-                          fontSize: '16px',
-                          fontWeight: '500',
-                          display: 'flex',
-                          alignItems: 'center',
-                          minWidth: '160px',
-                          justifyContent: 'center'
-                        }}
+                        className="product-detail-cart-button"
                       >
                         Ver en carrito ({cartQuantity})
                       </button>
@@ -455,14 +532,8 @@ const Product = () => {
                   </>
                 ) : (
                   <button 
-                    className="buy-button"
+                    className="product-detail-buy-button product-detail-buy-button-disabled"
                     disabled
-                    style={{ 
-                      backgroundColor: '#e5e7eb',
-                      color: '#9ca3af',
-                      cursor: 'not-allowed',
-                      minWidth: '160px'
-                    }}
                   >
                     Producto agotado
                   </button>
@@ -472,19 +543,9 @@ const Product = () => {
 
             {/* Información adicional para usuarios no autenticados */}
             {!isAuthenticated && (
-              <div style={{
-                marginTop: '1rem',
-                padding: '1rem',
-                backgroundColor: '#fef3c7',
-                border: '1px solid #f59e0b',
-                borderRadius: '0.5rem'
-              }}>
-                <p style={{ 
-                  margin: 0, 
-                  fontSize: '0.875rem',
-                  color: '#92400e'
-                }}>
-                  💡 <Link to="/Login" style={{ color: '#92400e', fontWeight: '600' }}>
+              <div className="product-detail-login-prompt">
+                <p>
+                  💡 <Link to="/Login" className="product-detail-login-link">
                     Inicia sesión
                   </Link> para agregar productos al carrito y guardar favoritos
                 </p>
@@ -493,14 +554,110 @@ const Product = () => {
           </div>
         </div>
 
-        {/* Sección de comentarios */}
-        <div className="comments-section">
-          <h2 className="comments-title">Comentarios</h2>
-          
-          <div className="comment-item">
-            <div className="comment-content">
+        {/* Sección de comentarios y calificaciones */}
+        <div className="product-detail-comments-section">
+          <h2 className="product-detail-comments-title">
+            Reseñas y Comentarios ({totalRatings})
+          </h2>
+
+          {/* Formulario para agregar comentario */}
+          {isAuthenticated ? (
+            <div className="product-detail-review-form">
+              <h3 className="product-detail-review-form-title">
+                Escribir una reseña
+              </h3>
+              
+              <form onSubmit={handleSubmitComment}>
+                {/* Selector de calificación */}
+                <div className="product-detail-rating-input">
+                  <label className="product-detail-label">
+                    Calificación:
+                  </label>
+                  <div className="product-detail-star-rating">
+                    {renderStars(newScore, true, setNewScore)}
+                  </div>
+                </div>
+
+                {/* Campo de comentario */}
+                <div className="product-detail-comment-input">
+                  <label className="product-detail-label">
+                    Comentario:
+                  </label>
+                  <textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Comparte tu experiencia con este producto..."
+                    rows={4}
+                    className="product-detail-comment-textarea"
+                    required
+                  />
+                </div>
+
+                {/* Botón de envío */}
+                <button
+                  type="submit"
+                  disabled={submittingComment || newScore === 0 || !newComment.trim()}
+                  className="product-detail-submit-review-btn"
+                >
+                  {submittingComment ? 'Enviando...' : 'Publicar Reseña'}
+                </button>
+              </form>
             </div>
-          </div>
+          ) : (
+            <div className="product-detail-login-prompt">
+              <p>
+                <Link to="/Login" className="product-detail-login-link">
+                  Inicia sesión
+                </Link> para escribir una reseña de este producto
+              </p>
+            </div>
+          )}
+
+          {/* Lista de comentarios */}
+          {loadingRatings ? (
+            <div className="product-detail-loading-text">
+              <p>Cargando comentarios...</p>
+            </div>
+          ) : ratings.length > 0 ? (
+            <div className="product-detail-reviews-list">
+              {ratings.map((rating) => (
+                <div key={rating._id} className="product-detail-review-item">
+                  <div className="product-detail-review-header">
+                    <div className="product-detail-review-user-info">
+                      <div className="product-detail-user-avatar">
+                        <FaUser size={16} />
+                      </div>
+                      <div className="product-detail-user-details">
+                        <h4 className="product-detail-user-name">
+                          {rating.idClient?.name || 'Usuario'}
+                        </h4>
+                        <div className="product-detail-user-rating-date">
+                          {renderStars(rating.score)}
+                          <span className="product-detail-review-date">
+                            {formatDate(rating.createdAt)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <p className="product-detail-review-comment">
+                    {rating.comment}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="product-detail-no-reviews">
+              <div className="product-detail-no-reviews-icon">💬</div>
+              <h3 className="product-detail-no-reviews-title">
+                Sin reseñas aún
+              </h3>
+              <p className="product-detail-no-reviews-text">
+                Sé el primero en compartir tu experiencia con este producto
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

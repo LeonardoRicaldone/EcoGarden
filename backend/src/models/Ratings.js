@@ -1,36 +1,29 @@
-/*
-    Campos:
-        comment
-        score
-        idProduct
-        idClient
-*/
-
 import { Schema, model } from "mongoose";
 
 const ratingsSchema = new Schema({
     comment: {
         type: String,
-        require: true
+        required: true
     },
     score: {
         type: Number,
-        require: true,
-        max: 5,
+        required: true,
+        min: 1,
+        max: 5
     },
     idProduct: {
         type: Schema.Types.ObjectId,
         ref: "Products",
-        require: true
+        required: true
     },
     idClient: {
         type: Schema.Types.ObjectId,
         ref: "Clients",
-        require: true
+        required: true
     }
 }, {
     timestamps: true,
     strict: false
 });
 
-export default model("Ratings", ratingsSchema)
+export default model("Ratings", ratingsSchema);

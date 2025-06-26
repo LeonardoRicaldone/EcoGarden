@@ -1,15 +1,23 @@
-import express from "express";
+import { Router } from "express";
 import ratingsController from "../controllers/ratingsController.js";
-//Router() nos ayuda a colocar los métodos que tendrá mi ruta
-const router = express.Router();
 
-router.route("/")
-.get(ratingsController.getRatings)
-.post(ratingsController.createRatings)
+const router = Router();
 
-router.route("/:id")
-.put(ratingsController.updateRatings)
-.delete(ratingsController.deleteRatings)
+router.get("/", ratingsController.getRatings);
+
+// GET - Obtener ratings de un producto específico con estadísticas
+router.get("/product/:productId", ratingsController.getProductRatings);
+
+// GET - Obtener rating de un usuario para un producto específico
+router.get("/product/:productId/user/:clientId", ratingsController.getUserProductRating);
+
+// POST - Crear nuevo rating
+router.post("/", ratingsController.createRatings);
+
+// PUT - Actualizar rating
+router.put("/:id", ratingsController.updateRatings);
+
+// DELETE - Eliminar rating
+router.delete("/:id", ratingsController.deleteRatings);
 
 export default router;
-

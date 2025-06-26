@@ -40,7 +40,7 @@ const Products = () => {
   };
 
   // DEBUG: Verificar los productos
-  console.log('Products Component - Products data:', products.slice(0, 2));
+  console.log('Products Component - Products data with ratings:', products.slice(0, 2));
       
   const handleProductClick = (productId) => {
     console.log('Products - Product clicked:', productId);
@@ -262,6 +262,7 @@ const Products = () => {
                     originalId: product.id,
                     _id: product._id,
                     name: product.name,
+                    rating: product.rating,
                     hasId: !!product.id
                   });
 
@@ -272,7 +273,7 @@ const Products = () => {
                         id: product.id || product._id, // FALLBACK por si acaso
                         name: product.name,
                         price: `${product.price}€`,
-                        rating: product.rating || 3,
+                        rating: product.rating || 0, // Usar el rating real calculado, 0 si no hay
                         img: product.imgProduct,
                         isFavorite: product.isFavorite,
                         stock: product.stock,

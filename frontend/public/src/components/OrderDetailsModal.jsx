@@ -325,7 +325,7 @@ const OrderDetailsModal = ({ sale, isOpen, onClose }) => {
                     <div style={{ textAlign: 'right' }}>
                       <p style={{ 
                         fontWeight: '600', 
-                        color: '#22c55e',
+                        color: '#93A267',
                         margin: 0
                       }}>
                         ${item.subtotal?.toFixed(2) || '0.00'}
@@ -408,7 +408,7 @@ const OrderDetailsModal = ({ sale, isOpen, onClose }) => {
                 <span>Envío:</span>
                 <span>
                   {sale.total >= 70 ? (
-                    <span style={{ color: '#22c55e', fontWeight: '500' }}>GRATIS</span>
+                    <span style={{ color: '#93A267', fontWeight: '500' }}>GRATIS</span>
                   ) : (
                     '$4.00'
                   )}
@@ -425,7 +425,7 @@ const OrderDetailsModal = ({ sale, isOpen, onClose }) => {
                 color: '#111827'
               }}>
                 <span>Total:</span>
-                <span style={{ color: '#22c55e' }}>${sale.total.toFixed(2)}</span>
+                <span style={{ color: '#93A267' }}>${sale.total.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -442,7 +442,7 @@ const OrderDetailsModal = ({ sale, isOpen, onClose }) => {
           <button
             onClick={onClose}
             style={{
-              backgroundColor: '#22c55e',
+              backgroundColor: '#93A267',
               color: 'white',
               border: 'none',
               padding: '0.75rem 1.5rem',
@@ -453,10 +453,10 @@ const OrderDetailsModal = ({ sale, isOpen, onClose }) => {
               transition: 'all 0.2s'
             }}
             onMouseOver={(e) => {
-              e.target.style.backgroundColor = '#16a34a';
+              e.target.style.backgroundColor = '#7a8a5c';
             }}
             onMouseOut={(e) => {
-              e.target.style.backgroundColor = '#22c55e';
+              e.target.style.backgroundColor = '#93A267';
             }}
           >
             Cerrar

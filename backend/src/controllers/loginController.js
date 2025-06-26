@@ -36,7 +36,8 @@ loginController.login = async(req, res) => {
                 id: "admin",
                 email: config.ADMIN.emailAdmin,
                 userType: "admin",
-                name: "Administrador"
+                name: "Administrador",
+                isVerified: true // Admin siempre verificado
             }
         } else {
             //2. Empleados
@@ -59,7 +60,8 @@ loginController.login = async(req, res) => {
                     userType: "employee",
                     name: userFound.name || userFound.nombre || "Empleado",
                     lastname: userFound.lastname,
-                    phone: userFound.phone
+                    phone: userFound.phone,
+                    isVerified: true // Empleados siempre verificados
                 }
             } else {
                 //3. Cliente
@@ -73,6 +75,16 @@ loginController.login = async(req, res) => {
                             message: "Invalid credentials" 
                         });
                     }
+
+                    // 🚨 NUEVA VERIFICACIÓN: Comprobar si el cliente está verificado
+                    if (!userFound.isVerified) {
+                        return res.status(403).json({ 
+                            success: false, 
+                            message: "Debes verificar tu correo electrónico antes de iniciar sesión.",
+                            needsVerification: true,
+                            email: userFound.email
+                        });
+                    }
                     
                     userType = "customer"
                     userData = {
@@ -81,7 +93,8 @@ loginController.login = async(req, res) => {
                         userType: "customer",
                         name: userFound.name || userFound.nombre || "Cliente",
                         lastname: userFound.lastname,
-                        telephone: userFound.telephone
+                        telephone: userFound.telephone,
+                        isVerified: userFound.isVerified // ← IMPORTANTE: Incluir campo isVerified
                     }
                 }
             }
@@ -171,7 +184,8 @@ loginController.verify = async (req, res) => {
                 id: "admin",
                 email: config.ADMIN.emailAdmin,
                 userType: "admin",
-                name: "Administrador"
+                name: "Administrador",
+                isVerified: true // Admin siempre verificado
             };
         } else if (decoded.userType === "employee") {
             const employee = await employeesModel.findById(decoded.id);
@@ -187,7 +201,8 @@ loginController.verify = async (req, res) => {
                 userType: "employee",
                 name: employee.name || employee.nombre || "Empleado",
                 lastname: employee.lastname,
-                phone: employee.phone
+                phone: employee.phone,
+                isVerified: true // Empleados siempre verificados
             };
         } else if (decoded.userType === "customer") {
             const customer = await customersModel.findById(decoded.id);
@@ -197,13 +212,25 @@ loginController.verify = async (req, res) => {
                     message: "Customer not found" 
                 });
             }
+
+            // 🚨 VERIFICACIÓN ADICIONAL: Si el cliente no está verificado, invalidar sesión
+            if (!customer.isVerified) {
+                return res.status(403).json({ 
+                    success: false, 
+                    message: "Account not verified. Please verify your email.",
+                    needsVerification: true,
+                    email: customer.email
+                });
+            }
+
             userData = {
                 id: customer._id,
                 email: customer.email,
                 userType: "customer",
                 name: customer.name || customer.nombre || "Cliente",
                 lastname: customer.lastname,
-                telephone: customer.telephone
+                telephone: customer.telephone,
+                isVerified: customer.isVerified // ← IMPORTANTE: Incluir campo isVerified
             };
         } else {
             return res.status(401).json({ 
