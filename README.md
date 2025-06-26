@@ -229,3 +229,16 @@ Integrar métodos de pago adicionales (PayPal, criptomonedas).
 Expansión a nuevos mercados internacionales.
 
 Optimización de rendimiento y mejora continua de la UX/UI.
+
+
+
+## Capturas de pantalla para mejor comprensión
+![image](https://github.com/user-attachments/assets/fd1b7dcf-8954-459a-b9ea-0ce303591d87)
+
+![image](https://github.com/user-attachments/assets/8d9608a9-79be-46e7-b33b-383bf5182cab)
+
+![image](https://github.com/user-attachments/assets/983642f5-ba8e-472a-8ee8-6bfa05d7d693)
+
+
+
+
