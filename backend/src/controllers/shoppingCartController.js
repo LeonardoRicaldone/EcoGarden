@@ -1,22 +1,6 @@
 const shoppingCartController = {};
 import shoppingCartModel from "../models/ShoppingCart.js"
-
-// SELECT - Obtener todos los carritos
-shoppingCartController.getShoppingCart = async (req, res) => {
-    try {
-        const shoppingCart = await shoppingCartModel.find()
-            .populate('idClient')
-            .populate('products.idProduct');
-        res.json(shoppingCart);
-    } catch (error) {
-        console.error("Error al obtener carritos:", error);
-        res.status(500).json({ 
-            success: false, 
-            message: "Error al obtener carritos", 
-            error: error.message 
-        });
-    }
-}
+import mongoose from "mongoose"; // AGREGADO: para convertir ObjectId
 
 // SELECT por cliente - Obtener carrito PENDIENTE de un cliente específico
 shoppingCartController.getCartByClient = async (req, res) => {
@@ -31,9 +15,20 @@ shoppingCartController.getCartByClient = async (req, res) => {
             });
         }
 
+        // CORREGIDO: Convertir string a ObjectId
+        let objectIdClient;
+        try {
+            objectIdClient = new mongoose.Types.ObjectId(clientId);
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: "ID del cliente inválido"
+            });
+        }
+
         // IMPORTANTE: Solo buscar carritos con status "Pending"
         const cart = await shoppingCartModel.findOne({ 
-            idClient: clientId, 
+            idClient: objectIdClient, // USAR ObjectId convertido
             status: "Pending" 
         })
         .populate('idClient')
@@ -73,6 +68,17 @@ shoppingCartController.createShoppingCart = async (req, res) => {
             });
         }
 
+        // CORREGIDO: Convertir string a ObjectId
+        let objectIdClient;
+        try {
+            objectIdClient = new mongoose.Types.ObjectId(idClient);
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: "ID del cliente inválido"
+            });
+        }
+
         if (!products || !Array.isArray(products) || products.length === 0) {
             return res.status(400).json({
                 success: false,
@@ -92,7 +98,7 @@ shoppingCartController.createShoppingCart = async (req, res) => {
 
         // CRÍTICO: Verificar si ya existe un carrito pendiente para este cliente
         const existingCart = await shoppingCartModel.findOne({ 
-            idClient, 
+            idClient: objectIdClient, // USAR ObjectId convertido
             status: "Pending" 
         });
 
@@ -125,7 +131,7 @@ shoppingCartController.createShoppingCart = async (req, res) => {
 
         // Solo crear si no existe un carrito pendiente
         const newShoppingCart = new shoppingCartModel({
-            idClient, 
+            idClient: objectIdClient, // USAR ObjectId convertido
             products, 
             total: total || 0, 
             status: status || "Pending"
@@ -150,6 +156,23 @@ shoppingCartController.createShoppingCart = async (req, res) => {
         res.status(500).json({ 
             success: false,
             message: "Error al crear carrito", 
+            error: error.message 
+        });
+    }
+}
+
+// SELECT - Obtener todos los carritos
+shoppingCartController.getShoppingCart = async (req, res) => {
+    try {
+        const shoppingCart = await shoppingCartModel.find()
+            .populate('idClient')
+            .populate('products.idProduct');
+        res.json(shoppingCart);
+    } catch (error) {
+        console.error("Error al obtener carritos:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Error al obtener carritos", 
             error: error.message 
         });
     }
@@ -227,9 +250,16 @@ shoppingCartController.updateShoppingCart = async (req, res) => {
             updateData.total = total;
         }
 
-        // Si se proporciona idClient, incluirlo
+        // Si se proporciona idClient, incluirlo (convertir a ObjectId)
         if (idClient) {
-            updateData.idClient = idClient;
+            try {
+                updateData.idClient = new mongoose.Types.ObjectId(idClient);
+            } catch (error) {
+                return res.status(400).json({
+                    success: false,
+                    message: "ID del cliente inválido"
+                });
+            }
         }
 
         console.log('Update data:', updateData);
@@ -450,8 +480,19 @@ shoppingCartController.getCartHistoryByClient = async (req, res) => {
             });
         }
 
+        // CORREGIDO: Convertir string a ObjectId
+        let objectIdClient;
+        try {
+            objectIdClient = new mongoose.Types.ObjectId(clientId);
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: "ID del cliente inválido"
+            });
+        }
+
         const cartHistory = await shoppingCartModel.find({ 
-            idClient: clientId, 
+            idClient: objectIdClient, // USAR ObjectId convertido
             status: "Paid" 
         })
         .populate('idClient')

@@ -1,38 +1,23 @@
-/*
-    Campos:
-    idShoppingCart,
-    name,
-    lastname,
-    phone,
-    department,
-    city,
-    zipCode,
-    address,
-    creditCard,
-    total,
-    status
-*/
-
 import { Schema, model } from "mongoose";
 
 const salesSchema = new Schema(
     {
         idShoppingCart: {
             type: Schema.Types.ObjectId,
-            ref: "Products",
-            require: true
+            ref: "ShoppingCart", 
+            required: true 
         },
         name: {
             type: String,
-            require: true
+            required: true
         },
         lastname: {
-            type: String
-
+            type: String,
+            required: true 
         },
         phone: {
-            type: Number,
-            require: true
+            type: String, 
+            required: true 
         },
         department: {
             type: String,
@@ -43,24 +28,26 @@ const salesSchema = new Schema(
             required: true
         },
         zipCode: {
-            type: Number,
+            type: String, 
             required: true
-
         },
         address: {
             type: String,
             required: true
         },
         creditCard: {
-            type: Number,
+            type: String, 
             required: true
         },
-        total:{
+        total: {
             type: Number,
-            required: true
+            required: true,
+            min: 0 
         },
         status: {
             type: String,
+            enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"], 
+            default: "Pending",
             required: true
         }
     },

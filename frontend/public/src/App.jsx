@@ -15,6 +15,7 @@ import TermsConditions from './screens/TermsConditions';
 import Nav from './components/Nav/Nav';
 import Layout from './components/Layaout';
 import Product from './screens/Product';
+import Checkout from './screens/CheckOut';
 
 function App() {
   return (
@@ -26,16 +27,51 @@ function App() {
             
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/Product" element={<Product />} />
+              
+              <Route path="/Products" element={<Products />} />
+              <Route path="/product/:id" element={<Product />} />
+              
               <Route path="/About" element={<About />} />
-              <Route path='/Contact' element={<Contact />} />
-              <Route path='/Register' element={<Register />} />
-              <Route path='/Login' element={<Login />} />
-              <Route path='/Favorites' element={<Favorites />} />
-              <Route path='/Products' element={<Products />} />
-              <Route path='/Profile' element={<Profile />} />
-              <Route path='/ShoppingCart' element={<ShoppingCart />} />
-              <Route path='/TermsConditions' element={<TermsConditions />} />
+              <Route path="/Contact" element={<Contact />} />
+              <Route path="/Register" element={<Register />} />
+              <Route path="/Login" element={<Login />} />
+              <Route path="/Favorites" element={<Favorites />} />
+              <Route path="/Profile" element={<Profile />} />
+              <Route path="/ShoppingCart" element={<ShoppingCart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/TermsConditions" element={<TermsConditions />} />
+              
+              <Route path="*" element={
+                <div style={{ 
+                  textAlign: 'center', 
+                  padding: '50px',
+                  minHeight: '400px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}>
+                  <h2 style={{ fontSize: '2rem', color: '#374151', marginBottom: '1rem' }}>
+                    404 - Página no encontrada
+                  </h2>
+                  <p style={{ color: '#6b7280', marginBottom: '2rem' }}>
+                    La página que buscas no existe o ha sido movida.
+                  </p>
+                  <a 
+                    href="/" 
+                    style={{
+                      backgroundColor: '#93A267',
+                      color: 'white',
+                      padding: '12px 24px',
+                      borderRadius: '8px',
+                      textDecoration: 'none',
+                      fontWeight: '500'
+                    }}
+                  >
+                    Volver al inicio
+                  </a>
+                </div>
+              } />
             </Routes>
           </Layout>
           <Footer/>

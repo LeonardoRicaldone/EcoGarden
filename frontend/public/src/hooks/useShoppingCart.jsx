@@ -12,6 +12,11 @@ const useShoppingCart = (clientId) => {
 
     console.log('useShoppingCart initialized with clientId:', clientId);
 
+    // Función para validar ObjectId
+    const isValidObjectId = (id) => {
+        return /^[0-9a-fA-F]{24}$/.test(id);
+    };
+
     // Función para obtener el carrito del cliente
     const fetchCart = useCallback(async () => {
         // Si no hay cliente autenticado, no hacer nada
@@ -19,6 +24,14 @@ const useShoppingCart = (clientId) => {
             console.log('No clientId provided, clearing cart');
             setCartItems([]);
             setCartId(null);
+            setLoading(false);
+            return;
+        }
+
+        // AGREGADO: Validar que clientId sea un ObjectId válido
+        if (!isValidObjectId(clientId)) {
+            console.error('Invalid clientId format:', clientId);
+            setError("ID de cliente inválido");
             setLoading(false);
             return;
         }
@@ -38,6 +51,15 @@ const useShoppingCart = (clientId) => {
                     setError(null);
                     return;
                 }
+                
+                // MEJORADO: Manejar errores específicos
+                if (response.status === 400) {
+                    const errorData = await response.json();
+                    console.error('Client ID error:', errorData.message);
+                    setError("ID de cliente inválido");
+                    return;
+                }
+                
                 throw new Error(`Error ${response.status}: ${response.statusText}`);
             }
 
@@ -128,6 +150,12 @@ const useShoppingCart = (clientId) => {
                 },
                 icon: '🛒'
             });
+            return false;
+        }
+
+        // AGREGADO: Validar que clientId sea un ObjectId válido
+        if (!isValidObjectId(clientId)) {
+            toast.error("Error: ID de cliente inválido");
             return false;
         }
 
@@ -267,11 +295,17 @@ const useShoppingCart = (clientId) => {
     const syncCartWithServerItems = async (items) => {
         if (!clientId) return;
 
+        // AGREGADO: Validar que clientId sea un ObjectId válido antes de sincronizar
+        if (!isValidObjectId(clientId)) {
+            console.error('Cannot sync cart: Invalid clientId format:', clientId);
+            return;
+        }
+
         try {
             console.log('Syncing cart with server using specific items...');
             
             const cartData = {
-                idClient: clientId,
+                idClient: clientId, // El backend ahora maneja la conversión a ObjectId
                 products: items.map(item => ({
                     idProduct: item.id,
                     quantity: item.quantity,
@@ -280,6 +314,8 @@ const useShoppingCart = (clientId) => {
                 total: items.reduce((total, item) => total + item.subtotal, 0),
                 status: "Pending"
             };
+
+            console.log('Cart data to sync:', cartData);
 
             let response;
             if (cartId && items.length > 0) {
@@ -320,11 +356,30 @@ const useShoppingCart = (clientId) => {
 
             if (response && response.ok) {
                 console.log('Cart synced successfully with server');
+                // AGREGADO: Limpiar cualquier error anterior después de sincronización exitosa
+                setError(null);
             } else if (response) {
                 console.error('Error syncing cart:', response.status, response.statusText);
+                
+                // MEJORADO: Manejar errores específicos de sincronización
+                if (response.status === 400) {
+                    const errorData = await response.json();
+                    console.error('Sync error details:', errorData);
+                    
+                    if (errorData.message && errorData.message.includes('ObjectId')) {
+                        setError("Error de sincronización: ID inválido");
+                        toast.error("Error al sincronizar carrito");
+                    }
+                }
             }
         } catch (error) {
             console.error('Error syncing cart with server:', error);
+            
+            // MEJORADO: Manejar errores de conexión
+            if (error.message.includes('fetch')) {
+                setError("Error de conexión al servidor");
+                toast.error("Error de conexión. Verifica tu internet.");
+            }
         }
     };
 
@@ -355,11 +410,12 @@ const useShoppingCart = (clientId) => {
                 toast.success("Compra procesada exitosamente");
                 return true;
             } else {
-                throw new Error('Error al procesar la compra');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al procesar la compra');
             }
         } catch (error) {
             console.error('Error processing checkout:', error);
-            toast.error("Error al procesar la compra");
+            toast.error("Error al procesar la compra: " + error.message);
             return false;
         }
     };
@@ -409,7 +465,7 @@ const useShoppingCart = (clientId) => {
         removeFromCart,
         updateQuantity,
         clearCart,
-        processCheckout, // Nueva función para el checkout
+        processCheckout,
         
         // Utilidades
         getSubtotal,
