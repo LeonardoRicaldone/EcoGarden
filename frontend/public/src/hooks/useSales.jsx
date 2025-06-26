@@ -265,6 +265,138 @@ const useSales = () => {
         }
     }, []);
 
+    // NUEVA: Función para validar datos del checkout
+    const validateCheckoutData = useCallback((formData, totalAmount) => {
+        const errors = {};
+
+        // Validar campos requeridos
+        if (!formData.name?.trim()) {
+            errors.name = 'El nombre es requerido';
+        }
+
+        if (!formData.lastname?.trim()) {
+            errors.lastname = 'El apellido es requerido';
+        }
+
+        if (!formData.phone?.trim()) {
+            errors.phone = 'El teléfono es requerido';
+        } else if (!/^\+?[\d\s\-\(\)]{8,}$/.test(formData.phone)) {
+            errors.phone = 'Formato de teléfono inválido';
+        }
+
+        if (!formData.department) {
+            errors.department = 'El departamento es requerido';
+        }
+
+        if (!formData.city?.trim()) {
+            errors.city = 'La ciudad es requerida';
+        }
+
+        if (!formData.zipCode?.trim()) {
+            errors.zipCode = 'El código postal es requerido';
+        }
+
+        if (!formData.address?.trim()) {
+            errors.address = 'La dirección es requerida';
+        }
+
+        if (!formData.creditCard?.trim()) {
+            errors.creditCard = 'El número de tarjeta es requerido';
+        } else if (formData.creditCard.replace(/\s/g, '').length < 16) {
+            errors.creditCard = 'Número de tarjeta inválido';
+        }
+
+        if (!formData.expiryDate?.trim()) {
+            errors.expiryDate = 'La fecha de expiración es requerida';
+        } else if (!/^\d{2}\/\d{2}$/.test(formData.expiryDate)) {
+            errors.expiryDate = 'Formato de fecha inválido (MM/AA)';
+        }
+
+        if (!formData.cvv?.trim()) {
+            errors.cvv = 'El CVV es requerido';
+        } else if (!/^\d{3,4}$/.test(formData.cvv)) {
+            errors.cvv = 'CVV inválido (3-4 dígitos)';
+        }
+
+        if (!formData.cardName?.trim()) {
+            errors.cardName = 'El nombre en la tarjeta es requerido';
+        }
+
+        if (!totalAmount || totalAmount <= 0) {
+            errors.total = 'El total debe ser mayor a 0';
+        }
+
+        return {
+            isValid: Object.keys(errors).length === 0,
+            errors
+        };
+    }, []);
+
+    // NUEVA: Función para procesar checkout completo
+    const processCompleteCheckout = useCallback(async (formData, cartId, processCheckoutFn) => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            console.log('Processing complete checkout...');
+            console.log('FormData:', formData);
+            console.log('CartId:', cartId);
+
+            // 1. Primero crear la venta
+            const saleData = {
+                idShoppingCart: cartId,
+                name: formData.name,
+                lastname: formData.lastname,
+                phone: formData.phone,
+                department: formData.department,
+                city: formData.city,
+                zipCode: formData.zipCode,
+                address: formData.address,
+                creditCard: formData.creditCard,
+                total: formData.total,
+                status: 'Pending'
+            };
+
+            console.log('Creating sale with data:', saleData);
+            const saleResult = await createSale(saleData);
+
+            if (!saleResult.success) {
+                throw new Error(saleResult.error || 'Error al crear la venta');
+            }
+
+            console.log('Sale created successfully:', saleResult.saleId);
+
+            // 2. Procesar el checkout del carrito
+            console.log('Processing cart checkout...');
+            const checkoutResult = await processCheckoutFn();
+
+            if (!checkoutResult) {
+                console.error('Cart checkout failed');
+                // Si falla el checkout del carrito, deberíamos considerar cancelar la venta
+                throw new Error('Error al procesar el carrito');
+            }
+
+            console.log('Complete checkout successful');
+
+            return {
+                success: true,
+                saleId: saleResult.saleId,
+                sale: saleResult.sale
+            };
+
+        } catch (error) {
+            console.error('Error in complete checkout:', error);
+            setError(error.message);
+            
+            return {
+                success: false,
+                error: error.message
+            };
+        } finally {
+            setLoading(false);
+        }
+    }, [createSale]);
+
     return {
         // Estado
         loading,
@@ -276,6 +408,10 @@ const useSales = () => {
         getSales,
         getSaleById,
         updateSaleStatus,
+
+        // Nuevas funciones para checkout
+        validateCheckoutData,
+        processCompleteCheckout,
 
         // Limpiar estado
         clearError: () => setError(null)
