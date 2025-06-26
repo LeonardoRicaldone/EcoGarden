@@ -2,7 +2,7 @@ import React from "react";
 import "./AddProduct.css";
 import HeaderProducts from '../components/HeaderProducts';
 import useDataProducts from '../components/Products/hooks/useDataProducts';
-import { useCustomAlert } from '../components/CustomAlert'; // Importar el hook
+import Swal from 'sweetalert2'; // Importar SweetAlert2
 
 const AddProduct = () => {
   const {
@@ -16,26 +16,40 @@ const AddProduct = () => {
     resetForm
   } = useDataProducts();
 
-  // Usar el hook de alertas personalizadas
-  const { showSuccess, showError,  AlertComponent } = useCustomAlert();
-
   // Manejar envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Mostrar loading mientras se procesa
+    Swal.fire({
+      title: 'Registrando producto...',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+    
     const result = await createProduct(formData, selectedImage);
     
     if (result.success) {
-      showSuccess(
-        '🎉 ¡Producto Registrado!',
-        `El producto "${formData.name}" se ha agregado exitosamente al inventario.`
-      );
+      Swal.fire({
+        icon: 'success',
+        title: '🎉 ¡Producto Registrado!',
+        text: `El producto "${formData.name}" se ha agregado exitosamente al inventario.`,
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#28a745',
+        timer: 3000,
+        timerProgressBar: true
+      });
       resetForm(); // Limpiar formulario después del éxito
     } else {
-      showError(
-        '❌ Error al Registrar',
-        result.message || 'No se pudo registrar el producto. Por favor, intenta nuevamente.'
-      );
+      Swal.fire({
+        icon: 'error',
+        title: '❌ Error al Registrar',
+        text: result.message || 'No se pudo registrar el producto. Por favor, intenta nuevamente.',
+        confirmButtonText: 'Intentar de nuevo',
+        confirmButtonColor: '#dc3545'
+      });
     }
   };
 
@@ -145,9 +159,6 @@ const AddProduct = () => {
           </div>
         </form>
       </div>
-
-      {/* Componente de alerta personalizada */}
-      <AlertComponent />
     </div>
   );
 };

@@ -5,7 +5,7 @@ import "./Inventary.css";
 import HeaderProducts from '../components/HeaderProducts';
 import Searcher from '../components/Searcher';
 import useDataProducts from '../components/Products/hooks/useDataProducts';
-import { useCustomAlert } from '../components/CustomAlert'; // Importar el hook
+import Swal from 'sweetalert2'; // Importar SweetAlert2
 
 const Inventary = () => {
   const {
@@ -24,54 +24,91 @@ const Inventary = () => {
     resetForm
   } = useDataProducts();
 
-  // Usar el hook de alertas personalizadas
-  const { showSuccess, showError, showConfirm, AlertComponent } = useCustomAlert();
-
   // Manejar actualización del producto
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!editingProduct) return;
 
+    // Mostrar loading mientras se actualiza
+    Swal.fire({
+      title: 'Actualizando producto...',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
     const result = await updateProduct(editingProduct._id, formData, selectedImage);
     
     if (result.success) {
-      showSuccess(
-        '✨ ¡Producto Actualizado!',
-        `Los cambios en "${formData.name}" se han guardado correctamente.`
-      );
+      Swal.fire({
+        icon: 'success',
+        title: '✨ ¡Producto Actualizado!',
+        text: `Los cambios en "${formData.name}" se han guardado correctamente.`,
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#28a745',
+        timer: 3000,
+        timerProgressBar: true
+      });
       resetForm(); // Cerrar modal después del éxito
     } else {
-      showError(
-        '❌ Error al Actualizar',
-        result.message || 'No se pudieron guardar los cambios. Por favor, intenta nuevamente.'
-      );
+      Swal.fire({
+        icon: 'error',
+        title: '❌ Error al Actualizar',
+        text: result.message || 'No se pudieron guardar los cambios. Por favor, intenta nuevamente.',
+        confirmButtonText: 'Intentar de nuevo',
+        confirmButtonColor: '#dc3545'
+      });
     }
   };
 
-  // Manejar eliminación del producto con alerta de confirmación personalizada
+  // Manejar eliminación del producto con alerta de confirmación
   const handleDelete = async (product) => {
-    // Mostrar alerta de confirmación personalizada
-    const confirmed = await showConfirm({
+    // Mostrar alerta de confirmación
+    const result = await Swal.fire({
+      icon: 'warning',
       title: '🚨 ¿Eliminar Producto?',
-      message: `¿Estás seguro de que deseas eliminar "${product.name}"?\n\nEsta acción no se puede deshacer y se perderá toda la información del producto.`,
-      confirmText: 'Sí, Eliminar',
-      cancelText: 'Cancelar'
+      html: `¿Estás seguro de que deseas eliminar <strong>"${product.name}"</strong>?<br><br>Esta acción no se puede deshacer y se perderá toda la información del producto.`,
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      reverseButtons: true,
+      focusCancel: true
     });
     
-    if (confirmed) {
-      const result = await deleteProduct(product._id);
+    if (result.isConfirmed) {
+      // Mostrar loading mientras se elimina
+      Swal.fire({
+        title: 'Eliminando producto...',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      const deleteResult = await deleteProduct(product._id);
       
-      if (result.success) {
-        showSuccess(
-          '🗑️ Producto Eliminado',
-          `"${product.name}" ha sido eliminado del inventario exitosamente.`
-        );
+      if (deleteResult.success) {
+        Swal.fire({
+          icon: 'success',
+          title: '🗑️ Producto Eliminado',
+          text: `"${product.name}" ha sido eliminado del inventario exitosamente.`,
+          confirmButtonText: 'Entendido',
+          confirmButtonColor: '#28a745',
+          timer: 3000,
+          timerProgressBar: true
+        });
       } else {
-        showError(
-          '❌ Error al Eliminar',
-          result.message || 'No se pudo eliminar el producto. Por favor, intenta nuevamente.'
-        );
+        Swal.fire({
+          icon: 'error',
+          title: '❌ Error al Eliminar',
+          text: deleteResult.message || 'No se pudo eliminar el producto. Por favor, intenta nuevamente.',
+          confirmButtonText: 'Intentar de nuevo',
+          confirmButtonColor: '#dc3545'
+        });
       }
     }
   };
@@ -225,9 +262,6 @@ const Inventary = () => {
           </div>
         </div>
       </div>
-
-      {/* Componente de alerta personalizada */}
-      <AlertComponent />
     </>
   );
 };
