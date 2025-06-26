@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { FaHeart, FaArrowLeft, FaShoppingCart, FaStar, FaRegStar, FaRegHeart, FaUser } from 'react-icons/fa';
+import { FaHeart, FaArrowLeft, FaShoppingCart, FaStar, FaRegStar, FaRegHeart, FaUser, FaTrash } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import './Product.css';
 import { useAuth } from '../context/AuthContext';
 import useShoppingCart from '../hooks/useShoppingCart';
 import useFavorites from '../hooks/useFavorites';
+import useProductRatings from '../hooks/useProductsRatings';
 
 const Product = () => {
   const { id } = useParams();
@@ -13,36 +14,37 @@ const Product = () => {
   
   // Estados del componente
   const [product, setProduct] = useState(null);
-  const [ratings, setRatings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadingRatings, setLoadingRatings] = useState(false);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  
-  // Estados para nuevo comentario
-  const [newComment, setNewComment] = useState('');
-  const [newScore, setNewScore] = useState(0);
-  const [submittingComment, setSubmittingComment] = useState(false);
+
+  // Hook de ratings
+  const {
+    ratings,
+    loading: loadingRatings,
+    submitting: submittingComment,
+    newComment,
+    newScore,
+    setNewComment,
+    setNewScore,
+    submitRating,
+    deleteRating,
+    averageRating,
+    totalRatings,
+    userRatings,
+    isAuthenticated,
+    clientId
+  } = useProductRatings(id);
 
   // Hooks de autenticación y funcionalidades
   const { auth, user } = useAuth();
-  const { isAuthenticated } = auth;
-  const clientId = user?.id || null;
-
+  
   // Hooks para carrito y favoritos
   const { addToCart, isInCart, getProductQuantity } = useShoppingCart(isAuthenticated ? clientId : null);
   const { toggleFavorite, isFavorite } = useFavorites(isAuthenticated ? clientId : null);
 
   // URLs de tu API
   const PRODUCTS_API = "http://localhost:4000/api/products";
-  const RATINGS_API = "http://localhost:4000/api/ratings";
-
-  // Función para calcular el rating promedio
-  const calculateAverageRating = (ratingsArray) => {
-    if (!ratingsArray || ratingsArray.length === 0) return 0;
-    const sum = ratingsArray.reduce((acc, rating) => acc + rating.score, 0);
-    return (sum / ratingsArray.length).toFixed(1);
-  };
 
   // Función para obtener token de autenticación
   const getAuthToken = () => {
@@ -56,48 +58,6 @@ const Product = () => {
       "Content-Type": "application/json",
       ...(token && { "Authorization": `Bearer ${token}` })
     };
-  };
-
-  // Cargar ratings del producto
-  const fetchRatings = async (productId) => {
-    try {
-      setLoadingRatings(true);
-      console.log('Fetching ratings for product ID:', productId);
-      
-      const response = await fetch(`${RATINGS_API}?productId=${productId}`);
-      
-      if (response.ok) {
-        const allRatings = await response.json();
-        console.log('All ratings received:', allRatings);
-        
-        // Filtrar ratings solo para este producto (doble verificación)
-        const productRatings = allRatings.filter(rating => {
-          const ratingProductId = rating.idProduct?._id || rating.idProduct;
-          const matches = ratingProductId === productId;
-          
-          if (!matches && ratingProductId) {
-            console.log('Rating filtered out - Product ID mismatch:', {
-              ratingProductId,
-              expectedProductId: productId,
-              rating
-            });
-          }
-          
-          return matches;
-        });
-        
-        console.log(`Filtered to ${productRatings.length} ratings for this product`);
-        setRatings(productRatings);
-      } else {
-        console.error('Error fetching ratings:', response.status);
-        setRatings([]);
-      }
-    } catch (error) {
-      console.error('Error fetching ratings:', error);
-      setRatings([]);
-    } finally {
-      setLoadingRatings(false);
-    }
   };
 
   // Cargar datos del producto
@@ -127,9 +87,6 @@ const Product = () => {
 
         setProduct(productData);
 
-        // Cargar ratings del producto
-        await fetchRatings(id);
-
       } catch (error) {
         console.error('Error fetching product:', error);
         setError(error.message);
@@ -147,63 +104,7 @@ const Product = () => {
   // Función para enviar nuevo comentario
   const handleSubmitComment = async (e) => {
     e.preventDefault();
-    
-    if (!isAuthenticated) {
-      toast.error("Debes iniciar sesión para calificar productos");
-      return;
-    }
-
-    if (newScore === 0) {
-      toast.error("Por favor selecciona una calificación");
-      return;
-    }
-
-    if (newScore < 1 || newScore > 5) {
-      toast.error("La calificación debe estar entre 1 y 5");
-      return;
-    }
-
-    if (!newComment.trim()) {
-      toast.error("Por favor escribe un comentario");
-      return;
-    }
-
-    try {
-      setSubmittingComment(true);
-
-      console.log('Submitting comment with data:', {
-        comment: newComment.trim(),
-        score: newScore,
-        idProduct: id,
-        idClient: clientId
-      });
-
-      const response = await fetch(RATINGS_API, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          comment: newComment.trim(),
-          score: newScore,
-          idProduct: id,
-          idClient: clientId
-        })
-      });
-
-      if (response.ok) {
-        toast.success("Comentario agregado exitosamente");
-        setNewComment('');
-        setNewScore(0);
-        // Recargar ratings
-        await fetchRatings(id);
-      } else {
-        throw new Error('Error al enviar comentario');
-      }
-    } catch (error) {
-      console.error('Error submitting comment:', error);
-      toast.error("Error al enviar comentario");
-    } finally {
-      setSubmittingComment(false);
-    }
+    await submitRating();
   };
 
   // Funciones para manejar cantidad
@@ -320,8 +221,22 @@ const Product = () => {
     return date.toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
+  };
+
+  // Función para verificar si un rating pertenece al usuario actual
+  const isUserRating = (rating) => {
+    return rating.idClient?._id === clientId || rating.idClient === clientId;
+  };
+
+  // Función para eliminar rating
+  const handleDeleteRating = async (ratingId) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
+      await deleteRating(ratingId);
+    }
   };
 
   // Estados de carga y error
@@ -371,10 +286,6 @@ const Product = () => {
       </div>
     );
   }
-
-  // Calcular rating promedio
-  const averageRating = calculateAverageRating(ratings);
-  const totalRatings = ratings.length;
 
   // Preparar imagen del producto
   const productImage = product.imgProduct;
@@ -602,6 +513,37 @@ const Product = () => {
                   {submittingComment ? 'Enviando...' : 'Publicar Reseña'}
                 </button>
               </form>
+
+              {/* Mostrar comentarios del usuario actual si tiene */}
+              {userRatings.length > 0 && (
+                <div className="product-detail-user-comments">
+                  <h4 className="product-detail-user-comments-title">
+                    Tus comentarios ({userRatings.length})
+                  </h4>
+                  <div className="product-detail-user-comments-list">
+                    {userRatings.map((rating) => (
+                      <div key={rating._id} className="product-detail-user-comment-item">
+                        <div className="product-detail-user-comment-header">
+                          {renderStars(rating.score)}
+                          <span className="product-detail-user-comment-date">
+                            {formatDate(rating.createdAt)}
+                          </span>
+                          <button
+                            onClick={() => handleDeleteRating(rating._id)}
+                            className="product-detail-delete-btn"
+                            title="Eliminar comentario"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                        <p className="product-detail-user-comment-text">
+                          {rating.comment}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="product-detail-login-prompt">
@@ -620,6 +562,9 @@ const Product = () => {
             </div>
           ) : ratings.length > 0 ? (
             <div className="product-detail-reviews-list">
+              <h3 className="product-detail-all-comments-title">
+                Todos los comentarios
+              </h3>
               {ratings.map((rating) => (
                 <div key={rating._id} className="product-detail-review-item">
                   <div className="product-detail-review-header">
@@ -630,6 +575,9 @@ const Product = () => {
                       <div className="product-detail-user-details">
                         <h4 className="product-detail-user-name">
                           {rating.idClient?.name || 'Usuario'}
+                          {isUserRating(rating) && (
+                            <span className="product-detail-user-badge">(Tú)</span>
+                          )}
                         </h4>
                         <div className="product-detail-user-rating-date">
                           {renderStars(rating.score)}
@@ -639,6 +587,17 @@ const Product = () => {
                         </div>
                       </div>
                     </div>
+                    
+                    {/* Botón eliminar solo para comentarios del usuario */}
+                    {isUserRating(rating) && (
+                      <button
+                        onClick={() => handleDeleteRating(rating._id)}
+                        className="product-detail-delete-btn"
+                        title="Eliminar comentario"
+                      >
+                        <FaTrash />
+                      </button>
+                    )}
                   </div>
                   
                   <p className="product-detail-review-comment">
