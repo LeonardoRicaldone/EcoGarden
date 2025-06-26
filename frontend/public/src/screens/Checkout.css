@@ -1,0 +1,365 @@
+:root {
+    /* Colores de texto */
+    --title-color: #485935;
+    --product-title-color: #93A267;
+    --price-color: #485935;
+    --text-color: #485935;
+    
+    /* Colores de iconos */
+    --icon-color: #93A267;
+    --delete-icon-color: #6b7280;
+    --feature-icon-color: #93A267;
+    
+    /* Colores de botones principales */
+    --primary-button-bg: #93A267;
+    --primary-button-text: #ffffff;
+    --primary-button-hover: #7da267;
+    
+    /* Colores de botones de contorno */
+    --outline-button-border: #485935;
+    --outline-button-text: #485935;
+    --outline-button-hover: #eef7ee;
+    
+    /* Colores de input focus */
+    --input-focus-ring: #93A267;
+    --input-focus-border: #93A267;
+    
+    /* Color de fondo de la sección de características */
+    --features-section-bg: #eef7ee;
+    
+    /* Colores para mensajes de éxito */
+    --success-color: #93A267;
+    --success-bg: #eef7ee;
+    --success-border: #93A267;
+}
+
+.checkout-container {
+    background-color: #f9fafb;
+    min-height: 100vh;
+}
+
+/* Colores de texto */
+.title-color {
+    color: var(--title-color);
+}
+
+.product-title-color {
+    color: var(--product-title-color);
+}
+
+.price-color {
+    color: var(--price-color);
+}
+
+.text-color {
+    color: var(--text-color);
+}
+
+/* Colores de iconos */
+.icon-color {
+    color: var(--icon-color);
+}
+
+.feature-icon-color {
+    color: var(--feature-icon-color);
+}
+
+/* Botones principales */
+.primary-button {
+    background-color: var(--primary-button-bg);
+    color: var(--primary-button-text);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.primary-button:hover:not(:disabled) {
+    background-color: var(--primary-button-hover);
+}
+
+.primary-button:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Botón de volver */
+.back-button {
+    color: var(--primary-button-bg);
+    transition: color 0.2s ease;
+}
+
+.back-button:hover {
+    color: var(--primary-button-hover);
+}
+
+/* Estilos para inputs y formularios */
+.form-input {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 0 2px rgba(147, 162, 103, 0.2);
+}
+
+.form-input.error {
+    border-color: #ef4444;
+}
+
+.form-select {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 0 2px rgba(147, 162, 103, 0.2);
+}
+
+.form-select.error {
+    border-color: #ef4444;
+}
+
+.form-textarea {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    resize: vertical;
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 0 2px rgba(147, 162, 103, 0.2);
+}
+
+.form-textarea.error {
+    border-color: #ef4444;
+}
+
+/* Estilos para labels */
+.form-label {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+/* Estilos para mensajes de error */
+.error-message {
+    color: #ef4444;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+/* Estilos para secciones del formulario */
+.form-section {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+}
+
+.section-title {
+    color: var(--title-color);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.section-title .icon {
+    color: var(--icon-color);
+    margin-right: 0.5rem;
+}
+
+/* Resumen del pedido */
+.order-summary {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    position: sticky;
+    top: 2rem;
+}
+
+.order-summary-title {
+    color: var(--title-color);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.product-image {
+    width: 3rem;
+    height: 3rem;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.product-info {
+    flex: 1;
+}
+
+.product-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.product-quantity {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.product-price {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--price-color);
+}
+
+/* Totales */
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.125rem;
+    font-weight: bold;
+    color: var(--price-color);
+}
+
+.free-shipping {
+    color: var(--success-color);
+    font-weight: 500;
+}
+
+/* Mensaje de envío gratis */
+.shipping-message {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background-color: var(--success-bg);
+    border: 1px solid var(--success-border);
+    border-radius: 6px;
+    font-size: 0.875rem;
+}
+
+.shipping-message-text {
+    color: var(--success-color);
+}
+
+/* Loading states */
+.loading-spinner {
+    display: inline-block;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid transparent;
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 0.5rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Sección de seguridad */
+.security-message {
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-align: center;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.security-icon {
+    margin-right: 0.25rem;
+}
+
+/* Debug info (remover en producción) */
+.debug-info {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background-color: #f3f4f6;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+.debug-info p {
+    margin: 0.125rem 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .form-section {
+        padding: 1rem;
+    }
+    
+    .order-summary {
+        position: static;
+        margin-top: 1.5rem;
+    }
+    
+    .product-item {
+        gap: 0.5rem;
+    }
+    
+    .product-image {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+}
+
+/* Estados de hover para elementos interactivos */
+.form-input:hover:not(:focus):not(.error) {
+    border-color: #9ca3af;
+}
+
+.form-select:hover:not(:focus):not(.error) {
+    border-color: #9ca3af;
+}
+
+.form-textarea:hover:not(:focus):not(.error) {
+    border-color: #9ca3af;
+}
+
+/* Estilos adicionales para mejorar la UX */
+.required-field::after {
+    content: " *";
+    color: #ef4444;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .form-row-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .form-row-full {
+        grid-column: 1 / -1;
+    }
+}

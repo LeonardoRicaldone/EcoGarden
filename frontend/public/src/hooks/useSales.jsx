@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-import { toast } from "react-hot-toast";
 
 const useSales = () => {
     const [loading, setLoading] = useState(false);
@@ -23,7 +22,7 @@ const useSales = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include' // Para incluir cookies si es necesario
+                credentials: 'include'
             });
             
             if (!response.ok) {
@@ -63,15 +62,7 @@ const useSales = () => {
         } catch (error) {
             console.error('Error fetching sales:', error);
             setError(error.message);
-            setSales([]); // Limpiar sales en caso de error
-            
-            // Solo mostrar toast si no es un error de CORS o conexión
-            if (!error.message.includes('CORS') && !error.message.includes('fetch')) {
-                toast.error(`Error al cargar ventas: ${error.message}`, {
-                    duration: 4000,
-                    position: 'top-center'
-                });
-            }
+            setSales([]);
             
             return {
                 success: false,
@@ -83,7 +74,7 @@ const useSales = () => {
         }
     }, []);
 
-    // Función para crear una nueva venta
+    // Función para crear una nueva venta - SIN TOAST
     const createSale = useCallback(async (saleData) => {
         try {
             setLoading(true);
@@ -129,19 +120,6 @@ const useSales = () => {
             const result = await response.json();
             console.log('Sale created successfully:', result);
 
-            toast.success('Venta creada exitosamente', {
-                duration: 3000,
-                position: 'top-center',
-                style: {
-                    background: '#93A267',
-                    color: 'white',
-                    fontSize: '16px',
-                    padding: '16px',
-                    borderRadius: '8px'
-                },
-                icon: '🎉'
-            });
-
             return {
                 success: true,
                 sale: result.sale || result,
@@ -152,18 +130,6 @@ const useSales = () => {
             console.error('Error creating sale:', error);
             setError(error.message);
             
-            toast.error(`Error al crear la venta: ${error.message}`, {
-                duration: 4000,
-                position: 'top-center',
-                style: {
-                    background: '#ef4444',
-                    color: 'white',
-                    fontSize: '14px',
-                    padding: '12px 16px',
-                    borderRadius: '8px'
-                }
-            });
-
             return {
                 success: false,
                 error: error.message
@@ -236,11 +202,6 @@ const useSales = () => {
             }
 
             const result = await response.json();
-            
-            toast.success(`Estado actualizado a: ${newStatus}`, {
-                duration: 3000,
-                position: 'bottom-center'
-            });
 
             return {
                 success: true,
@@ -250,11 +211,6 @@ const useSales = () => {
         } catch (error) {
             console.error('Error updating sale status:', error);
             setError(error.message);
-            
-            toast.error(`Error al actualizar: ${error.message}`, {
-                duration: 4000,
-                position: 'bottom-center'
-            });
 
             return {
                 success: false,
@@ -265,7 +221,7 @@ const useSales = () => {
         }
     }, []);
 
-    // NUEVA: Función para validar datos del checkout
+    // Función para validar datos del checkout
     const validateCheckoutData = useCallback((formData, totalAmount) => {
         const errors = {};
 
@@ -332,7 +288,7 @@ const useSales = () => {
         };
     }, []);
 
-    // NUEVA: Función para procesar checkout completo
+    // Función para procesar checkout completo - SIN TOAST DUPLICADOS
     const processCompleteCheckout = useCallback(async (formData, cartId, processCheckoutFn) => {
         try {
             setLoading(true);
@@ -372,7 +328,6 @@ const useSales = () => {
 
             if (!checkoutResult) {
                 console.error('Cart checkout failed');
-                // Si falla el checkout del carrito, deberíamos considerar cancelar la venta
                 throw new Error('Error al procesar el carrito');
             }
 

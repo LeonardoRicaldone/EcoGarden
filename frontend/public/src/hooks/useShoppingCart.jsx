@@ -80,10 +80,10 @@ const useShoppingCart = (clientId) => {
                                 return {
                                     id: item.idProduct._id.toString(),
                                     name: item.idProduct.name,
-                                    price: item.idProduct.price,
+                                    price: parseFloat(item.idProduct.price),
                                     img: item.idProduct.imgProduct,
-                                    quantity: item.quantity,
-                                    subtotal: item.subtotal,
+                                    quantity: parseInt(item.quantity),
+                                    subtotal: parseFloat(item.subtotal),
                                     stock: item.idProduct.stock
                                 };
                             } else {
@@ -94,10 +94,10 @@ const useShoppingCart = (clientId) => {
                                     return {
                                         id: productData._id.toString(),
                                         name: productData.name,
-                                        price: productData.price,
+                                        price: parseFloat(productData.price),
                                         img: productData.imgProduct,
-                                        quantity: item.quantity,
-                                        subtotal: item.subtotal,
+                                        quantity: parseInt(item.quantity),
+                                        subtotal: parseFloat(item.subtotal),
                                         stock: productData.stock
                                     };
                                 }
@@ -161,13 +161,17 @@ const useShoppingCart = (clientId) => {
                 return false;
             }
 
+            const productPrice = parseFloat(product.price);
+            const productQuantity = parseInt(quantity);
+            const calculatedSubtotal = parseFloat((productPrice * productQuantity).toFixed(2));
+
             const newItem = {
                 id: product._id.toString(),
                 name: product.name,
-                price: product.price,
+                price: productPrice,
                 img: product.imgProduct,
-                quantity: quantity,
-                subtotal: product.price * quantity,
+                quantity: productQuantity,
+                subtotal: calculatedSubtotal,
                 stock: product.stock
             };
 
@@ -180,7 +184,7 @@ const useShoppingCart = (clientId) => {
                     if (existingItemIndex >= 0) {
                         // Si el producto ya existe, actualizar cantidad
                         const existingItem = prevItems[existingItemIndex];
-                        const newQuantity = existingItem.quantity + quantity;
+                        const newQuantity = existingItem.quantity + productQuantity;
                         
                         if (newQuantity > product.stock) {
                             toast.error(`Solo hay ${product.stock} unidades disponibles`);
@@ -189,12 +193,14 @@ const useShoppingCart = (clientId) => {
                             return prevItems;
                         }
 
+                        const newSubtotal = parseFloat((newQuantity * existingItem.price).toFixed(2));
+
                         updatedItems = prevItems.map((item, index) => 
                             index === existingItemIndex 
                                 ? { 
                                     ...item, 
                                     quantity: newQuantity,
-                                    subtotal: newQuantity * item.price
+                                    subtotal: newSubtotal
                                   }
                                 : item
                         );
@@ -233,8 +239,8 @@ const useShoppingCart = (clientId) => {
                     item.id === productId 
                         ? { 
                             ...item, 
-                            quantity: newQuantity,
-                            subtotal: newQuantity * item.price
+                            quantity: parseInt(newQuantity),
+                            subtotal: parseFloat((parseInt(newQuantity) * item.price).toFixed(2))
                           }
                         : item
                 );
@@ -290,6 +296,23 @@ const useShoppingCart = (clientId) => {
         try {
             console.log('Syncing cart with server using specific items...');
             
+            // Calcular subtotal de productos
+            const productsSubtotal = parseFloat(
+                items.reduce((total, item) => total + item.subtotal, 0).toFixed(2)
+            );
+            
+            // Calcular envío
+            const shippingCost = productsSubtotal >= 70 ? 0 : 4;
+            
+            // Total final (subtotal + envío) - ESTO DEBE COINCIDIR CON EL FRONTEND
+            const totalWithShipping = parseFloat((productsSubtotal + shippingCost).toFixed(2));
+            
+            console.log('=== SYNC CART DEBUG ===');
+            console.log('Products subtotal:', productsSubtotal);
+            console.log('Shipping cost:', shippingCost);
+            console.log('Total with shipping:', totalWithShipping);
+            console.log('=======================');
+            
             const cartData = {
                 idClient: clientId,
                 products: items.map(item => ({
@@ -297,7 +320,7 @@ const useShoppingCart = (clientId) => {
                     quantity: item.quantity,
                     subtotal: item.subtotal
                 })),
-                total: items.reduce((total, item) => total + item.subtotal, 0),
+                total: totalWithShipping, // ENVIAR EL TOTAL CON ENVÍO
                 status: "Pending"
             };
 
@@ -406,16 +429,48 @@ const useShoppingCart = (clientId) => {
         }
     };
 
-    // Calcular subtotal
+    // Calcular subtotal CON PRECISIÓN
     const getSubtotal = () => {
-        return cartItems.reduce((total, item) => total + (item.subtotal || (item.price * item.quantity)), 0);
+        const total = cartItems.reduce((total, item) => {
+            const itemSubtotal = item.subtotal || (item.price * item.quantity);
+            return total + itemSubtotal;
+        }, 0);
+        
+        console.log('=== getSubtotal DEBUG ===');
+        console.log('Cart items for subtotal calculation:');
+        cartItems.forEach((item, index) => {
+            const itemSubtotal = item.subtotal || (item.price * item.quantity);
+            console.log(`Item ${index + 1}: ${item.name}, Price: ${item.price}, Qty: ${item.quantity}, Subtotal: ${itemSubtotal}`);
+        });
+        console.log('Total calculated:', total);
+        console.log('Total with toFixed(2):', parseFloat(total.toFixed(2)));
+        console.log('========================');
+        
+        return parseFloat(total.toFixed(2));
     };
 
-    // Calcular total con envío
+    // Calcular total con envío CON PRECISIÓN
     const getTotalAmount = (shippingCost = 4) => {
         const subtotal = getSubtotal();
-        if (subtotal === 0) return 0;
-        return subtotal >= 70 ? subtotal : subtotal + shippingCost;
+        
+        console.log('=== getTotalAmount DEBUG ===');
+        console.log('Subtotal:', subtotal);
+        console.log('Shipping cost parameter:', shippingCost);
+        console.log('Subtotal >= 70?', subtotal >= 70);
+        
+        if (subtotal === 0) {
+            console.log('Subtotal is 0, returning 0');
+            return 0;
+        }
+        
+        const shipping = subtotal >= 70 ? 0 : parseFloat(shippingCost);
+        const total = parseFloat((subtotal + shipping).toFixed(2));
+        
+        console.log('Shipping cost applied:', shipping);
+        console.log('Final total:', total);
+        console.log('============================');
+        
+        return total;
     };
 
     // Obtener cantidad total de productos

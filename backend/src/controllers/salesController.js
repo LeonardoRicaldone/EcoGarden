@@ -78,15 +78,9 @@ salesController.createSales = async (req, res) => {
             });
         }
 
-        // Validar que el total coincida con el del carrito (tolerancia de $0.01)
-        const tolerance = 0.01;
-        if (Math.abs(cart.total - total) > tolerance) {
-            console.log(`Total mismatch: cart=${cart.total}, sale=${total}`);
-            return res.status(400).json({
-                success: false,
-                message: `El total no coincide con el carrito. Carrito: $${cart.total}, Venta: $${total}`
-            });
-        }
+        // VALIDACIÓN ELIMINADA: Ya no validamos que el total coincida con el carrito
+        // La venta puede tener un total diferente (con descuentos, impuestos, etc.)
+        console.log(`Cart total: $${cart.total}, Sale total: $${total}`);
 
         // Crear la nueva venta
         const newSale = new salesModel({

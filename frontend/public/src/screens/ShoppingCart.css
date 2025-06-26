@@ -22,6 +22,10 @@
     
     /* Color de fondo de la sección de características */
     --features-section-bg: #eef7ee;
+    
+    /* Color para el botón explorar productos */
+    --explore-button-bg: #93A267;
+    --explore-button-hover: #7da267;
 }
 
 .tramitarcompra{
@@ -88,6 +92,16 @@
 
 .outline-button-hover:hover {
     background-color: var(--outline-button-hover);
+}
+
+/* Botón explorar productos */
+.explore-products-button {
+    background-color: var(--explore-button-bg);
+    color: white;
+}
+
+.explore-products-button:hover {
+    background-color: var(--explore-button-hover);
 }
 
 /* Fondo de la sección de características */
