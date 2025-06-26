@@ -46,7 +46,6 @@ const salesSchema = new Schema(
         },
         status: {
             type: String,
-            enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"], 
             default: "Pending",
             required: true
         }
