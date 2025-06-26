@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import API_BASE from '../../../api/URL.js'
 
-
 const useDashboardData = () => {
   const [dashboardData, setDashboardData] = useState({
     totalRevenue: 0,
@@ -37,13 +36,48 @@ const useDashboardData = () => {
         salesResponse.json()
       ]);
 
+      // DEBUGGING: Verificar estructura de datos
+      console.log('Products data:', productsData);
+      console.log('Sales data:', salesData);
+      console.log('Type of salesData:', typeof salesData);
+      console.log('Is salesData array?', Array.isArray(salesData));
+
+      // Validar y normalizar datos de productos
+      let normalizedProducts = [];
+      if (Array.isArray(productsData)) {
+        normalizedProducts = productsData;
+      } else if (productsData && Array.isArray(productsData.data)) {
+        normalizedProducts = productsData.data;
+      } else if (productsData && typeof productsData === 'object') {
+        // Si es un objeto, intentar encontrar la propiedad que contiene el array
+        const possibleArrays = Object.values(productsData).filter(Array.isArray);
+        normalizedProducts = possibleArrays.length > 0 ? possibleArrays[0] : [];
+      }
+
+      // Validar y normalizar datos de ventas
+      let normalizedSales = [];
+      if (Array.isArray(salesData)) {
+        normalizedSales = salesData;
+      } else if (salesData && Array.isArray(salesData.data)) {
+        normalizedSales = salesData.data;
+      } else if (salesData && typeof salesData === 'object') {
+        // Si es un objeto, intentar encontrar la propiedad que contiene el array
+        const possibleArrays = Object.values(salesData).filter(Array.isArray);
+        normalizedSales = possibleArrays.length > 0 ? possibleArrays[0] : [];
+      }
+
       // Calcular estadísticas
-      const totalProducts = productsData.length;
-      const totalSales = salesData.length;
+      const totalProducts = normalizedProducts.length;
+      const totalSales = normalizedSales.length;
       
       // Calcular ingresos totales sumando el total de cada venta
-      const totalRevenue = salesData.reduce((sum, sale) => {
-        return sum + (sale.total || 0);
+      const totalRevenue = normalizedSales.reduce((sum, sale) => {
+        // Validar que sale sea un objeto y tenga la propiedad total
+        if (sale && typeof sale === 'object') {
+          const saleTotal = sale.total || sale.amount || sale.price || 0;
+          return sum + (typeof saleTotal === 'number' ? saleTotal : 0);
+        }
+        return sum;
       }, 0);
 
       // Actualizar estado con los datos calculados

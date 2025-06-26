@@ -282,7 +282,7 @@ salesController.updateSales = async (req, res) => {
             }
         });
 
-        // Validar status si se está actualizando
+       /* // Validar status si se está actualizando
         if (updateData.status) {
             const validStatuses = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
             if (!validStatuses.includes(updateData.status)) {
@@ -291,7 +291,7 @@ salesController.updateSales = async (req, res) => {
                     message: `Estado inválido. Debe ser uno de: ${validStatuses.join(', ')}`
                 });
             }
-        }
+        }*/
 
         // Prevenir actualización de campos críticos
         if (updates.total !== undefined || updates.creditCard !== undefined || 

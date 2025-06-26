@@ -4,8 +4,31 @@ import './Analytics.css';
 import Header from '../components/Header';
 import useAnalyticsData from '../components/Analytics/hooks/useAnalyticsData';
 
-// Registrar todos los componentes necesarios de Chart.js
-Chart.Chart.register(...Chart.registerables);
+// Registrar todos los componentes necesarios de Chart.js - CORREGIDO
+const {
+  Chart: ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+} = Chart;
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const Analytics = () => {
   const {
@@ -39,16 +62,21 @@ const Analytics = () => {
   useEffect(() => {
     if (loading || error) return;
 
+    console.log('Creando gráficas con datos:', { salesByMonth, salesByStatus });
+
     // Destruir gráficas existentes
     Object.values(chartsRef.current).forEach(chart => {
       if (chart) chart.destroy();
     });
     chartsRef.current = {};
 
-    // Crear gráfica de ventas por mes (combinada)
-    if (salesChartRef.current && salesByMonth.length > 0) {
+    // Crear gráfica de ventas por mes (combinada) - CORREGIDO
+    if (salesChartRef.current && salesByMonth && salesByMonth.length > 0) {
       const ctx = salesChartRef.current.getContext('2d');
-      chartsRef.current.sales = new Chart.Chart(ctx, {
+      
+      console.log('Creando gráfica de ventas con datos:', salesByMonth);
+      
+      chartsRef.current.sales = new ChartJS(ctx, {
         type: 'bar',
         data: {
           labels: salesByMonth.map(item => item.month),
@@ -76,7 +104,14 @@ const Analytics = () => {
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
           scales: {
+            x: {
+              display: true,
+            },
             y: {
               type: 'linear',
               display: true,
@@ -84,7 +119,8 @@ const Analytics = () => {
               title: {
                 display: true,
                 text: 'Número de Ventas'
-              }
+              },
+              beginAtZero: true
             },
             y1: {
               type: 'linear',
@@ -92,8 +128,9 @@ const Analytics = () => {
               position: 'right',
               title: {
                 display: true,
-                text: 'Ingresos (CRC)'
+                text: 'Ingresos (USD)'
               },
+              beginAtZero: true,
               grid: {
                 drawOnChartArea: false,
               },
@@ -113,12 +150,21 @@ const Analytics = () => {
           }
         }
       });
+    } else {
+      console.log('No se puede crear gráfica de ventas:', { 
+        hasRef: !!salesChartRef.current, 
+        hasData: !!salesByMonth, 
+        dataLength: salesByMonth?.length 
+      });
     }
 
-    // Crear gráfica de estados de ventas
-    if (statusChartRef.current && salesByStatus.length > 0) {
+    // Crear gráfica de estados de ventas - CORREGIDO
+    if (statusChartRef.current && salesByStatus && salesByStatus.length > 0) {
       const ctx = statusChartRef.current.getContext('2d');
-      chartsRef.current.status = new Chart.Chart(ctx, {
+      
+      console.log('Creando gráfica de estados con datos:', salesByStatus);
+      
+      chartsRef.current.status = new ChartJS(ctx, {
         type: 'doughnut',
         data: {
           labels: salesByStatus.map(item => item.name),
@@ -136,12 +182,30 @@ const Analytics = () => {
             legend: {
               position: 'bottom',
               labels: {
-                padding: 10,
-                usePointStyle: true
+                padding: 15,
+                usePointStyle: true,
+                font: {
+                  size: 12
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((context.parsed * 100) / total).toFixed(1);
+                  return `${context.label}: ${context.parsed} (${percentage}%)`;
+                }
               }
             }
           }
         }
+      });
+    } else {
+      console.log('No se puede crear gráfica de estados:', { 
+        hasRef: !!statusChartRef.current, 
+        hasData: !!salesByStatus, 
+        dataLength: salesByStatus?.length 
       });
     }
 
@@ -198,20 +262,19 @@ const Analytics = () => {
       {/* Tarjetas resumen */}
       <div className="estadisticas-cards">
         <div className="estadisticas-card">
-          <h2>{formatCurrency(totalRevenue)}</h2>
-
+          <h2>{formatCurrency(totalRevenue || 0)}</h2>
           <p>Ganancias Totales</p>
         </div>
         <div className="estadisticas-card">
-          <h2>{formatNumber(totalProducts)}</h2>
+          <h2>{formatNumber(totalProducts || 0)}</h2>
           <p>Número de Productos</p>
         </div>
         <div className="estadisticas-card">
-          <h2>{formatNumber(totalSales)}</h2>
+          <h2>{formatNumber(totalSales || 0)}</h2>
           <p>Cantidad de Ventas</p>
         </div>
         <div className="estadisticas-card">
-          <h2>{averageRating.toFixed(1)} ★</h2>
+          <h2>{(averageRating || 0).toFixed(1)} ★</h2>
           <p>Rating Promedio</p>
         </div>
       </div>
@@ -221,16 +284,56 @@ const Analytics = () => {
         {/* Ventas e ingresos por mes */}
         <div className="estadisticas-chart">
           <h3>Ventas e Ingresos por Mes</h3>
-          <div style={{ position: 'relative', height: '220px' }}>
-            <canvas ref={salesChartRef}></canvas>
+          <div style={{ position: 'relative', height: '300px', padding: '10px' }}>
+            {salesByMonth && salesByMonth.length > 0 ? (
+              <canvas 
+                ref={salesChartRef}
+                style={{ 
+                  maxWidth: '100%', 
+                  maxHeight: '100%',
+                  backgroundColor: '#ffffff'
+                }}
+              ></canvas>
+            ) : (
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                height: '100%',
+                color: '#666',
+                fontSize: '1rem'
+              }}>
+                No hay datos de ventas disponibles
+              </div>
+            )}
           </div>
         </div>
 
         {/* Estados de ventas */}
         <div className="estadisticas-chart">
           <h3>Estados de Ventas</h3>
-          <div style={{ position: 'relative', height: '220px' }}>
-            <canvas ref={statusChartRef}></canvas>
+          <div style={{ position: 'relative', height: '300px', padding: '10px' }}>
+            {salesByStatus && salesByStatus.length > 0 ? (
+              <canvas 
+                ref={statusChartRef}
+                style={{ 
+                  maxWidth: '100%', 
+                  maxHeight: '100%',
+                  backgroundColor: '#ffffff'
+                }}
+              ></canvas>
+            ) : (
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                height: '100%',
+                color: '#666',
+                fontSize: '1rem'
+              }}>
+                No hay datos de estados disponibles
+              </div>
+            )}
           </div>
         </div>
       </div>

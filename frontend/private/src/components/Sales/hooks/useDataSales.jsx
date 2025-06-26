@@ -17,11 +17,33 @@ const useDataSales = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setSales(data);
-      setFilteredSales(data);
+      
+      // DEBUGGING: Verificar estructura de datos
+      console.log('Sales data received:', data);
+      console.log('Type of data:', typeof data);
+      console.log('Is data array?', Array.isArray(data));
+
+      // Normalizar datos - manejar diferentes estructuras posibles
+      let normalizedSales = [];
+      if (Array.isArray(data)) {
+        normalizedSales = data;
+      } else if (data && Array.isArray(data.data)) {
+        normalizedSales = data.data;
+      } else if (data && typeof data === 'object') {
+        // Buscar arrays anidados en el objeto
+        const possibleArrays = Object.values(data).filter(Array.isArray);
+        normalizedSales = possibleArrays.length > 0 ? possibleArrays[0] : [];
+      }
+
+      console.log('Normalized sales:', normalizedSales);
+
+      setSales(normalizedSales);
+      setFilteredSales(normalizedSales);
       setLoading(false);
     } catch (error) {
       console.error("Error al obtener ventas", error);
+      setSales([]); // Asegurar que siempre sea un array
+      setFilteredSales([]);
       setLoading(false);
     }
   };
@@ -72,6 +94,14 @@ const useDataSales = () => {
 
   const filterSales = (term) => {
     setSearchTerm(term);
+    
+    // Validar que sales sea un array antes de filtrar
+    if (!Array.isArray(sales)) {
+      console.warn('Sales is not an array:', sales);
+      setFilteredSales([]);
+      return;
+    }
+
     if (!term.trim()) {
       setFilteredSales(sales);
     } else {
@@ -96,11 +126,27 @@ const useDataSales = () => {
     }
   };
 
-  // Función para calcular el total de ingresos
+  // Función para calcular el total de ingresos con validación
   const calculateTotalRevenue = (salesArray) => {
+    // Validar que salesArray sea un array
+    if (!Array.isArray(salesArray)) {
+      console.warn('calculateTotalRevenue: Input is not an array:', salesArray);
+      return 0;
+    }
+
     return salesArray.reduce((total, sale) => {
-      const saleTotal = sale.total || 0;
-      return total + saleTotal;
+      // Validar que sale sea un objeto
+      if (!sale || typeof sale !== 'object') {
+        return total;
+      }
+      
+      // Buscar diferentes posibles campos de total
+      const saleTotal = sale.total || sale.amount || sale.price || 0;
+      
+      // Validar que el total sea un número
+      const numericTotal = typeof saleTotal === 'number' ? saleTotal : 0;
+      
+      return total + numericTotal;
     }, 0);
   };
 
@@ -119,20 +165,29 @@ const useDataSales = () => {
     if (searchTerm) {
       filterSales(searchTerm);
     } else {
-      setFilteredSales(sales);
+      // Validar que sales sea un array antes de asignarlo
+      if (Array.isArray(sales)) {
+        setFilteredSales(sales);
+      } else {
+        setFilteredSales([]);
+      }
     }
   }, [sales]);
 
+  // Asegurar que siempre devolvamos arrays válidos
+  const safeSales = Array.isArray(sales) ? sales : [];
+  const safeFilteredSales = Array.isArray(filteredSales) ? filteredSales : [];
+
   return {
-    sales: filteredSales,
-    allSales: sales,
+    sales: safeFilteredSales,
+    allSales: safeSales,
     loading,
     searchTerm,
     filterSales,
-    totalSales: sales.length,
-    filteredCount: filteredSales.length,
-    totalRevenue: calculateTotalRevenue(sales),
-    filteredRevenue: calculateTotalRevenue(filteredSales),
+    totalSales: safeSales.length,
+    filteredCount: safeFilteredSales.length,
+    totalRevenue: calculateTotalRevenue(safeSales),
+    filteredRevenue: calculateTotalRevenue(safeFilteredSales),
     updateSaleStatus,
     refreshSales
   };
