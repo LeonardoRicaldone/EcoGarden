@@ -9,7 +9,7 @@ const ProductCard = ({
   onToggleFavorite,
   onAddClick 
 }) => {
-  const { id, name, price, rating, img, isFavorite } = product;
+  const { id, name, price, rating, img, isFavorite, stock, category } = product;
   
   
   // Obtener información de autenticación
@@ -27,6 +27,25 @@ const ProductCard = ({
       );
     }
     return <div className="flex">{stars}</div>;
+  };
+
+   // Función para obtener el nombre de la categoría de forma seguraAdd commentMore actions
+  const getCategoryDisplay = (category) => {
+    // Si category es undefined, null o vacío
+    if (!category || category === 'undefined' || category === 'null') {
+      return "Sin categoría";
+    }
+    
+    // Si category es un string vacío o solo espacios
+    if (typeof category === 'string') {
+      const trimmed = category.trim();
+      if (trimmed === '' || trimmed === 'undefined' || trimmed === 'null') {
+        return "Sin categoría";
+      }
+      return trimmed;
+    }
+    
+    return category;
   };
 
   // Controla el clic en el botón de añadir producto
@@ -145,7 +164,13 @@ const ProductCard = ({
       {/* Información textual del producto */}
       <div className="p-4">
         <h3 className="text-gray-700 font-medium mb-1 line-clamp-2">{name}</h3>
+         <p className="text-gray-600 text-sm mb-1 truncate">
+          Categoría: {getCategoryDisplay(category)}
+        </p>
         <p className="text-gray-800 font-bold mb-2">{price}</p>
+         <div className="mt-2 text-xs text-gray-500">
+          Stock: {stock > 0 ? stock : 'Agotado'}
+        </div>
         <div className="stars-container">
           {renderStars(rating)}
         </div>

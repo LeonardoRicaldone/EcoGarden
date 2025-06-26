@@ -28,6 +28,17 @@ const Products = () => {
     getCategoryName
   } = useProducts();
 
+   // Función para obtener el nombre de la categoría de forma segura
+  const getSafeCategoryName = (categoryId) => {
+    try {
+      const categoryName = getCategoryName(categoryId);
+      return categoryName || "Sin categoría";
+    } catch (error) {
+      console.error('Error al obtener nombre de categoría:', error);
+      return "Sin categoría";
+    }
+  };
+
   // DEBUG: Verificar los productos
   console.log('Products Component - Products data:', products.slice(0, 2));
       

@@ -44,13 +44,14 @@ const useProducts = () => {
     return id.toString();
   };
 
+
+
   // Función utilitaria para comparar IDs de manera segura
   const compareIds = (id1, id2) => {
     const normalizedId1 = normalizeId(id1);
     const normalizedId2 = normalizeId(id2);
     return normalizedId1 === normalizedId2;
   };
-
   // Obtener token de autenticación (si lo tienes)
   const getAuthToken = () => {
     return localStorage.getItem('token') || localStorage.getItem('authToken');
@@ -107,19 +108,22 @@ const useProducts = () => {
       console.log('Raw products from API:', data.length);
       
       // Transformar datos
-      const transformedProducts = data.map(product => ({
-        ...product,
-        // Convertir _id a id como string
-        id: product._id ? product._id.toString() : product.id,
-        isFavorite: false, // Se actualizará con el estado de favoritos
-        rating: Math.floor(Math.random() * 5) + 1,
-        // Asegurar que el precio sea numérico
-        price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
-        // Solo usar 'descripcion' como está en el esquema
-        description: product.descripcion || '',
-        // Convertir idCategory a string si es ObjectId
-        idCategory: product.idCategory ? product.idCategory.toString() : null
-      }));
+      const transformedProducts = data.map(product => {
+  const categoryId = normalizeId(product.idCategory || product.categoryId);
+
+  return {
+    ...product,
+    id: product._id ? product._id.toString() : product.id,
+    isFavorite: false,
+    rating: Math.floor(Math.random() * 5) + 1,
+    price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
+    description: product.descripcion || '',
+    categoryId: categoryId,
+    idCategory: categoryId,
+  };
+});
+
+     
       
       console.log('Transformed products:', transformedProducts.length);
       setProducts(transformedProducts);
@@ -202,7 +206,7 @@ const useProducts = () => {
     console.log('handleAddToCart called with:', { id, quantity });
     
     try {
-      const normalizedProductId = normalizeId(productId);
+      const normalizedProductId = normalizeId(id);
       console.log('Adding to cart, product ID:', normalizedProductId); // Debug
       
       const product = products.find(p => compareIds(p.id, normalizedProductId));
