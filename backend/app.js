@@ -23,23 +23,10 @@ import contactRoutes from './src/routes/contactRoutes.js';
 const app = express();
 
 app.use(
-  cors({
-    origin: function (origin, callback) {
-      const allowedOrigins = [
-        "https://eco-garden.vercel.app", 
-        "http://localhost:5173"          
-      ];
-
-      // Permitir solicitudes sin origin (como en Postman o curl)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Origen no permitido por CORS"));
-      }
-    },
-    credentials: true
-  })
-);
+    cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+}))
 
 //Que acepte datos de json
 app.use(express.json());
