@@ -354,11 +354,6 @@ const Login = () => {
                 )}
               </div>
 
-              <div className="login-options">
-                <Link to="/PasswordRecovery" className="forgot-password">
-                  ¿Olvidaste tu contraseña?
-                </Link>
-              </div>
 
               <button type="submit" className="submit-button" disabled={isLoading}>
                 {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
