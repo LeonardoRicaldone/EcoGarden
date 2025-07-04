@@ -170,6 +170,7 @@ npm install react-hot-toast
 ```
 ```
 npm install react-icons
+npm install react-hook-form @hookform/resolvers yup
 ```
 ```
 npm install lucide-react
